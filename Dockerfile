@@ -1,6 +1,7 @@
 # Currently, Edifice targets Bionic (18.04) or Focal (20.04)
 ARG UBUNTU_VERSION=focal
-FROM ubuntu:${UBUNTU_VERSION} as dev
+# Create a base image that is just the Ignition install.
+FROM ubuntu:${UBUNTU_VERSION} as base
 
 # Install Ignition Edifice and its dependencies. Because of the install via new key, 2 installs are required. One for
 # the dependecies and one for the package after the dependencies are used to add the key.
@@ -18,3 +19,12 @@ RUN apt update && \
 
 # Start up a simple test environment for now.
 CMD [ "ign", "gazebo", "shapes.sdf" ]
+
+# The development image will have development tools, like Git, installed.
+FROM base as dev
+
+RUN apt update && \
+	DEBIAN_FRONTEND=noninteractive \
+	apt install -y \
+	git && \
+	rm -rf /var/lib/apt/lists/*

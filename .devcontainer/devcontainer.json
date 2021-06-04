@@ -1,0 +1,10 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.177.0/containers/docker-existing-dockerfile
+{
+	"name": "Ground Texture",
+	"image": "ground-texture-sim:dev",
+	"containerEnv": {
+		"DISPLAY": "host.docker.internal:0.0"
+	},
+	"extensions": []
+}
