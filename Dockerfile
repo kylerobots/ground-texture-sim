@@ -3,6 +3,10 @@ ARG UBUNTU_VERSION=focal
 # Create a base image that is just the Ignition install.
 FROM ubuntu:${UBUNTU_VERSION} as base
 
+LABEL author="Kyle M. Hart" \
+	version="1.0" \
+	license="BSD-3-Clause License"
+
 # Install Ignition Edifice and its dependencies. Because of the install via new key, 2 installs are required. One for
 # the dependecies and one for the package after the dependencies are used to add the key.
 ARG DEBIAN_FRONTEND=noninteractive
