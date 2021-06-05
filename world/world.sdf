@@ -31,6 +31,8 @@
 					<specular>0.1 0.1 0.1</specular>
 					<pbr>
 						<metal>
+							<!-- Texture maps are copied from here:
+							https://app.ignitionrobotics.org/OpenRobotics/fuel/models/Indoor%20lightmap -->
 							<albedo_map>textures/Floor_Albedo.png</albedo_map>
 							<normal_map>textures/Floor_Normal.png</normal_map>
 							<roughness_map>textures/Floor_Roughness.png</roughness_map>
