@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+	<world name="ground_texture">
+	<scene>
+		<grid>0</grid>
+	</scene>
+	<light type="directional" name="sun">
+		<cast_shadows>true</cast_shadows>
+		<pose>0.0 0.0 10.0 0.0 0.0 0.0</pose>
+		<diffuse>0.8 0.8 0.8 1.0</diffuse>
+		<specular>0.2 0.2 0.2 1.0</specular>
+		<attenuation>
+			<range>1000</range>
+			<constant>0.9</constant>
+			<linear>0.01</linear>
+			<quadratic>0.001</quadratic>
+		</attenuation>
+		<direction>-0.5 0.1 -0.9</direction>
+	</light>
+	<model name="ground">
+		<static>true</static>
+		<link name="ground">
+			<visual name="ground_visual">
+				<geometry>
+					<plane>
+						<size>10 10</size>
+					</plane>
+				</geometry>
+				<material>
+					<diffuse>1.0 1.0 1.0</diffuse>
+					<specular>0.1 0.1 0.1</specular>
+					<pbr>
+						<metal>
+							<!-- Texture maps are copied from here:
+							https://app.ignitionrobotics.org/OpenRobotics/fuel/models/Indoor%20lightmap -->
+							<albedo_map>textures/Floor_Albedo.png</albedo_map>
+							<normal_map>textures/Floor_Normal.png</normal_map>
+							<roughness_map>textures/Floor_Roughness.png</roughness_map>
+							<metalness>0.0</metalness>
+						</metal>
+					</pbr>
+        		</material>
+			</visual>
+			<collision name="ground_collision">
+				<geometry>
+					<plane/>
+				</geometry>
+			</collision>
+		</link>
+	</model>
+	</world>
+</sdf>
