@@ -12,6 +12,8 @@ LABEL author="Kyle M. Hart" \
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
 	apt install -y \
+	build-essential \
+	cmake \
 	gnupg \
 	lsb-release \
 	wget && \
