@@ -109,7 +109,7 @@
 				<visual name="ground_visual">
 					<geometry>
 						<plane>
-							<size>10 10</size>
+							<size>1 1</size>
 						</plane>
 					</geometry>
 					<material>
@@ -117,12 +117,11 @@
 						<specular>0.1 0.1 0.1</specular>
 						<pbr>
 							<metal>
-								<!-- Texture maps are copied from here:
-								https://app.ignitionrobotics.org/OpenRobotics/fuel/models/Indoor%20lightmap -->
-								<albedo_map>textures/Floor_Albedo.png</albedo_map>
-								<normal_map>textures/Floor_Normal.png</normal_map>
-								<roughness_map>textures/Floor_Roughness.png</roughness_map>
-								<metalness>0.0</metalness>
+								<!-- Texture maps are from: https://www.cgbookcase.com/ -->
+								<albedo_map>textures\brick_floor_1k_1_basecolor.png</albedo_map>
+								<normal_map>textures\brick_floor_1k_1_normal.png</normal_map>
+								<roughness_map>textures\brick_floor_1k_1_roughness.png</roughness_map>
+								<metalness_map>textures\brick_floor_1k_1_specularlevel.png</metalness_map>
 							</metal>
 						</pbr>
 					</material>
