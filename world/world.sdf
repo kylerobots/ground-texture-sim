@@ -1,52 +1,191 @@
 <?xml version="1.0"?>
 <sdf version="1.8">
 	<world name="ground_texture">
-	<scene>
-		<grid>0</grid>
-	</scene>
-	<light type="directional" name="sun">
-		<cast_shadows>true</cast_shadows>
-		<pose>0.0 0.0 10.0 0.0 0.0 0.0</pose>
-		<diffuse>0.8 0.8 0.8 1.0</diffuse>
-		<specular>0.2 0.2 0.2 1.0</specular>
-		<attenuation>
-			<range>1000</range>
-			<constant>0.9</constant>
-			<linear>0.01</linear>
-			<quadratic>0.001</quadratic>
-		</attenuation>
-		<direction>-0.5 0.1 -0.9</direction>
-	</light>
-	<model name="ground">
-		<static>true</static>
-		<link name="ground">
-			<visual name="ground_visual">
-				<geometry>
-					<plane>
-						<size>10 10</size>
-					</plane>
-				</geometry>
-				<material>
-					<diffuse>1.0 1.0 1.0</diffuse>
-					<specular>0.1 0.1 0.1</specular>
-					<pbr>
-						<metal>
-							<!-- Texture maps are copied from here:
-							https://app.ignitionrobotics.org/OpenRobotics/fuel/models/Indoor%20lightmap -->
-							<albedo_map>textures/Floor_Albedo.png</albedo_map>
-							<normal_map>textures/Floor_Normal.png</normal_map>
-							<roughness_map>textures/Floor_Roughness.png</roughness_map>
-							<metalness>0.0</metalness>
-						</metal>
-					</pbr>
-        		</material>
-			</visual>
-			<collision name="ground_collision">
-				<geometry>
-					<plane/>
-				</geometry>
-			</collision>
-		</link>
-	</model>
+
+		<!-- Various plugins to simulate and render the world. -->
+		<plugin
+			filename="ignition-gazebo-physics-system"
+			name="ignition::gazebo::systems::Physics">
+		</plugin>
+		<plugin
+			filename="ignition-gazebo-sensors-system"
+			name="ignition::gazebo::systems::Sensors">
+			<render_engine>ogre2</render_engine>
+		</plugin>
+		<plugin
+			filename="ignition-gazebo-user-commands-system"
+			name="ignition::gazebo::systems::UserCommands">
+		</plugin>
+		<plugin
+			filename="ignition-gazebo-scene-broadcaster-system"
+			name="ignition::gazebo::systems::SceneBroadcaster">
+		</plugin>
+			
+		<!-- Turn the grid off in the GUI. -->
+		<scene>
+			<grid>0</grid>
+		</scene>
+
+		<!-- Set up the GUI to show the main window and the camera feed. -->
+		<gui fullscreen="0">
+			<plugin filename="GzScene3D" name="3D View">
+				<ignition-gui>
+					<title>3D View</title>
+					<property type="bool" key="showTitleBar">false</property>
+					<property type="string" key="state">docked</property>
+				</ignition-gui>
+
+				<engine>ogre2</engine>
+				<scene>scene</scene>
+				<ambient_light>1.0 1.0 1.0</ambient_light>
+				<background_color>0.8 0.8 0.8</background_color>
+				<camera_pose>-6 0 6 0 0.5 0</camera_pose>
+			</plugin>
+			<plugin filename="WorldControl" name="World control">
+				<ignition-gui>
+					<title>World control</title>
+					<property type="bool" key="showTitleBar">false</property>
+					<property type="bool" key="resizable">false</property>
+					<property type="double" key="height">72</property>
+					<property type="double" key="width">121</property>
+					<property type="double" key="z">1</property>
+
+					<property type="string" key="state">floating</property>
+					<anchors target="3D View">
+						<line own="left" target="left"/>
+						<line own="bottom" target="bottom"/>
+					</anchors>
+				</ignition-gui>
+				<play_pause>true</play_pause>
+				<start_paused>true</start_paused>
+			</plugin>
+			<plugin filename="WorldStats" name="World stats">
+				<ignition-gui>
+					<title>World stats</title>
+					<property type="bool" key="showTitleBar">false</property>
+					<property type="bool" key="resizable">false</property>
+					<property type="double" key="height">110</property>
+					<property type="double" key="width">290</property>
+					<property type="double" key="z">1</property>
+
+					<property type="string" key="state">floating</property>
+					<anchors target="3D View">
+						<line own="right" target="right"/>
+						<line own="bottom" target="bottom"/>
+					</anchors>
+				</ignition-gui>
+
+				<sim_time>true</sim_time>
+				<real_time>true</real_time>
+				<real_time_factor>true</real_time_factor>
+				<iterations>true</iterations>
+			</plugin>
+			<plugin filename="ImageDisplay" name="Image Display">
+				<ignition-gui>
+					<property key="state" type="string">docked</property>
+				</ignition-gui>
+			</plugin>
+			<plugin filename="KeyPublisher" name="Key Publisherr">
+			</plugin>
+		</gui>
+
+		<!-- Add the sun as a light source. -->
+		<light type="directional" name="sun">
+			<cast_shadows>true</cast_shadows>
+			<pose>0.0 0.0 10.0 0.0 0.0 0.0</pose>
+			<diffuse>0.8 0.8 0.8 1.0</diffuse>
+			<specular>0.2 0.2 0.2 1.0</specular>
+			<attenuation>
+				<range>1000</range>
+				<constant>0.9</constant>
+				<linear>0.01</linear>
+				<quadratic>0.001</quadratic>
+			</attenuation>
+			<direction>-0.5 0.1 -0.9</direction>
+		</light>
+
+		<!-- Create a static ground texture. -->
+		<model name="ground">
+			<static>true</static>
+			<link name="ground">
+				<visual name="ground_visual">
+					<geometry>
+						<plane>
+							<size>1 1</size>
+						</plane>
+					</geometry>
+					<material>
+						<diffuse>1.0 1.0 1.0</diffuse>
+						<specular>0.1 0.1 0.1</specular>
+						<pbr>
+							<metal>
+								<!-- Texture maps are from: https://www.cgbookcase.com/ -->
+								<albedo_map>textures\brick_floor_1k_1_basecolor.png</albedo_map>
+								<normal_map>textures\brick_floor_1k_1_normal.png</normal_map>
+								<roughness_map>textures\brick_floor_1k_1_roughness.png</roughness_map>
+								<metalness_map>textures\brick_floor_1k_1_specularlevel.png</metalness_map>
+							</metal>
+						</pbr>
+					</material>
+				</visual>
+				<collision name="ground_collision">
+					<geometry>
+						<plane/>
+					</geometry>
+				</collision>
+			</link>
+		</model>
+
+		<!-- Create a camera. -->
+		<model name="camera">
+			<pose>0.0 0.0 0.25 0.0 1.5708 0.0</pose>
+			<link name="base_link">
+				<pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+				<inertial>
+					<mass>0.0</mass>
+					<inertia>
+						<ixx>0.000166667</ixx>
+						<iyy>0.000166667</iyy>
+						<izz>0.000166667</izz>
+					</inertia>
+				</inertial>
+				<collision name="camera_collision">
+					<geometry>
+						<box>
+							<size>0.1 0.1 0.1</size>
+						</box>
+					</geometry>
+				</collision>
+				<visual name="camera_visual">
+					<geometry>
+						<box>
+							<size>0.1 0.1 0.1</size>
+						</box>
+					</geometry>
+				</visual>
+				<sensor name="camera" type="camera">
+					<camera>
+						<horizontal_fov>1.047</horizontal_fov>
+						<image>
+							<width>1280</width>
+							<height>960</height>
+						</image>
+						<clip>
+							<near>0.01</near>
+							<far>100</far>
+						</clip>
+					</camera>
+					<always_on>1</always_on>
+					<update_rate>30</update_rate>
+					<visualize>true</visualize>
+					<topic>camera</topic>
+				</sensor>
+			</link>
+			<!-- Give the camera the ability to move around. -->
+			<plugin filename="ignition-gazebo-velocity-control-system"
+				name="ignition::gazebo::systems::VelocityControl">
+				<topic>/camera/cmd_vel</topic>
+			</plugin>
+		</model>
 	</world>
 </sdf>
