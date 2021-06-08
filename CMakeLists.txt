@@ -10,7 +10,12 @@ find_package(ignition-transport10 REQUIRED)
 set(IGN_TRANSPORT_VER ${ignition-transport10_VERSION_MAJOR})
 
 add_executable(keyboard_controller
-	src/keyboard_controller.cpp
+	src/keyboard_controller_node.cpp
+	src/KeyboardController.cpp
+)
+target_include_directories(keyboard_controller
+	PUBLIC
+	include
 )
 target_link_libraries(keyboard_controller
 	ignition-transport${IGN_TRANSPORT_VER}::core

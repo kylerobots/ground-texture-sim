@@ -1,4 +1,8 @@
 {
 	"C_Cpp.errorSquiggles": "Enabled",
-	"cmake.configureOnOpen": false
+	"cmake.configureOnOpen": false,
+	"files.associations": {
+		"*.sdf": "xml",
+		"iostream": "cpp"
+	}
 }
