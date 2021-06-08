@@ -6,6 +6,8 @@ project(ground-texture-sim
 	LANGUAGES CXX
 )
 
+set(CMAKE_CXX_STANDARD 11)
+
 find_package(ignition-transport10 REQUIRED)
 set(IGN_TRANSPORT_VER ${ignition-transport10_VERSION_MAJOR})
 

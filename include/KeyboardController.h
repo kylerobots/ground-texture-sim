@@ -1,6 +1,8 @@
 #ifndef _KEYBOARD_CONTROLLER_H_
 #define _KEYBOARD_CONTROLLER_H_
 
+#include <atomic>
+#include <chrono>
 #include <ignition/msgs/int32.pb.h>
 
 /**
@@ -30,7 +32,19 @@ namespace ground_texture_sim {
 	 */
 	class KeyboardController {
 		private:
-		/* data */
+		/// The time a reverse key was last pressed, stored as milliseconds since Epoch.
+		std::atomic<std::chrono::milliseconds> back_press_time;
+		/// The time a rotate clockwise key was last pressed, stored as milliseconds since Epoch.
+		std::atomic<std::chrono::milliseconds> clockwise_press_time;
+		/// The time a rotate counterclockwise key was last pressed, stored as milliseconds since Epoch.
+		std::atomic<std::chrono::milliseconds> counterclockwise_press_time;
+		/// The time a forward key was last pressed, stored as milliseconds since Epoch.
+		std::atomic<std::chrono::milliseconds> forward_press_time;
+		/// The time a left strafe key was last pressed, stored as milliseconds since Epoch.
+		std::atomic<std::chrono::milliseconds> left_press_time;
+		/// The time a right strafe key was last pressed, stored as milliseconds since Epoch.
+		std::atomic<std::chrono::milliseconds> right_press_time;
+
 		public:
 		/**
 		 * @brief The no-arg constructor.
