@@ -3,6 +3,7 @@
 	"cmake.configureOnOpen": false,
 	"files.associations": {
 		"*.sdf": "xml",
-		"iostream": "cpp"
+		"iostream": "cpp",
+		"atomic": "cpp"
 	}
 }

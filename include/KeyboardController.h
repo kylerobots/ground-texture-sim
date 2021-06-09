@@ -4,6 +4,7 @@
 #include <atomic>
 #include <chrono>
 #include <ignition/msgs/int32.pb.h>
+#include <ignition/msgs/twist.pb.h>
 
 /**
  * @brief The namespace for any class created in this package.
@@ -52,6 +53,16 @@ namespace ground_texture_sim {
 		KeyboardController(/* args */);
 
 		/**
+		 * @brief Create a Twist message.
+		 * 
+		 * The resulting velocity will use any key press logged via registerKeypress in the last 0.1 seconds, even if
+		 * opposite keys are pressed.
+		 * 
+		 * @return ignition::msgs::Twist The resulting message.
+		 */
+		ignition::msgs::Twist createMessage() const;
+
+		/**
 		 * @brief Record the time a given key is pressed.
 		 * 
 		 * This method will extract the key sent by the message. If it maps to a velocity command, it will record the
@@ -59,7 +70,8 @@ namespace ground_texture_sim {
 		 * 
 		 * @param msg The keypress message received from Ignition's topic.
 		 */
-		void registerKeypress(const ignition::msgs::Int32 & msg);
+		void
+				registerKeypress(const ignition::msgs::Int32 & msg);
 	};
 
 } // namespace ground_texture_sim
