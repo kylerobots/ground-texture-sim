@@ -18,7 +18,7 @@ namespace ground_texture_sim {
 		double current_y = 0.0;
 		double current_t = 0.0;
 		ignition::msgs::Twist msg;
-		auto threshold = std::chrono::milliseconds(100);
+		auto threshold = std::chrono::milliseconds(600);
 		double linear_speed = 0.5;
 		double angular_speed = 0.25;
 		// Look at each key and see if it was pressed less than 0.1 seconds. If it has, add it's velocity contribution

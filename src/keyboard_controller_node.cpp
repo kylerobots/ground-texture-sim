@@ -64,7 +64,7 @@ int main(int argc, char ** argv) {
 		if (!result) {
 			std::cerr << "Unable to send twist message. Skipping..." << std::endl;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 	return 0;
 }
