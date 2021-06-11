@@ -35,6 +35,7 @@ To start the Gazebo simulation, run this from the root level of the code:
 ign gazebo world/world.sdf
 ```
 You should see the GUI appear with a camera feed, like so.
+![Example GUI](GUI.png)
 
 ### Keyboard Controller ###
 To start the keyboard control of the camera, run this from the build directory:

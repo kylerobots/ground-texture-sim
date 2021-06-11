@@ -14,7 +14,6 @@ RUN apt update && \
 	apt install -y \
 	build-essential \
 	cmake \
-	gnupg \
 	lsb-release \
 	wget && \
 	echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list && \
