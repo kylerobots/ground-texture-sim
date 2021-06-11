@@ -1,6 +1,8 @@
 #include "KeyboardController.h"
 
 #include "gtest/gtest.h"
+#include <chrono>
+#include <thread>
 
 /**
  * @brief The fixture to assist with testing KeyboardController.
@@ -116,4 +118,54 @@ TEST_F(KeyboardControllerTest, CCW) {
 	registerLetter('Q');
 	auto msg = controller.createMessage();
 	checkVelocity(msg, 0.0, 0.0, 0.0, -0.25, 0.0, 0.0);
+}
+
+/**
+ * @brief Test that multiple key presses produce a superpositioned velocity.
+ * 
+ */
+TEST_F(KeyboardControllerTest, CompositeVelocity) {
+	registerLetter('A');
+	registerLetter('W');
+	registerLetter('Q');
+	auto msg = controller.createMessage();
+	checkVelocity(msg, 0.0, 0.5, 0.5, -0.25, 0.0, 0.0);
+}
+
+/**
+ * @brief Test that opposite keys produce no velocity.
+ * 
+ * If a forward and back key are pressed, for example, no velocity should return.
+ */
+TEST_F(KeyboardControllerTest, CancelVelocity) {
+	registerLetter('W');
+	registerLetter('S');
+	auto msg = controller.createMessage();
+	checkVelocity(msg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
+/**
+ * @brief Test that the velocity will persist for the right length of time.
+ * 
+ * After a key press, the velocity should last for the requisite number of seconds. After, it should return to zero.
+ * 
+ */
+TEST_F(KeyboardControllerTest, TimePersistentVelocity) {
+	// Verify the velocity is zero.
+	auto msg = controller.createMessage();
+	checkVelocity(msg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	// After a key press, it should be immediately registered.
+	registerLetter('A');
+	msg = controller.createMessage();
+	checkVelocity(msg, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0);
+	// It should also exist right up until the transition mark.
+	std::this_thread::sleep_for(std::chrono::milliseconds(800));
+	msg = controller.createMessage();
+	checkVelocity(msg, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0);
+	// But it should go back to zero after the transition mark.
+	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	msg = controller.createMessage();
+	checkVelocity(msg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+	// I could check closer to the actual transition mark, but sleep_for does not guarantee that it will free right at
+	// the designated time, due to allocation constraints. This gets it close without hopefully going over.
 }
