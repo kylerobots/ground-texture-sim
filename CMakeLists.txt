@@ -22,3 +22,28 @@ target_include_directories(keyboard_controller
 target_link_libraries(keyboard_controller
 	ignition-transport${IGN_TRANSPORT_VER}::core
 )
+
+# Use Google Test for unit testing. This could probably be compiled in the image, but this was easier to implement.
+include(CTest)
+enable_testing()
+include(FetchContent)
+FetchContent_Declare(
+	google_test
+	GIT_REPOSITORY https://github.com/google/googletest.git
+	GIT_TAG master
+	GIT_SHALLOW true
+)
+FetchContent_MakeAvailable(google_test)
+add_executable(unit_tests
+	test/test_keyboard_controller.cpp
+	src/KeyboardController.cpp
+)
+target_include_directories(unit_tests
+	PUBLIC
+	include
+)
+target_link_libraries(unit_tests
+	ignition-transport${IGN_TRANSPORT_VER}::core
+	gtest_main
+)
+add_test(UnitTests unit_tests)
