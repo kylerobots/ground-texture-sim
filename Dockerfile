@@ -12,6 +12,8 @@ LABEL author="Kyle M. Hart" \
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
 	apt install -y \
+	build-essential \
+	cmake \
 	gnupg \
 	lsb-release \
 	wget && \
@@ -30,5 +32,6 @@ FROM base as dev
 RUN apt update && \
 	DEBIAN_FRONTEND=noninteractive \
 	apt install -y \
+	gdb \
 	git && \
 	rm -rf /var/lib/apt/lists/*

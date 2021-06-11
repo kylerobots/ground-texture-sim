@@ -26,6 +26,9 @@
 			<grid>0</grid>
 		</scene>
 
+		<!-- Turn off gravity to allow a floating camera. -->
+		<gravity>0.0 0.0 0.0</gravity>
+
 		<!-- Set up the GUI to show the main window and the camera feed. -->
 		<gui fullscreen="0">
 			<plugin filename="GzScene3D" name="3D View">
@@ -142,7 +145,7 @@
 			<link name="base_link">
 				<pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
 				<inertial>
-					<mass>0.0</mass>
+					<mass>0.1</mass>
 					<inertia>
 						<ixx>0.000166667</ixx>
 						<iyy>0.000166667</iyy>

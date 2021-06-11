@@ -1,0 +1,49 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(ground-texture-sim
+	VERSION 1.0.0
+	DESCRIPTION "A simulation to generate ground texture data for monocular SLAM."
+	HOMEPAGE_URL https://github.com/kylerobots/ground-texture-sim
+	LANGUAGES CXX
+)
+
+set(CMAKE_CXX_STANDARD 11)
+
+find_package(ignition-transport10 REQUIRED)
+set(IGN_TRANSPORT_VER ${ignition-transport10_VERSION_MAJOR})
+
+add_executable(keyboard_controller
+	src/keyboard_controller_node.cpp
+	src/KeyboardController.cpp
+)
+target_include_directories(keyboard_controller
+	PUBLIC
+	include
+)
+target_link_libraries(keyboard_controller
+	ignition-transport${IGN_TRANSPORT_VER}::core
+)
+
+# Use Google Test for unit testing. This could probably be compiled in the image, but this was easier to implement.
+include(CTest)
+enable_testing()
+include(FetchContent)
+FetchContent_Declare(
+	google_test
+	GIT_REPOSITORY https://github.com/google/googletest.git
+	GIT_TAG master
+	GIT_SHALLOW true
+)
+FetchContent_MakeAvailable(google_test)
+add_executable(unit_tests
+	test/test_keyboard_controller.cpp
+	src/KeyboardController.cpp
+)
+target_include_directories(unit_tests
+	PUBLIC
+	include
+)
+target_link_libraries(unit_tests
+	ignition-transport${IGN_TRANSPORT_VER}::core
+	gtest_main
+)
+add_test(UnitTests unit_tests)
