@@ -3,6 +3,10 @@ This package provides an Ignition simulation of realistic ground texture for use
 promote fidelity, it uses physics based rendering (PBR) to accurately simulate the appearance of the ground texture.
 Additionally, it avoids the repetition of tiles common in most simulated floors.
 
+[Source Code](https://github.com/kylerobots/ground-texture-sim)
+
+[Documentation](https://kylerobots.github.io/ground-texture-sim/)
+
 ## Installing ##
 There are two ways to use this. The code comes with a Dockerfile. If you build that, it has all the dependencies that
 you need. Alternatively, you can use this directly on your computer. As of now, it only supports Ubuntu Bionic or Focal.
