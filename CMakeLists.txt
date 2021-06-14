@@ -23,6 +23,18 @@ target_link_libraries(keyboard_controller
 	ignition-transport${IGN_TRANSPORT_VER}::core
 )
 
+add_executable(data_writer
+	src/data_writer_node.cpp
+	src/DataWriter.cpp
+)
+target_include_directories(data_writer
+	PUBLIC
+	include
+)
+target_link_libraries(data_writer
+	ignition-transport${IGN_TRANSPORT_VER}::core
+)
+
 # Use Google Test for unit testing. This could probably be compiled in the image, but this was easier to implement.
 include(CTest)
 enable_testing()
