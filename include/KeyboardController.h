@@ -70,8 +70,7 @@ namespace ground_texture_sim {
 		 * 
 		 * @param msg The keypress message received from Ignition's topic.
 		 */
-		void
-				registerKeypress(const ignition::msgs::Int32 & msg);
+		void registerKeypress(const ignition::msgs::Int32 & msg);
 	};
 
 } // namespace ground_texture_sim
