@@ -63,7 +63,7 @@ namespace ground_texture_sim {
 		 * 
 		 * @param msg The published Pose message.
 		 */
-		void registerPose(const ignition::msgs::Pose & msg);
+		void registerPose(const ignition::msgs::Pose_V & msg);
 	};
 
 } // namespace ground_texture_sim
