@@ -31,6 +31,7 @@ FROM base as dev
 RUN apt update && \
 	DEBIAN_FRONTEND=noninteractive \
 	apt install -y \
+	doxygen \
 	gdb \
 	git && \
 	rm -rf /var/lib/apt/lists/*

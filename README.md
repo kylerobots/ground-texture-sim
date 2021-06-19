@@ -60,3 +60,79 @@ unsupported (by the keyboards, not this software).
 | D   | 0.0     | 0.5     | 0.0           |
 | Q   | 0.0     | 0.0     | 0.25          |
 | E   | 0.0     | 0.0     | -0.25         |
+
+### Data Writer ###
+This program records data coming from the simulation. To run it, use
+```bash
+./keyboard_controller
+```
+However, be advised that it writes data to whichever folder you are in when you call it. So it is recommended to
+navigate to a dedicated folder before calling.
+
+Each time an image is received, it writes the raw image to a PNG file with the name based on the current number of
+images captures. (e.g. 000000.png, 000001.png, etc.). It also writes a similarly named file containing the pose of the
+camera when the image is captured. This file is a CSV file named like 000000.txt, etc. The values are as follows.
+```
+x,y,z,roll,pitch,yaw
+```
+Lastly, the application writes the camera calibration information to file, with the name scheme 000000_calib.txt, etc.
+While it is unlikely the calibration information will change during simulation, it is written at each instance just in
+case. The output is more defined and describes each value before printing. An example is shown below.
+
+```
+header {
+  stamp {
+    sec: 132
+  }
+  data {
+    key: "frame_id"
+    value: "camera::base_link::camera"
+  }
+}
+width: 1280
+height: 960
+distortion {
+  k: 0
+  k: 0
+  k: 0
+  k: 0
+  k: 0
+}
+intrinsics {
+  k: 277
+  k: 0
+  k: 160
+  k: 0
+  k: 277
+  k: 120
+  k: 0
+  k: 0
+  k: 1
+}
+projection {
+  p: 277
+  p: 0
+  p: 160
+  p: -0
+  p: 0
+  p: 277
+  p: 120
+  p: 0
+  p: 0
+  p: 0
+  p: 1
+  p: 0
+}
+rectification_matrix: 1
+rectification_matrix: 0
+rectification_matrix: 0
+rectification_matrix: 0
+rectification_matrix: 1
+rectification_matrix: 0
+rectification_matrix: 0
+rectification_matrix: 0
+rectification_matrix: 1
+```
+
+Note that, because of the asynchronous nature of the data. The first pose or camera info files may be empty if they have
+not been received prior to receiving an image.

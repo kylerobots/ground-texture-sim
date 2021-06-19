@@ -1,4 +1,5 @@
 .git/
 .devcontainer/
 build/
-Dockerfile*
+data/
+docs/
