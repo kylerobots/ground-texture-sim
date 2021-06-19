@@ -1,6 +1,7 @@
 #ifndef _DATA_WRITER_H_
 #define _DATA_WRITER_H_
 
+#include <ignition/common/Image.hh>
 #include <ignition/msgs.hh>
 
 /**
@@ -24,6 +25,8 @@ namespace ground_texture_sim {
 	 */
 	class DataWriter {
 		private:
+		/// The count of how many images have been written to file.
+		int image_count;
 		/// The most recent camera parameters received from the simulation.
 		ignition::msgs::CameraInfo current_camera_info;
 		/// The most recent pose received from the simulation.
@@ -49,7 +52,7 @@ namespace ground_texture_sim {
 		 * @brief Record the latest image with associated camera info and pose.
 		 * 
 		 * When an image is received, this method also looks up the most recent camera info and camera pose. These are
-		 * then all written to file as a single data point.
+		 * then all written to file as a single data point. It uses OpenCV to write the image in the proper format.
 		 * 
 		 * @param msg The published Image message.
 		 */
