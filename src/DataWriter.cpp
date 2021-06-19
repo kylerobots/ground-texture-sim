@@ -11,30 +11,8 @@ namespace ground_texture_sim {
 	}
 
 	void DataWriter::registerImage(const ignition::msgs::Image & msg) {
-		// Use Ignition's Image class from the Common package to handle writing.
-		ignition::common::Image image;
-		// The pixel formats use the exact same options, but they are different enums, so convert manually.
-		ignition::common::Image::PixelFormatType pixel_format;
-		switch (msg.pixel_format_type()) {
-			case ignition::msgs::RGB_INT8:
-				pixel_format = ignition::common::Image::RGB_INT8;
-				break;
-			default:
-				std::cerr << "Unknown pixel type: " << msg.pixel_format_type() << std::endl;
-				return;
-		}
-		// Convert the data from signed char to unsigned.
-		std::vector<unsigned char> data(msg.data().begin(), msg.data().end());
-		// Load the data into the image.
-		image.SetFromData(&data[0], msg.width(), msg.height(), pixel_format);
-		// Create the right filename.
-		char buffer[11];
-		snprintf(buffer, 11, "%06d.png", image_count);
-		std::string filename = std::string(buffer);
-		std::cout << "Saving: " << filename << std::endl;
-		// Write it to file.
-		image.SavePNG(filename);
-		image_count++;
+		current_image = msg;
+		writeData();
 	}
 
 	void DataWriter::registerPose(const ignition::msgs::Pose_V & msg) {
@@ -44,5 +22,49 @@ namespace ground_texture_sim {
 				current_pose = msg.pose(i);
 			}
 		}
+	}
+
+	void DataWriter::writeData() {
+		// First, create the base filename from the image count index.
+		char buffer[7];
+		snprintf(buffer, 7, "%06d", image_count);
+		std::string base_filename(buffer);
+
+		// Then, write the image to file using Ignition's Image class, which already has the ability to write. The
+		// types need converted though.
+		ignition::common::Image image;
+		// The pixel formats also need converted, even though the labels are exactly the same. The simulation only
+		// outputs one type of format, so only convert that one for now.
+		ignition::common::Image::PixelFormatType pixel_format;
+		switch (current_image.pixel_format_type()) {
+			case ignition::msgs::RGB_INT8:
+				pixel_format = ignition::common::Image::RGB_INT8;
+				break;
+			default:
+				std::cerr << "Unknown pixel type: " << current_image.pixel_format_type() << std::endl;
+				return;
+		}
+		// The image data also needs loaded as an array of unsigned chars, so convert.
+		std::vector<unsigned char> data(current_image.data().begin(), current_image.data().end());
+		image.SetFromData(&data[0], current_image.width(), current_image.height(), pixel_format);
+		// Write the image.
+		image.SavePNG(base_filename + ".png");
+
+		// Now write the latest pose to a file. This will require extracting the quaternion yaw value.
+		double x = current_pose.position().x();
+		double y = current_pose.position().y();
+		double z = current_pose.position().z();
+		ignition::math::Quaternion quaternion(current_pose.orientation().w(), current_pose.orientation().x(), current_pose.orientation().y(), current_pose.orientation().z());
+		double roll = quaternion.Roll();
+		double pitch = quaternion.Pitch();
+		double yaw = quaternion.Yaw();
+		// Write as a csv.
+		std::ofstream pose_file;
+		pose_file.open(base_filename + ".txt");
+		pose_file << x << "," << y << "," << z << "," << roll << "," << pitch << "," << yaw << std::endl;
+		pose_file.close();
+
+		// Increment the image count to write new data next time.
+		image_count++;
 	}
 } // namespace ground_texture_sim

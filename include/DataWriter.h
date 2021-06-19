@@ -2,7 +2,9 @@
 #define _DATA_WRITER_H_
 
 #include <ignition/common/Image.hh>
+#include <ignition/math/Quaternion.hh>
 #include <ignition/msgs.hh>
+#include <ostream>
 
 /**
  * @brief The namespace for any class created in this package.
@@ -29,8 +31,19 @@ namespace ground_texture_sim {
 		int image_count;
 		/// The most recent camera parameters received from the simulation.
 		ignition::msgs::CameraInfo current_camera_info;
+		/// The most recent image received from the simulation.
+		ignition::msgs::Image current_image;
 		/// The most recent pose received from the simulation.
 		ignition::msgs::Pose current_pose;
+
+		/**
+		 * @brief Performs the actual data writing.
+		 * 
+		 * Before writing to file, this first does some quick data conversions from msg datatypes in order to leverage
+		 * Ignition's built in image saving and quaternion conversion functionality.
+		 * 
+		 */
+		void writeData();
 
 		public:
 		/**
@@ -51,8 +64,7 @@ namespace ground_texture_sim {
 		/**
 		 * @brief Record the latest image with associated camera info and pose.
 		 * 
-		 * When an image is received, this method also looks up the most recent camera info and camera pose. These are
-		 * then all written to file as a single data point. It uses OpenCV to write the image in the proper format.
+		 * When an image is received, it records the image, then triggers the write to file actions.
 		 * 
 		 * @param msg The published Image message.
 		 */
