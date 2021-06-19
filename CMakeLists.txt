@@ -8,8 +8,12 @@ project(ground-texture-sim
 
 set(CMAKE_CXX_STANDARD 11)
 
-find_package(ignition-transport10 REQUIRED)
-find_package(ignition-common4 REQUIRED COMPONENTS graphics)
+# Specify which versions of Ignition components to load.
+set(IGNITION_TRANSPORT_VERSION 10)
+set(IGNITION_COMMON_VERSION 4)
+
+find_package(ignition-transport${IGNITION_TRANSPORT_VERSION} REQUIRED)
+find_package(ignition-common${IGNITION_COMMON_VERSION} REQUIRED COMPONENTS graphics)
 
 add_executable(keyboard_controller
 	src/keyboard_controller_node.cpp
@@ -20,7 +24,7 @@ target_include_directories(keyboard_controller
 	include
 )
 target_link_libraries(keyboard_controller
-	ignition-transport10::core
+	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 )
 
 add_executable(data_writer
@@ -32,8 +36,8 @@ target_include_directories(data_writer
 	include
 )
 target_link_libraries(data_writer
-	ignition-transport10::core
-	ignition-common4::ignition-common4-graphics
+	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
+	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
 )
 
 # Use Google Test for unit testing. This could probably be compiled in the image, but this was easier to implement.
@@ -56,7 +60,7 @@ target_include_directories(unit_tests
 	include
 )
 target_link_libraries(unit_tests
-	ignition-transport10::core
+	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 	gtest_main
 )
 add_test(UnitTests unit_tests)
