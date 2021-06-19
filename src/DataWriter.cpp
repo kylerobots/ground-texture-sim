@@ -64,6 +64,12 @@ namespace ground_texture_sim {
 		pose_file << x << "," << y << "," << z << "," << roll << "," << pitch << "," << yaw << std::endl;
 		pose_file.close();
 
+		// Write the calibration data to file. Since there isn't really a given format, just write the debug string.
+		std::ofstream calibration_file;
+		calibration_file.open(base_filename + "_calib.txt");
+		calibration_file << current_camera_info.DebugString() << std::endl;
+		calibration_file.close();
+
 		// Increment the image count to write new data next time.
 		image_count++;
 	}
