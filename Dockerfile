@@ -42,15 +42,17 @@ RUN apt update && \
 FROM base AS build
 COPY . /opt/ground-texture-sim
 WORKDIR /opt/ground-texture-sim/build
-RUN cmake -DBUILD_TESTING=on .. && \
+RUN cmake -DBUILD_TESTING=on -DCMAKE_BUILD_TYPE=Release .. && \
 	make -j && \
 	make install
 CMD [ "ctest", "-VV" ]
 
 # From the compiled version, copy over the applications needed to run.
 FROM base AS run
-COPY --from=build /usr/local/bin/keyboard_controller /usr/local/bin
-COPY --from=build /usr/local/bin/data_writer /usr/local/bin
+COPY --from=build \
+	/usr/local/bin/keyboard_controller \
+	/usr/local/bin/data_writer \
+	/usr/local/bin/
 # Make a local user.
 RUN useradd -ms /bin/bash user
 USER user
