@@ -9,7 +9,14 @@ Additionally, it avoids the repetition of tiles common in most simulated floors.
 
 ## Installing ##
 There are two ways to use this. The code comes with a Dockerfile. If you build that, it has all the dependencies that
-you need. Alternatively, you can use this directly on your computer. As of now, it only supports Ubuntu Bionic or Focal.
+you need. The *run* stage is a minimal version that has the commands needed to run. Build it with:
+```powershell
+docker build --target run -t ground-texture-sim:run .
+```
+There is also fully compiled images available at https://hub.docker.com/repository/docker/kylerobots/ground-texture-sim
+that can be pulled and used immediately.
+
+Alternatively, you can use this directly on your computer. As of now, it only supports Ubuntu Bionic or Focal.
 This is because the simulation uses Ignition Gazebo, which only works on those OS versions at the moment. Specifically,
 this has been tested with Ignition Edifice. You will need the below dependencies. Most are just to support compilation.
 
@@ -30,8 +37,20 @@ make -j
 ```
 
 ## Running ##
-The following commands start different parts of the simulation. They can be run in the Docker container or on your
-computer, depending on the install method you used above.
+The preferred way to run the simulation is with the included launch file. It starts the simulation, keyboard control,
+and data writing in one go. The command, if running from the root directory is 
+```bash
+ign launch launch/keyboard.ign
+```
+It is also the default command for the Dockerfile, so can be run that way.
+```powershell
+docker run -e DISPLAY=host.docker.internal:0.0 ground-texture-sim:run
+```
+In that example, it assumes running on a Windows host (so setting the right DISPLAY variable) and that the image is
+tagged according to the previous build instructions.
+
+If you wish to start each part individually, instructions are below. They can be run in the Docker containers or on
+your computer, depending on how you installed everything.
 
 ### Simulation ###
 To start the Gazebo simulation, run this from the root level of the code:

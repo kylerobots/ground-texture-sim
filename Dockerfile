@@ -59,4 +59,5 @@ USER user
 WORKDIR /home/user
 # Copy in the sdf file.
 COPY world/ /home/user/world/
-CMD [ "ign", "gazebo", "world/world.sdf" ]
+COPY launch/ /home/user/launch/
+CMD [ "ign", "launch", "launch/keyboard.ign" ]
