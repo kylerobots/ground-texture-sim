@@ -1,7 +1,7 @@
 # Currently, Edifice targets Bionic (18.04) or Focal (20.04)
 ARG UBUNTU_VERSION=focal
 # Create a base image that is just the Ignition install.
-FROM ubuntu:${UBUNTU_VERSION} as base
+FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
 	version="1.0" \
@@ -14,6 +14,9 @@ RUN apt update && \
 	apt install -y \
 	build-essential \
 	cmake \
+	# Git is needed for development, but also to clone GTest for testing while building. It isn't needed during
+	# deployment though, so maybe it should be installed then uninstalled during building.
+	git \
 	lsb-release \
 	wget && \
 	echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list && \
@@ -26,12 +29,35 @@ RUN apt update && \
 CMD [ "ign", "gazebo", "shapes.sdf" ]
 
 # The development image will have development tools, like Git, installed.
-FROM base as dev
+FROM base AS dev
 
 RUN apt update && \
 	DEBIAN_FRONTEND=noninteractive \
 	apt install -y \
 	doxygen \
-	gdb \
-	git && \
+	gdb && \
 	rm -rf /var/lib/apt/lists/*
+
+# Use an image to compile and install the package.
+FROM base AS build
+COPY . /opt/ground-texture-sim
+WORKDIR /opt/ground-texture-sim/build
+RUN cmake -DBUILD_TESTING=on -DCMAKE_BUILD_TYPE=Release .. && \
+	make -j && \
+	make install
+CMD [ "ctest", "-VV" ]
+
+# From the compiled version, copy over the applications needed to run.
+FROM base AS run
+COPY --from=build \
+	/usr/local/bin/keyboard_controller \
+	/usr/local/bin/data_writer \
+	/usr/local/bin/
+# Make a local user.
+RUN useradd -ms /bin/bash user
+USER user
+WORKDIR /home/user
+# Copy in the sdf file.
+COPY world/ /home/user/world/
+COPY launch/ /home/user/launch/
+CMD [ "ign", "launch", "launch/keyboard.ign" ]

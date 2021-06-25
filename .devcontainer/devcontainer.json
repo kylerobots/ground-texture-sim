@@ -2,7 +2,11 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.177.0/containers/docker-existing-dockerfile
 {
 	"name": "Ground Texture",
-	"image": "ground-texture-sim:dev",
+	"build": {
+		"context": "..",
+		"dockerfile": "../Dockerfile",
+		"target": "dev",
+	},
 	"containerEnv": {
 		"DISPLAY": "host.docker.internal:0.0"
 	},

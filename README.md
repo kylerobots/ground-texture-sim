@@ -7,11 +7,32 @@ Additionally, it avoids the repetition of tiles common in most simulated floors.
 
 [Documentation](https://kylerobots.github.io/ground-texture-sim/)
 
-## Installing ##
-There are two ways to use this. The code comes with a Dockerfile. If you build that, it has all the dependencies that
-you need. Alternatively, you can use this directly on your computer. As of now, it only supports Ubuntu Bionic or Focal.
-This is because the simulation uses Ignition Gazebo, which only works on those OS versions at the moment. Specifically,
-this has been tested with Ignition Edifice. You will need the below dependencies. Most are just to support compilation.
+## Installing and Running with Docker ##
+Using the Docker images defined with the project is by far the easiest route, as it avoids all the installation. The
+already built image is available at https://hub.docker.com/repository/docker/kylerobots/ground-texture-sim or you can
+build the image from the source code. The *run* stage has a minimal image that provides all needed code and simulation
+files. If you are building locally, use something like the following to build.
+```powershell
+docker build --target run -t ground-texture-sim:run .
+```
+The online repository image and the one built in the previous command both have a default command that starts the
+correct launch file. This launch file starts the simulation, keyboard control, and data writer. Details about each
+node can be found below. It can be started by running the following, which uses the same image tag as the online
+repository. This assumes a Windows host, so defines the needed DISPLAY variable to show the GUI correctly.
+```powershell
+docker run -e DISPLAY=host.docker.internal:0.0 kylerobots/ground-texture-sim:1.1.0
+```
+
+When working from source, there is also a *test* stage if you wish to run the unit tests. Commands are similar to above.
+```powershell
+docker build --target test -t ground-texture-sim:test .
+docker run ground-texture-sim:test
+```
+
+## Installing and Running Locally ##
+If you wish to install on your computer, you will need a system running Ubuntu 20.04 or 16.04. This is because the
+simulation uses Ignition Gazebo, which only works on those OS versions at the moment. Specifically, this has been tested
+with Ignition Edifice. You will need the below dependencies. Most are just to support compilation.
 
 * cmake *(installed via apt)*
 * build-essential *(installed via apt)*
@@ -20,18 +41,24 @@ this has been tested with Ignition Edifice. You will need the below dependencies
 * ignition edifice *(see [their documentation](https://www.ignitionrobotics.org/docs/edifice/install_ubuntu) for install
 instructions)*
 
-After installing the dependencies, run the following commands from wherever you want to put the source code.
+After installing the dependencies, run the following commands from wherever you want to put the source code. You can
+turn unit tests back on by changing DBUILD_TESTING to *on*.
 ```bash
 git clone https://github.com/kylerobots/ground-texture-sim.git
 mkdir ground-texture-sim/build
 cd ground-texture-sim/build
-cmake ..
+cmake -DBUILD_TESTING=off -DCMAKE_BUILD_TYPE=Release ..
 make -j
+make install
 ```
 
-## Running ##
-The following commands start different parts of the simulation. They can be run in the Docker container or on your
-computer, depending on the install method you used above.
+There is a launch file that starts everything automatically, so you only need to run the following.
+```bash
+ign launch launch/keyboard.ign
+```
+You can also start each node individually if you prefer. See below for details on each.
+
+## Node Descriptions ##
 
 ### Simulation ###
 To start the Gazebo simulation, run this from the root level of the code:
@@ -42,9 +69,9 @@ You should see the GUI appear with a camera feed, like so.
 ![Example GUI](GUI.png)
 
 ### Keyboard Controller ###
-To start the keyboard control of the camera, run this from the build directory:
+To start the keyboard control of the camera, run this command:
 ```bash
-./keyboard_controller
+keyboard_controller
 ```
 There won't be anything printed on the terminal. You can then go to the GUI and press any of the keys listed on the
 table to get the corresponding velocities. A key press will set the listed velocity for 0.5 seconds. After which, it
@@ -64,7 +91,7 @@ unsupported (by the keyboards, not this software).
 ### Data Writer ###
 This program records data coming from the simulation. To run it, use
 ```bash
-./keyboard_controller
+keyboard_controller
 ```
 However, be advised that it writes data to whichever folder you are in when you call it. So it is recommended to
 navigate to a dedicated folder before calling.
