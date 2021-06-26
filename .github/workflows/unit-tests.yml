@@ -1,0 +1,21 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    # The build stage has all of the code built, include gtest, so it is easy to run unit tests from there.
+    - name: Build the Docker image
+      run: docker build . --target build --file Dockerfile --tag ground-texture-sim:test
+    - name: Run tests
+      run: docker run ground-texture-sim:test ctest -VV
