@@ -7,6 +7,9 @@ Additionally, it avoids the repetition of tiles common in most simulated floors.
 
 [Documentation](https://kylerobots.github.io/ground-texture-sim/)
 
+## License ##
+This project is licensed, under the BSD 3-Clause "New" or "Revised" License. See [LICENSE](LICENSE) for more info.
+
 ## Installing and Running with Docker ##
 Using the Docker images defined with the project is by far the easiest route, as it avoids all the installation. The
 already built image is available at https://hub.docker.com/repository/docker/kylerobots/ground-texture-sim or you can
