@@ -19,11 +19,11 @@ find_package(ignition-transport${IGNITION_TRANSPORT_VERSION} REQUIRED)
 
 add_executable(data_writer
 	src/data_writer_node.cpp
-	src/DataWriter.cpp
+	src/ground_texture_sim/DataWriter.cpp
 )
 target_include_directories(data_writer
 	PRIVATE
-		include
+		include/ground_texture_sim
 )
 target_link_libraries(data_writer
 	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
@@ -33,21 +33,21 @@ target_link_libraries(data_writer
 
 add_executable(follow_trajectory
 	src/follow_trajectory.cpp
-	src/TrajectoryFollower.cpp
+	src/ground_texture_sim/TrajectoryFollower.cpp
 )
 target_include_directories(follow_trajectory
 	PRIVATE
-		include
+		include/ground_texture_sim
 )
 target_link_libraries(follow_trajectory)
 
 add_executable(keyboard_controller
 	src/keyboard_controller_node.cpp
-	src/KeyboardController.cpp
+	src/ground_texture_sim/KeyboardController.cpp
 )
 target_include_directories(keyboard_controller
 	PRIVATE
-		include
+		include/ground_texture_sim
 )
 target_link_libraries(keyboard_controller
 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
@@ -75,11 +75,11 @@ if(BUILD_TESTING)
 	# Unit test for the keyboard
 	add_executable(test_keyboard_controller
 		test/test_keyboard_controller.cpp
-		src/KeyboardController.cpp
+		src/ground_texture_sim/KeyboardController.cpp
 	)
 	target_include_directories(test_keyboard_controller
 		PRIVATE
-			include
+			include/ground_texture_sim
 	)
 	target_link_libraries(test_keyboard_controller
 		ignition-transport${IGNITION_TRANSPORT_VERSION}::core
@@ -90,11 +90,11 @@ if(BUILD_TESTING)
 	# Unit test for the trajectory
 	add_executable(test_trajectory_follower
 		test/test_trajectory_follower.cpp
-		src/TrajectoryFollower.cpp
+		src/ground_texture_sim/TrajectoryFollower.cpp
 	)
 	target_include_directories(test_trajectory_follower
 		PRIVATE
-			include
+			include/ground_texture_sim
 	)
 	target_link_libraries(test_trajectory_follower
 		gtest_main
