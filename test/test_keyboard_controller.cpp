@@ -159,11 +159,11 @@ TEST_F(KeyboardControllerTest, TimePersistentVelocity) {
 	msg = controller.createMessage();
 	checkVelocity(msg, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0);
 	// It should also exist right up until the transition mark.
-	std::this_thread::sleep_for(std::chrono::milliseconds(80));
+	std::this_thread::sleep_for(std::chrono::milliseconds(400));
 	msg = controller.createMessage();
 	checkVelocity(msg, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0);
 	// But it should go back to zero after the transition mark.
-	std::this_thread::sleep_for(std::chrono::milliseconds(40));
+	std::this_thread::sleep_for(std::chrono::milliseconds(400));
 	msg = controller.createMessage();
 	checkVelocity(msg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 	// I could check closer to the actual transition mark, but sleep_for does not guarantee that it will free right at
