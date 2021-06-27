@@ -1,6 +1,8 @@
 #ifndef _TRAJECTORY_FOLLOWER_H_
 #define _TRAJECTORY_FOLLOWER_H_
 
+#include <stdexcept>
+
 /**
  * @brief The namespace for any class created in this package.
  * 
@@ -33,6 +35,25 @@ namespace ground_texture_sim {
 		 * 
 		 */
 		TrajectoryFollower();
+
+		/**
+		 * @brief Get the height of the camera.
+		 * 
+		 * @return float The height of the camera above the ground, in meters.
+		 */
+		float getCameraHeight() const;
+
+		/**
+		 * @brief Set the height of the camera.
+		 * 
+		 * @param camera_height The new height of the camera above the ground, in meters. This should be non-negative.
+		 * @throws std::invalid_argument Thrown if the height is negative, as that is not physically possible.`
+		 */
+		void setCameraHeight(float camera_height);
+
+		private:
+		/// The height at which to keep the camera.
+		float camera_height;
 	};
 } // namespace ground_texture_sim
 
