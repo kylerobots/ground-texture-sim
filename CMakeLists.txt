@@ -11,10 +11,12 @@ set(CMAKE_CXX_STANDARD 11)
 # Specify which versions of Ignition components to load.
 set(IGNITION_COMMON_VERSION 4)
 set(IGNITION_MATH_VERSION 6)
+set(IGNITION_MSGS_VERSION 7)
 set(IGNITION_TRANSPORT_VERSION 10)
 
 find_package(ignition-common${IGNITION_COMMON_VERSION} REQUIRED COMPONENTS graphics)
 find_package(ignition-math${IGNITION_MATH_VERSION} REQUIRED)
+find_package(ignition-msgs${IGNITION_MSGS_VERSION} REQUIRED)
 find_package(ignition-transport${IGNITION_TRANSPORT_VERSION} REQUIRED)
 
 add_executable(data_writer
@@ -34,12 +36,16 @@ target_link_libraries(data_writer
 add_executable(follow_trajectory
 	src/follow_trajectory.cpp
 	src/ground_texture_sim/TrajectoryFollower.cpp
+	src/ground_texture_sim/DataWriter.cpp
 )
 target_include_directories(follow_trajectory
 	PRIVATE
 		include/ground_texture_sim
 )
-target_link_libraries(follow_trajectory)
+target_link_libraries(follow_trajectory
+	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
+	ignition-msgs${IGNITION_MSGS_VERSION}::core
+)
 
 add_executable(keyboard_controller
 	src/keyboard_controller_node.cpp
@@ -91,6 +97,7 @@ if(BUILD_TESTING)
 	add_executable(test_trajectory_follower
 		test/test_trajectory_follower.cpp
 		src/ground_texture_sim/TrajectoryFollower.cpp
+		src/ground_texture_sim/DataWriter.cpp
 	)
 	target_include_directories(test_trajectory_follower
 		PRIVATE
@@ -98,6 +105,8 @@ if(BUILD_TESTING)
 	)
 	target_link_libraries(test_trajectory_follower
 		gtest_main
+		ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
+		ignition-msgs${IGNITION_MSGS_VERSION}::core
 	)
 	add_test(TrajectoryFollower test_trajectory_follower)
 			

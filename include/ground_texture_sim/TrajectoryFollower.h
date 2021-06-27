@@ -1,7 +1,10 @@
 #ifndef _TRAJECTORY_FOLLOWER_H_
 #define _TRAJECTORY_FOLLOWER_H_
 
+#include "DataWriter.h"
+
 #include <stdexcept>
+#include <vector>
 
 /**
  * @brief The namespace for any class created in this package.
@@ -31,10 +34,35 @@ namespace ground_texture_sim {
 	class TrajectoryFollower {
 		public:
 		/**
+		 * @brief A simple representation of different poses along the trajectory.
+		 * 
+		 */
+		struct Pose2D {
+			/// The location along the X-axis, in meters.
+			float x;
+			/// The location along the Y-axis, in meters.
+			float y;
+			/// The rotation about the Z-axis, in radians.
+			float yaw;
+		};
+
+		public:
+		/**
 		 * @brief Construct a new Trajectory Follower object
 		 * 
 		 */
 		TrajectoryFollower();
+
+		/**
+		 * @brief Record data along each pose of the given series of poses.
+		 * 
+		 * This will iterate through each pose, put the camera at that pose, and capture the data.
+		 * 
+		 * @param trajectory A vector of each 2D pose the camera should take.
+		 * @return true If the capture was completely successful.
+		 * @return false If the system was unable to capture each pose.
+		 */
+		bool captureTrajectory(const std::vector<Pose2D> & trajectory) const;
 
 		/**
 		 * @brief Get the height of the camera.
@@ -52,8 +80,22 @@ namespace ground_texture_sim {
 		void setCameraHeight(float camera_height);
 
 		private:
+		/**
+		 * @brief Capture a single pose from a trajectory.
+		 * 
+		 * This performs the camera manipulation and data collecting for a single pose.
+		 * 
+		 * @param pose The pose at which to place the camera.
+		 * @return true If the capture was successful.
+		 * @return false If the capture was unsuccessful.
+		 */
+		bool capturePose(const Pose2D & pose) const;
+
+		private:
 		/// The height at which to keep the camera.
 		float camera_height;
+		/// The object to output all data in the correct format.
+		DataWriter data_writer;
 	};
 } // namespace ground_texture_sim
 

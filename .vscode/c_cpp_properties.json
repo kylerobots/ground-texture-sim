@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/ground_texture_sim",
+                "/usr/include/ignition/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
