@@ -107,7 +107,7 @@ TEST_F(KeyboardControllerTest, Back) {
 TEST_F(KeyboardControllerTest, CW) {
 	registerLetter('E');
 	auto msg = controller.createMessage();
-	checkVelocity(msg, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0);
+	checkVelocity(msg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25);
 }
 
 /**
@@ -117,7 +117,7 @@ TEST_F(KeyboardControllerTest, CW) {
 TEST_F(KeyboardControllerTest, CCW) {
 	registerLetter('Q');
 	auto msg = controller.createMessage();
-	checkVelocity(msg, 0.0, 0.0, 0.0, -0.25, 0.0, 0.0);
+	checkVelocity(msg, 0.0, 0.0, 0.0, 0.0, 0.0, -0.25);
 }
 
 /**
@@ -129,7 +129,7 @@ TEST_F(KeyboardControllerTest, CompositeVelocity) {
 	registerLetter('W');
 	registerLetter('Q');
 	auto msg = controller.createMessage();
-	checkVelocity(msg, 0.0, 0.5, 0.5, -0.25, 0.0, 0.0);
+	checkVelocity(msg, 0.0, 0.5, 0.5, 0.0, 0.0, -0.25);
 }
 
 /**
