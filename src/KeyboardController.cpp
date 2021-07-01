@@ -41,11 +41,9 @@ namespace ground_texture_sim {
 		if ((current_time - counterclockwise_press_time.load()) <= threshold) {
 			current_t -= angular_speed;
 		}
-		// The camera is rotated down 90 degrees, so positive x drives straight into the ground. Adjust the actual
-		// message values.
 		msg.mutable_linear()->set_z(current_x);
 		msg.mutable_linear()->set_y(current_y);
-		msg.mutable_angular()->set_x(current_t);
+		msg.mutable_angular()->set_z(current_t);
 		return msg;
 	}
 
