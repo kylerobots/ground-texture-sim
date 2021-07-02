@@ -3,6 +3,10 @@
 
 #include "DataWriter.h"
 
+#include <ignition/math/Quaternion.hh>
+#include <ignition/msgs/boolean.pb.h>
+#include <ignition/msgs/pose.pb.h>
+#include <ignition/transport.hh>
 #include <stdexcept>
 #include <vector>
 
@@ -62,7 +66,7 @@ namespace ground_texture_sim {
 		 * @return true If the capture was completely successful.
 		 * @return false If the system was unable to capture each pose.
 		 */
-		bool captureTrajectory(const std::vector<Pose2D> & trajectory) const;
+		bool captureTrajectory(const std::vector<Pose2D> & trajectory);
 
 		/**
 		 * @brief Get the height of the camera.
@@ -79,7 +83,7 @@ namespace ground_texture_sim {
 		 */
 		void setCameraHeight(float camera_height);
 
-		private:
+		protected:
 		/**
 		 * @brief Capture a single pose from a trajectory.
 		 * 
@@ -89,13 +93,26 @@ namespace ground_texture_sim {
 		 * @return true If the capture was successful.
 		 * @return false If the capture was unsuccessful.
 		 */
-		bool capturePose(const Pose2D & pose) const;
+		bool capturePose(const Pose2D & pose);
 
-		private:
+		/**
+		 * @brief Send the new pose to the simulation.
+		 * 
+		 * It transforms it into a Pose message first.
+		 * 
+		 * @param pose The pose to send.
+		 * @return true If the simulation accepted the new pose.
+		 * @return false If there is some sort of error.
+		 */
+		bool sendPose(const Pose2D & pose);
+
+		protected:
 		/// The height at which to keep the camera.
 		float camera_height;
 		/// The object to output all data in the correct format.
 		DataWriter data_writer;
+		/// The transport node for interacting with the simulation.
+		ignition::transport::Node node;
 	};
 } // namespace ground_texture_sim
 

@@ -44,7 +44,9 @@ target_include_directories(follow_trajectory
 )
 target_link_libraries(follow_trajectory
 	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
+	ignition-math${IGNITION_MATH_VERSION}::core
 	ignition-msgs${IGNITION_MSGS_VERSION}::core
+	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 )
 
 add_executable(keyboard_controller
@@ -106,7 +108,9 @@ if(BUILD_TESTING)
 	target_link_libraries(test_trajectory_follower
 		gtest_main
 		ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
+		ignition-math${IGNITION_MATH_VERSION}::core
 		ignition-msgs${IGNITION_MSGS_VERSION}::core
+		ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 	)
 	add_test(TrajectoryFollower test_trajectory_follower)
 			
