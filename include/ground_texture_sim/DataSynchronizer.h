@@ -42,7 +42,7 @@ namespace ground_texture_sim {
 		 * Because the parent class is abstract, the values are pointers to the messages. This assumes that you know
 		 * or can figure out what specific message type each is.
 		 */
-		std::map<std::string, std::unique_ptr<google::protobuf::Message>> getMessages();
+		std::map<std::string, std::shared_ptr<google::protobuf::Message>> getMessages();
 
 		/**
 		 * @brief Register a given topic name to synchronize its data with the other topics.
