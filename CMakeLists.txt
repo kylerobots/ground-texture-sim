@@ -113,5 +113,20 @@ if(BUILD_TESTING)
 		ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 	)
 	add_test(TrajectoryFollower test_trajectory_follower)
+
+	add_executable(test_data_synchronizer
+		test/test_data_synchronizer.cpp
+		src/ground_texture_sim/DataSynchronizer.cpp
+	)
+	target_include_directories(test_data_synchronizer
+		PRIVATE
+			include/ground_texture_sim
+	)
+	target_link_libraries(test_data_synchronizer
+		gtest_main
+		ignition-msgs${IGNITION_MSGS_VERSION}::core
+		ignition-transport${IGNITION_TRANSPORT_VERSION}::core
+	)
+	add_test(DataSynchronizer test_data_synchronizer)
 			
 endif(BUILD_TESTING)
