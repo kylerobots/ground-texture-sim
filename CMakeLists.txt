@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(ground-texture-sim
-	VERSION 1.1.0
+	VERSION 1.2.0
 	DESCRIPTION "A simulation to generate ground texture data for monocular SLAM."
 	HOMEPAGE_URL https://github.com/kylerobots/ground-texture-sim
 	LANGUAGES CXX

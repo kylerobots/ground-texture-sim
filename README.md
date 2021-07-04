@@ -19,9 +19,10 @@ files. If you are building locally, use something like the following to build.
 docker build --target run -t ground-texture-sim:run .
 ```
 The online repository image and the one built in the previous command both have a default command that starts the
-correct launch file. This launch file starts the simulation, keyboard control, and data writer. Details about each
-node can be found below. It can be started by running the following, which uses the same image tag as the online
-repository. This assumes a Windows host, so defines the needed DISPLAY variable to show the GUI correctly.
+correct launch file. This launch file starts the simulation and trajectory control, but there are scripts for keyboard
+control as well. Details about each node can be found below. It can be started by running the following, which uses the
+same image tag as the online repository. This assumes a Windows host, so defines the needed DISPLAY variable to show the
+GUI correctly.
 ```powershell
 docker run -e DISPLAY=host.docker.internal:0.0 kylerobots/ground-texture-sim:1.1.0
 ```
@@ -57,7 +58,7 @@ make install
 
 There is a launch file that starts everything automatically, so you only need to run the following.
 ```bash
-ign launch launch/keyboard.ign
+ign launch launch/trajectory.ign
 ```
 You can also start each node individually if you prefer. See below for details on each.
 
@@ -70,6 +71,16 @@ ign gazebo world/world.sdf
 ```
 You should see the GUI appear with a camera feed, like so.
 ![Example GUI](GUI.png)
+
+### Trajectory Follower ###
+This is the preferred node for capturing data. It walks the camera through a series of predefined poses and captures
+data at each pose. Unlike the keyboard controller node below, it writes data synchronously, so the only other thing that
+needs launched is the simulation itself. To start, run this command:
+```bash
+follow_trajectory
+```
+Right now, the path is hard-coded into the node. Future iterations will read from a CSV file. It will write data to
+the same directory the node is run from. Data will follow the format described in Data Writer.
 
 ### Keyboard Controller ###
 To start the keyboard control of the camera, run this command:

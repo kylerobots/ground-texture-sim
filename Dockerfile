@@ -4,7 +4,7 @@ ARG UBUNTU_VERSION=focal
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
-	version="1.0" \
+	version="1.2.0" \
 	license="BSD-3-Clause License"
 
 # Install Ignition Edifice and its dependencies. Because of the install via new key, 2 installs are required. One for
@@ -52,6 +52,7 @@ FROM base AS run
 COPY --from=build \
 	/usr/local/bin/keyboard_controller \
 	/usr/local/bin/data_writer \
+	/usr/local/bin/follow_trajectory \
 	/usr/local/bin/
 # Make a local user.
 RUN useradd -ms /bin/bash user
@@ -60,4 +61,4 @@ WORKDIR /home/user
 # Copy in the sdf file.
 COPY world/ /home/user/world/
 COPY launch/ /home/user/launch/
-CMD [ "ign", "launch", "launch/keyboard.ign" ]
+CMD [ "ign", "launch", "launch/trajectory.ign" ]

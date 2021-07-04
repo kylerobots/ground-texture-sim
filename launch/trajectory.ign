@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ignition version="1.0">
 	<executable name="simulation">
-		<command>ign gazebo world/world.sdf</command>
+		<command>ign gazebo -r world/world.sdf</command>
 	</executable>
 
 	<executable name="trajectory_follower">
