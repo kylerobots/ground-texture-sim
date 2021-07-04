@@ -1,6 +1,7 @@
 #ifndef _TRAJECTORY_FOLLOWER_H_
 #define _TRAJECTORY_FOLLOWER_H_
 
+#include "DataSynchronizer.h"
 #include "DataWriter.h"
 
 #include <ignition/math/Quaternion.hh>
@@ -109,6 +110,8 @@ namespace ground_texture_sim {
 		protected:
 		/// The height at which to keep the camera.
 		float camera_height;
+		/// The object to get updates messages from each topic.
+		DataSynchronizer data_synchronizer;
 		/// The object to output all data in the correct format.
 		DataWriter data_writer;
 		/// The transport node for interacting with the simulation.

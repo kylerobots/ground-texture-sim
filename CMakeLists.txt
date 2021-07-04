@@ -35,8 +35,9 @@ target_link_libraries(data_writer
 
 add_executable(follow_trajectory
 	src/follow_trajectory.cpp
-	src/ground_texture_sim/TrajectoryFollower.cpp
+	src/ground_texture_sim/DataSynchronizer.cpp
 	src/ground_texture_sim/DataWriter.cpp
+	src/ground_texture_sim/TrajectoryFollower.cpp
 )
 target_include_directories(follow_trajectory
 	PRIVATE
@@ -98,8 +99,9 @@ if(BUILD_TESTING)
 	# Unit test for the trajectory
 	add_executable(test_trajectory_follower
 		test/test_trajectory_follower.cpp
-		src/ground_texture_sim/TrajectoryFollower.cpp
+		src/ground_texture_sim/DataSynchronizer.cpp
 		src/ground_texture_sim/DataWriter.cpp
+		src/ground_texture_sim/TrajectoryFollower.cpp
 	)
 	target_include_directories(test_trajectory_follower
 		PRIVATE

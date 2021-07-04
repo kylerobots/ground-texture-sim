@@ -2,6 +2,10 @@
 
 namespace ground_texture_sim {
 	TrajectoryFollower::TrajectoryFollower() {
+		// Register the topics to capture.
+		data_synchronizer.registerTopic<ignition::msgs::Image>("/camera");
+		data_synchronizer.registerTopic<ignition::msgs::CameraInfo>("/camera_info");
+		data_synchronizer.registerTopic<ignition::msgs::Pose_V>("/world/ground_texture/dynamic_pose/info");
 	}
 
 	bool TrajectoryFollower::captureTrajectory(const std::vector<Pose2D> & trajectory) {
@@ -10,7 +14,16 @@ namespace ground_texture_sim {
 			if (!success) {
 				return false;
 			}
-			sleep(2);
+			// Now get the most up to date messages.
+			auto messages = data_synchronizer.getMessages();
+			// Cast each message back into the expected format.
+			auto camera_info_msg = dynamic_cast<ignition::msgs::CameraInfo *>(messages["/camera_info"].get());
+			auto image_msg = dynamic_cast<ignition::msgs::Image *>(messages["/camera"].get());
+			auto pose_msg = dynamic_cast<ignition::msgs::Pose_V *>(messages["/world/ground_texture/dynamic_pose/info"].get());
+			// Write them to file.
+			data_writer.registerCameraInfo(*camera_info_msg);
+			data_writer.registerPose(*pose_msg);
+			data_writer.registerImage(*image_msg);
 		}
 		return true;
 	}

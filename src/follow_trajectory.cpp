@@ -6,6 +6,10 @@ int main(int argc, char ** argv) {
 	// Assemble some poses.
 	ground_texture_sim::TrajectoryFollower::Pose2D pose;
 	std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> pose_vector;
+	pose.x = 0.0;
+	pose.y = 0.0;
+	pose.yaw = 0.0;
+	pose_vector.push_back(pose);
 	pose.x = 0.5;
 	pose.y = 0.5;
 	pose.yaw = 0.0;
