@@ -10,8 +10,10 @@ namespace ground_texture_sim {
 
 	bool TrajectoryFollower::captureTrajectory(const std::vector<Pose2D> & trajectory) {
 		for (auto && pose : trajectory) {
+			std::cout << "Capturing: (" << pose.x << ", " << pose.y << ", " << pose.yaw << ")" << std::endl;
 			bool success = capturePose(pose);
 			if (!success) {
+				std::cout << "ERROR: Failed to move to pose!" << std::endl;
 				return false;
 			}
 			ignition::msgs::CameraInfo * camera_info_msg;
@@ -35,11 +37,12 @@ namespace ground_texture_sim {
 				}
 				// We want all pose values to be updated, so flip to false if any aren't within eps.
 				pose_updated = true;
-				pose_updated &= abs(extracted_pose.position().x() - pose.x) <= 1e-8;
-				pose_updated &= abs(extracted_pose.position().y() - pose.y) <= 1e-8;
+				double eps = 1e-8;
+				pose_updated &= abs(extracted_pose.position().x() - pose.x) <= eps;
+				pose_updated &= abs(extracted_pose.position().y() - pose.y) <= eps;
 				// We have to pull out the quaternion values.
 				ignition::math::Quaternion quaternion(extracted_pose.orientation().w(), extracted_pose.orientation().x(), extracted_pose.orientation().y(), extracted_pose.orientation().z());
-				pose_updated &= abs(quaternion.Yaw() - pose.yaw) <= 1e-8;
+				pose_updated &= abs(quaternion.Yaw() - pose.yaw) <= eps;
 			}
 
 			// Write them to file.
@@ -47,6 +50,7 @@ namespace ground_texture_sim {
 			data_writer.registerPose(*pose_msg);
 			data_writer.registerImage(*image_msg);
 		}
+		std::cout << "Finished capturing!" << std::endl;
 		return true;
 	}
 
