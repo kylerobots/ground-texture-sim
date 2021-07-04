@@ -6,6 +6,21 @@
 #include <string>
 #include <vector>
 
+/**
+ * @brief Parse a CSV file containing poses.
+ * 
+ * This reads in a CSV file and converts it to a series of poses ready to use in TrajectoryFollower. Each line of the
+ * file should represent one pose in the trajectory. The form should be:
+ * ```
+ * x1, y1, yaw1
+ * x2, y2, yaw2
+ * ...
+ * ```
+ * 
+ * @param filename The file to read in for poses.
+ * @return std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> A resulting collection of poses. If an error
+ * occurs, this vector is empty.
+ */
 std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> parseFile(const std::string & filename) {
 	std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> trajectory;
 	std::string line;

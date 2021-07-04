@@ -79,8 +79,13 @@ needs launched is the simulation itself. To start, run this command:
 ```bash
 follow_trajectory
 ```
-Right now, the path is hard-coded into the node. Future iterations will read from a CSV file. It will write data to
-the same directory the node is run from. Data will follow the format described in Data Writer.
+The trajectory is read from a CSV file called *data/trajectory.txt* located relative to where the code runs. The built
+Docker image has an example file that it copies in. Poses should be specified one per line in the following format.
+```
+x1, y1, yaw1
+x2, y2, yaw2
+```
+Extra values per line will be ignored. If an error occurs on read, the system halts.
 
 ### Keyboard Controller ###
 To start the keyboard control of the camera, run this command:
