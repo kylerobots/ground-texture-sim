@@ -19,4 +19,7 @@ jobs:
           DEBIAN_FRONTEND=noninteractive sudo apt install -y doxygen
       - name: Run Doxygen
         working-directory: ${{runner.workspace}}
-        run: doxygen Doxyfile
+        run: |
+          pwd
+          ls
+          doxygen ./Doxyfile
