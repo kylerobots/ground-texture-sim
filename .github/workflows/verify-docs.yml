@@ -18,7 +18,4 @@ jobs:
           sudo apt update
           DEBIAN_FRONTEND=noninteractive sudo apt install -y doxygen
       - name: Run Doxygen
-        run: |
-          pwd
-          ls
-          doxygen Doxyfile
+        run: doxygen Doxyfile
