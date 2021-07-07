@@ -15,8 +15,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Install Doxygen
         run: |
-          apt update
-          DEBIAN_FRONTEND=noninteractive apt install -y doxygen
+          sudo apt update
+          DEBIAN_FRONTEND=noninteractive sudo apt install -y doxygen
       - name: Run Doxygen
         working-directory: ${{runner.workspace}}
         run: doxygen Doxyfile
