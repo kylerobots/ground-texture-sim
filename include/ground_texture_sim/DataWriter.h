@@ -57,7 +57,6 @@ namespace ground_texture_sim {
 		 * 
 		 * While the info should be unchanging, it will record it each time to make sure.
 		 * 
-		 * @param msg The published CameraInfo message.
 		 */
 		void registerCameraInfo(const ignition::msgs::CameraInfo & msg);
 
