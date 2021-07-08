@@ -130,5 +130,19 @@ if(BUILD_TESTING)
 		ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 	)
 	add_test(DataSynchronizer test_data_synchronizer)
+
+	add_executable(test_math
+		test/test_math.cpp
+	)
+	target_include_directories(test_math
+		PRIVATE
+			include/ground_texture_sim
+	)
+	target_link_libraries(test_math
+		gtest_main
+		ignition-math${IGNITION_MATH_VERSION}::core
+		ignition-msgs${IGNITION_MSGS_VERSION}::core
+	)
+	add_test(Math test_math)
 			
 endif(BUILD_TESTING)
