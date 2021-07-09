@@ -37,8 +37,21 @@ target_link_libraries(ground_texture_sim
 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 )
 
+add_executable(follow_trajectory
+	src/follow_trajectory.cpp
+)
+target_include_directories(follow_trajectory
+	PRIVATE
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/ground_texture_sim>
+  		$<INSTALL_INTERFACE:include/ground_texture_sim>
+)
+target_link_libraries(follow_trajectory
+	ground_texture_sim
+)
+
 install(
 	TARGETS
+		follow_trajectory
 		ground_texture_sim
 )
 
