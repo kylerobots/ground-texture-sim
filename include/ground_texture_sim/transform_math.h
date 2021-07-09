@@ -1,5 +1,5 @@
-#ifndef _GROUND_TEXTURE_SIM_MATH_H_
-#define _GROUND_TEXTURE_SIM_MATH_H_
+#ifndef _TRANSFORM_MATH_H_
+#define _TRANSFORM_MATH_H_
 
 #include <ignition/math/Quaternion.hh>
 
@@ -36,4 +36,4 @@ namespace ground_texture_sim {
 
 } // namespace ground_texture_sim
 
-#endif // _GROUND_TEXTURE_SIM_MATH_H_
+#endif // _TRANSFORM_MATH_H_
