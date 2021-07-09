@@ -1,13 +1,14 @@
 #ifndef _DATA_WRITER_H_
 #define _DATA_WRITER_H_
 
-// #include <ignition/common/Image.hh>
-// #include <ignition/math/Quaternion.hh>
-// #include <ignition/msgs.hh>
-// #include <ostream>
+#include "transform_math.h"
+
 #include <filesystem>
+#include <ignition/common/Image.hh>
 #include <ignition/msgs.hh>
+#include <ostream>
 #include <string>
+#include <vector>
 
 /**
  * @brief The namespace for any class created in this package.
@@ -90,6 +91,28 @@ namespace ground_texture_sim {
 
 		protected:
 		/**
+		 * @brief Returns a string of the write format based on the current index.
+		 * 
+		 * This string is the 6 digit leading zero format, without any file extensions or modifiers. It als includes the
+		 * directory of the file.
+		 * 
+		 * @return std::string The path and base name for the current iteration of files.
+		 */
+		std::string getBaseFilename() const;
+
+		/**
+		 * @brief Write the given camera info to the file with index for the filename.
+		 * 
+		 * File names are of the form 000000_calib.txt, 000001_calib.txt, etc. File format is exactly the same as
+		 * the DebugString of the message.
+		 * 
+		 * @param camera_info The camera info to write.
+		 * @return true if the write was successful.
+		 * @return false otherwise.
+		 */
+		bool writeCameraInfo(const ignition::msgs::CameraInfo & camera_info);
+
+		/**
 		 * @brief Write the given image to the file with index for the filename.
 		 * 
 		 * File names are of the form 000000.png, 000001.png, etc.
@@ -112,18 +135,6 @@ namespace ground_texture_sim {
 		 * @return false otherwise.
 		 */
 		bool writePose(const ignition::msgs::Pose & pose);
-
-		/**
-		 * @brief Write the given camera info to the file with index for the filename.
-		 * 
-		 * File names are of the form 000000_calib.txt, 000001_calib.txt, etc. File format is exactly the same as
-		 * the DebugString of the message.
-		 * 
-		 * @param camera_info The camera info to write.
-		 * @return true if the write was successful.
-		 * @return false otherwise.
-		 */
-		bool writeCameraInfo(const ignition::msgs::CameraInfo & camera_info);
 
 		protected:
 		/// The directory to place the written files.

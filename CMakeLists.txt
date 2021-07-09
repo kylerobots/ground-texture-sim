@@ -21,6 +21,7 @@ find_package(ignition-transport${IGNITION_TRANSPORT_VERSION} REQUIRED)
 
 add_library(ground_texture_sim
 	src/ground_texture_sim/DataWriter.cpp
+	src/ground_texture_sim/transform_math.cpp
 )
 target_include_directories(ground_texture_sim
 	PRIVATE
@@ -64,18 +65,6 @@ target_link_libraries(ground_texture_sim
 # 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 # )
 
-# add_executable(keyboard_controller
-# 	src/keyboard_controller_node.cpp
-# 	src/ground_texture_sim/KeyboardController.cpp
-# )
-# target_include_directories(keyboard_controller
-# 	PRIVATE
-# 		include/ground_texture_sim
-# )
-# target_link_libraries(keyboard_controller
-# 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
-# )
-
 # Specify installation information
 # install(
 # 	TARGETS
@@ -95,20 +84,6 @@ if(BUILD_TESTING)
 		GIT_SHALLOW true
 	)
 	FetchContent_MakeAvailable(google_test)
-	# Unit test for the keyboard
-	# add_executable(test_keyboard_controller
-	# 	test/test_keyboard_controller.cpp
-	# 	src/ground_texture_sim/KeyboardController.cpp
-	# )
-	# target_include_directories(test_keyboard_controller
-	# 	PRIVATE
-	# 		include/ground_texture_sim
-	# )
-	# target_link_libraries(test_keyboard_controller
-	# 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
-	# 	gtest_main
-	# )
-	# add_test(KeyboardController test_keyboard_controller)
 		
 	# # Unit test for the trajectory
 	# add_executable(test_trajectory_follower

@@ -19,12 +19,20 @@ namespace ground_texture_sim {
 	 */
 	struct Pose2D {
 		/// The location along the X-axis, in meters.
-		float x;
+		double x;
 		/// The location along the Y-axis, in meters.
-		float y;
+		double y;
 		/// The rotation about the Z-axis, in radians.
-		float yaw;
+		double yaw;
 	};
+
+	/**
+	 * @brief Convert a Pose2D struct into a Pose message.
+	 * 
+	 * @param pose2D The struct to convert.
+	 * @return ignition::msgs::Pose The resulting Pose message object.
+	 */
+	ignition::msgs::Pose poseMsgFromPose2D(const Pose2D & pose2D);
 
 	/**
 	 * @brief Convert a yaw value into a Quaternion.
@@ -49,32 +57,7 @@ namespace ground_texture_sim {
 	 * @param yaw The yaw to convert.
 	 * @return ignition::msgs::Quaternion The resulting Quaternion Message object.
 	 */
-	ignition::msgs::Quaternion quaternionMsgFromYaw(double yaw) {
-		auto quaternion = quaternionFromYaw(yaw);
-		ignition::msgs::Quaternion quaternion_msg;
-		quaternion_msg.set_x(quaternion.X());
-		quaternion_msg.set_y(quaternion.Y());
-		quaternion_msg.set_z(quaternion.Z());
-		quaternion_msg.set_w(quaternion.W());
-		return quaternion_msg;
-	}
-
-	/**
-	 * @brief Convert a Pose2D struct into a Pose message.
-	 * 
-	 * @param pose2D The struct to convert.
-	 * @return ignition::msgs::Pose The resulting Pose message object.
-	 */
-	ignition::msgs::Pose poseMsgFromPose2D(const Pose2D & pose2D) {
-		ignition::msgs::Pose pose;
-		pose.mutable_position()->set_x(pose2D.x);
-		pose.mutable_position()->set_y(pose2D.y);
-		pose.mutable_position()->set_z(0.0);
-		// Use existing functions to set rotation.
-		auto rotation = quaternionMsgFromYaw(pose2D.yaw);
-		pose.mutable_orientation()->Swap(&rotation);
-		return pose;
-	}
+	ignition::msgs::Quaternion quaternionMsgFromYaw(double yaw);
 
 	/**
 	 * @brief Extract the roll, pitch, and yaw from a Quaternion.
@@ -100,13 +83,7 @@ namespace ground_texture_sim {
 	 * @param quaternion The Quaternion message object to extract from.
 	 * @return std::tuple<double, double, double> A tuple containing the roll, pitch, and yaw.
 	 */
-	std::tuple<double, double, double> RPYFromQuaternionMsg(const ignition::msgs::Quaternion & quaternion) {
-		ignition::math::Quaternion quaternion_math(quaternion.w(), quaternion.x(), quaternion.y(), quaternion.z());
-		double roll = quaternion_math.Roll();
-		double pitch = quaternion_math.Pitch();
-		double yaw = quaternion_math.Yaw();
-		return std::make_tuple(roll, pitch, yaw);
-	}
+	std::tuple<double, double, double> RPYFromQuaternionMsg(const ignition::msgs::Quaternion & quaternion);
 
 } // namespace ground_texture_sim
 
