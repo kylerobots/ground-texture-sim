@@ -19,6 +19,7 @@ namespace ground_texture_sim {
 			ignition::msgs::CameraInfo * camera_info_msg;
 			ignition::msgs::Image * image_msg;
 			ignition::msgs::Pose_V * pose_msg;
+			ignition::msgs::Pose extracted_pose;
 			// Now get the most up to date messages. There might be a bit of a lag in updating the values, so check
 			// the pose to see if it matches approximately what we would expect.
 			bool pose_updated = false;
@@ -29,7 +30,6 @@ namespace ground_texture_sim {
 				image_msg = dynamic_cast<ignition::msgs::Image *>(messages["/camera"].get());
 				pose_msg = dynamic_cast<ignition::msgs::Pose_V *>(messages["/world/ground_texture/dynamic_pose/info"].get());
 				// Compare values to verify updated pose. Account for floating point accuracy.
-				ignition::msgs::Pose extracted_pose;
 				for (int i = 0; i < pose_msg->pose_size(); ++i) {
 					if (pose_msg->pose(i).name() == "camera") {
 						extracted_pose = pose_msg->pose(i);
@@ -46,9 +46,7 @@ namespace ground_texture_sim {
 			}
 
 			// Write them to file.
-			data_writer.registerCameraInfo(*camera_info_msg);
-			data_writer.registerPose(*pose_msg);
-			data_writer.registerImage(*image_msg);
+			data_writer.writeData(*image_msg, extracted_pose, *camera_info_msg);
 		}
 		std::cout << "Finished capturing!" << std::endl;
 		return true;
@@ -75,18 +73,8 @@ namespace ground_texture_sim {
 
 	bool TrajectoryFollower::sendPose(const Pose2D & pose) {
 		// First construct the message.
-		ignition::msgs::Pose pose_request;
+		ignition::msgs::Pose pose_request = poseMsgFromPose2D(pose);
 		pose_request.set_name("camera");
-		pose_request.mutable_position()->set_x(pose.x);
-		pose_request.mutable_position()->set_y(pose.y);
-		pose_request.mutable_position()->set_z(getCameraHeight());
-		// Convert the yaw to quaternion first. Yes, only X and W change, but this future proofs it.
-		// Also, the camera is tilted down, so planar rotation is about the X-axis.
-		ignition::math::Quaternion<float> quaternion(0.0, 0.0, pose.yaw);
-		pose_request.mutable_orientation()->set_x(quaternion.X());
-		pose_request.mutable_orientation()->set_y(quaternion.Y());
-		pose_request.mutable_orientation()->set_z(quaternion.Z());
-		pose_request.mutable_orientation()->set_w(quaternion.W());
 		ignition::msgs::Boolean response;
 		bool result;
 		unsigned int timeout = 1000;

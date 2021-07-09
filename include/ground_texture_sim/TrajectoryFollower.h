@@ -3,10 +3,11 @@
 
 #include "DataSynchronizer.h"
 #include "DataWriter.h"
+#include "transform_math.h"
 
-#include <ignition/math/Quaternion.hh>
-#include <ignition/msgs/boolean.pb.h>
-#include <ignition/msgs/pose.pb.h>
+// #include <ignition/math/Quaternion.hh>
+// #include <ignition/msgs/boolean.pb.h>
+// #include <ignition/msgs/pose.pb.h>
 #include <ignition/transport.hh>
 #include <stdexcept>
 #include <vector>
@@ -21,36 +22,17 @@ namespace ground_texture_sim {
 	/**
 	 * @brief A class to walk the camera through a predefined trajectory.
 	 * 
-	 * This class uses a predefined list of camera poses to move the camera about the simulation environment. It reads
-	 * in each pose, moves the camera to that spot, captures the image, and writes the data to file. This continues for
-	 * every pose. Poses are simply given as a CSV file of 2D poses:
-	 * ```
-	 * x1(meters),y1(meters),yaw1(radians)
-	 * x2(meters),y2(meters),yaw2(radians)
-	 * ...
-	 * ```
+	 * This is the primary class to use this library. It receives a vector of 2D poses, moves the camera to each pose,
+	 * captures the data, writes it to file, then moves to the next pose in the vector.
+	 * 
 	 * No interpolation is done between the poses, so ensure they have sufficient overlap. Data is written to the
-	 * specified directory in the same format as DataWriter.
+	 * specified directory in the format described in DataWriter.
 	 * 
 	 * Because this has to wait for the camera to move and refresh its data, this may take some time to process on slow
 	 * systems.
 	 * 
 	 */
 	class TrajectoryFollower {
-		public:
-		/**
-		 * @brief A simple representation of different poses along the trajectory.
-		 * 
-		 */
-		struct Pose2D {
-			/// The location along the X-axis, in meters.
-			float x;
-			/// The location along the Y-axis, in meters.
-			float y;
-			/// The rotation about the Z-axis, in radians.
-			float yaw;
-		};
-
 		public:
 		/**
 		 * @brief Construct a new Trajectory Follower object

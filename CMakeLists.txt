@@ -22,6 +22,7 @@ find_package(ignition-transport${IGNITION_TRANSPORT_VERSION} REQUIRED)
 add_library(ground_texture_sim
 	src/ground_texture_sim/DataSynchronizer.cpp
 	src/ground_texture_sim/DataWriter.cpp
+	src/ground_texture_sim/TrajectoryFollower.cpp
 	src/ground_texture_sim/transform_math.cpp
 )
 target_include_directories(ground_texture_sim
@@ -34,6 +35,11 @@ target_link_libraries(ground_texture_sim
 	ignition-math${IGNITION_MATH_VERSION}::core
 	ignition-msgs${IGNITION_MSGS_VERSION}::core
 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
+)
+
+install(
+	TARGETS
+		ground_texture_sim
 )
 
 # add_executable(follow_trajectory
@@ -53,14 +59,6 @@ target_link_libraries(ground_texture_sim
 # 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 # )
 
-# Specify installation information
-# install(
-# 	TARGETS
-# 		data_writer
-# 		follow_trajectory
-# 		keyboard_controller
-# )
-
 # Use Google Test for unit testing. This could probably be compiled in the image, but this was easier to implement.
 include(CTest)
 if(BUILD_TESTING)
@@ -73,25 +71,18 @@ if(BUILD_TESTING)
 	)
 	FetchContent_MakeAvailable(google_test)
 		
-	# # Unit test for the trajectory
-	# add_executable(test_trajectory_follower
-	# 	test/test_trajectory_follower.cpp
-	# 	src/ground_texture_sim/DataSynchronizer.cpp
-	# 	src/ground_texture_sim/DataWriter.cpp
-	# 	src/ground_texture_sim/TrajectoryFollower.cpp
-	# )
-	# target_include_directories(test_trajectory_follower
-	# 	PRIVATE
-	# 		include/ground_texture_sim
-	# )
-	# target_link_libraries(test_trajectory_follower
-	# 	gtest_main
-	# 	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
-	# 	ignition-math${IGNITION_MATH_VERSION}::core
-	# 	ignition-msgs${IGNITION_MSGS_VERSION}::core
-	# 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
-	# )
-	# add_test(TrajectoryFollower test_trajectory_follower)
+	add_executable(test_trajectory_follower
+		test/test_trajectory_follower.cpp
+	)
+	target_include_directories(test_trajectory_follower
+		PRIVATE
+			include/ground_texture_sim
+	)
+	target_link_libraries(test_trajectory_follower
+		gtest_main
+		ground_texture_sim
+	)
+	add_test(TrajectoryFollower test_trajectory_follower)
 
 	add_executable(test_data_synchronizer
 		test/test_data_synchronizer.cpp
