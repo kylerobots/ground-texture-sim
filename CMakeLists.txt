@@ -132,7 +132,7 @@ if(BUILD_TESTING)
 	add_test(DataSynchronizer test_data_synchronizer)
 
 	add_executable(test_math
-		test/test_math.cpp
+		test/test_transform_math.cpp
 	)
 	target_include_directories(test_math
 		PRIVATE

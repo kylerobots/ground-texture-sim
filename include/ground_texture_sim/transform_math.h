@@ -4,6 +4,7 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/msgs/pose.pb.h>
 #include <ignition/msgs/quaternion.pb.h>
+#include <tuple>
 
 /**
  * @brief The namespace for any class created in this package.
@@ -63,6 +64,34 @@ namespace ground_texture_sim {
 	ignition::msgs::Pose poseMsgFromPose2D(const Pose2D & pose2D) {
 		ignition::msgs::Pose pose;
 		return pose;
+	}
+
+	/**
+	 * @brief Extract the roll, pitch, and yaw from a Quaternion.
+	 * 
+	 * I believe these are calculate in RPY order.
+	 * 
+	 * @param quaternion The Quaternion object to extract from.
+	 * @return std::tuple<Scalar, Scalar, Scalar> A tuple containing the roll, pitch, and yaw.
+	 */
+	template <typename Scalar>
+	std::tuple<Scalar, Scalar, Scalar> RPYFromQuaternion(const ignition::math::Quaternion<Scalar> & quaternion) {
+		Scalar roll;
+		Scalar pitch;
+		Scalar yaw;
+		return std::make_tuple(roll, pitch, yaw);
+	}
+
+	/**
+	 * @brief Extract the roll, pitch, and yaw from a Quaternion message.
+	 * 
+	 * I believe these are calculated in RPY order.
+	 * 
+	 * @param quaternion The Quaternion message object to extract from.
+	 * @return std::tuple<double, double, double> A tuple containing the roll, pitch, and yaw.
+	 */
+	std::tuple<double, double, double> RPYFromQuaternionMsg(const ignition::msgs::Quaternion & quaternion) {
+		return std::make_tuple<double, double, double>(0.0, 0.0, 0.0);
 	}
 
 } // namespace ground_texture_sim

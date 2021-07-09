@@ -163,3 +163,69 @@ TEST(PoseFromPose2D, AngleWrap) {
 	auto result = ground_texture_sim::poseMsgFromPose2D(pose);
 	comparePoses(pose, result);
 }
+
+/// @test Test that the RPY is zero for an identity quaternion.
+TEST(RPYFromQuaternion, Identity) {
+	double input_yaw = 0.0;
+	auto quaternion = ground_texture_sim::quaternionFromYaw(input_yaw);
+	double roll, pitch, yaw;
+	std::tie(roll, pitch, yaw) = ground_texture_sim::RPYFromQuaternion(quaternion);
+	ASSERT_DOUBLE_EQ(roll, 0.0);
+	ASSERT_DOUBLE_EQ(pitch, 0.0);
+	ASSERT_DOUBLE_EQ(yaw, input_yaw);
+}
+
+/// @test Test that the RPY is correct for a positive yaw.
+TEST(RPYFromQuaternion, PositiveYaw) {
+	double input_yaw = M_PI / 2.0;
+	auto quaternion = ground_texture_sim::quaternionFromYaw(input_yaw);
+	double roll, pitch, yaw;
+	std::tie(roll, pitch, yaw) = ground_texture_sim::RPYFromQuaternion(quaternion);
+	ASSERT_DOUBLE_EQ(roll, 0.0);
+	ASSERT_DOUBLE_EQ(pitch, 0.0);
+	ASSERT_DOUBLE_EQ(yaw, input_yaw);
+}
+
+/// @test Test that the RPY is correct for a wrapped yaw
+TEST(RPYFromQuaternion, WrappedYaw) {
+	double input_yaw = 3.0 * M_PI;
+	auto quaternion = ground_texture_sim::quaternionFromYaw(input_yaw);
+	double roll, pitch, yaw;
+	std::tie(roll, pitch, yaw) = ground_texture_sim::RPYFromQuaternion(quaternion);
+	ASSERT_DOUBLE_EQ(roll, 0.0);
+	ASSERT_DOUBLE_EQ(pitch, 0.0);
+	ASSERT_DOUBLE_EQ(yaw, M_PI);
+}
+
+/// @test Test that the RPY is zero for an identity quaternion.
+TEST(RPYFromQuaternionMsg, Identity) {
+	double input_yaw = M_PI / 2.0;
+	auto quaternion = ground_texture_sim::quaternionMsgFromYaw(input_yaw);
+	double roll, pitch, yaw;
+	std::tie(roll, pitch, yaw) = ground_texture_sim::RPYFromQuaternionMsg(quaternion);
+	ASSERT_DOUBLE_EQ(roll, 0.0);
+	ASSERT_DOUBLE_EQ(pitch, 0.0);
+	ASSERT_DOUBLE_EQ(yaw, input_yaw);
+}
+
+/// @test Test that the RPY is correct for a positive yaw.
+TEST(RPYFromQuaternionMsg, PositiveYaw) {
+	double input_yaw = M_PI / 2.0;
+	auto quaternion = ground_texture_sim::quaternionMsgFromYaw(input_yaw);
+	double roll, pitch, yaw;
+	std::tie(roll, pitch, yaw) = ground_texture_sim::RPYFromQuaternionMsg(quaternion);
+	ASSERT_DOUBLE_EQ(roll, 0.0);
+	ASSERT_DOUBLE_EQ(pitch, 0.0);
+	ASSERT_DOUBLE_EQ(yaw, input_yaw);
+}
+
+/// @test Test that the RPY is correct for a wrapped yaw
+TEST(RPYFromQuaternionMsg, WrappedYaw) {
+	double input_yaw = 3.0 * M_PI;
+	auto quaternion = ground_texture_sim::quaternionMsgFromYaw(input_yaw);
+	double roll, pitch, yaw;
+	std::tie(roll, pitch, yaw) = ground_texture_sim::RPYFromQuaternionMsg(quaternion);
+	ASSERT_DOUBLE_EQ(roll, 0.0);
+	ASSERT_DOUBLE_EQ(pitch, 0.0);
+	ASSERT_DOUBLE_EQ(yaw, M_PI);
+}
