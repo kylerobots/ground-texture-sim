@@ -7,50 +7,52 @@
  * @brief Helper function to compare test results.
  * 
  * This compares Quaternion objects to their expected (x, y, z, w) values. Since we are dealing with yaw only, the x and
- * y value should always be zero. Since a negative of a quaterion represents the same rotation, the signs of both z
- * values are set equal by negating the z and w values, if required. This ensures that the tests only pass if the signs
- * of the w values also match.
+ * y value should always be zero. Since a negative of a quaterion represents the same rotation, both possibilities must
+ * be tested for.
  * 
  * @param quat The Quaternion to compare.
  * @param z The expected z value.
  * @param w The expected w value.
  */
 void compareQuaternions(const ignition::math::Quaternion<double> & quat, double z, double w) {
-	// A negative of a quaternion is the same as a quaterion. So massage to the right signs. Matching w will ensure z
-	// must also be matched.
-	if (std::signbit(quat.Z()) != std::signbit(z)) {
-		z *= -1.0;
-		w *= -1.0;
-	}
 	ASSERT_DOUBLE_EQ(quat.X(), 0.0);
 	ASSERT_DOUBLE_EQ(quat.Y(), 0.0);
-	ASSERT_NEAR(quat.Z(), z, 1e-10);
-	ASSERT_NEAR(quat.W(), w, 1e-10);
+	// Compare to the original and negative values. Slight computation differences are larger than double precision, so
+	// use a higher tolerance to compare.
+	bool original_z = abs(quat.Z() - z) <= 1e-10;
+	bool original_w = abs(quat.W() - w) <= 1e-10;
+	bool original = original_z && original_w;
+	bool negative_z = abs(quat.Z() + z) <= 1e-10;
+	bool negative_w = abs(quat.W() + w) <= 1e-10;
+	bool negative = negative_z && negative_w;
+	// One of the two must match, otherwise, they represent different rotations.
+	ASSERT_TRUE(original || negative);
 }
 
 /**
  * @brief Helper function to compare test results.
  * 
  * This compares Quaternion message objects to their expected (x, y, z, w) values. Since we are dealing with yaw only,
- * the x and y value should always be zero. Since a negative of a quaterion represents the same rotation, the signs of
- * both z values are set equal by negating the z and w values, if required. This ensures that the tests only pass if the
- * signs of the w values also match.
+ * the x and y value should always be zero. Since a negative of a quaterion represents the same rotation, both
+ * possibilities must be tested for.
  * 
  * @param quat The Quaternion to compare.
  * @param z The expected z value.
  * @param w The expected w value.
  */
 void compareQuaternions(const ignition::msgs::Quaternion & quat, double z, double w) {
-	// A negative of a quaternion is the same as a quaterion. So massage to the right signs. Matching w will ensure z
-	// must also be matched.
-	if (std::signbit(quat.z()) != std::signbit(z)) {
-		z *= -1.0;
-		w *= -1.0;
-	}
 	ASSERT_DOUBLE_EQ(quat.x(), 0.0);
 	ASSERT_DOUBLE_EQ(quat.y(), 0.0);
-	ASSERT_NEAR(quat.z(), z, 1e-10);
-	ASSERT_NEAR(quat.w(), w, 1e-10);
+	// Compare to the original and negative values. Slight computation differences are larger than double precision, so
+	// use a higher tolerance to compare.
+	bool original_z = abs(quat.z() - z) <= 1e-10;
+	bool original_w = abs(quat.w() - w) <= 1e-10;
+	bool original = original_z && original_w;
+	bool negative_z = abs(quat.z() + z) <= 1e-10;
+	bool negative_w = abs(quat.w() + w) <= 1e-10;
+	bool negative = negative_z && negative_w;
+	// One of the two must match, otherwise, they represent different rotations.
+	ASSERT_TRUE(original || negative);
 }
 
 /**

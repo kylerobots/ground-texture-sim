@@ -131,18 +131,18 @@ if(BUILD_TESTING)
 	)
 	add_test(DataSynchronizer test_data_synchronizer)
 
-	add_executable(test_math
+	add_executable(test_transform_math
 		test/test_transform_math.cpp
 	)
-	target_include_directories(test_math
+	target_include_directories(test_transform_math
 		PRIVATE
 			include/ground_texture_sim
 	)
-	target_link_libraries(test_math
+	target_link_libraries(test_transform_math
 		gtest_main
 		ignition-math${IGNITION_MATH_VERSION}::core
 		ignition-msgs${IGNITION_MSGS_VERSION}::core
 	)
-	add_test(Math test_math)
+	add_test(Math test_transform_math)
 			
 endif(BUILD_TESTING)
