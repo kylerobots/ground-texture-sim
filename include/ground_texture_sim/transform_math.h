@@ -67,22 +67,28 @@ namespace ground_texture_sim {
 	 */
 	ignition::msgs::Pose poseMsgFromPose2D(const Pose2D & pose2D) {
 		ignition::msgs::Pose pose;
+		pose.mutable_position()->set_x(pose2D.x);
+		pose.mutable_position()->set_y(pose2D.y);
+		pose.mutable_position()->set_z(0.0);
+		// Use existing functions to set rotation.
+		auto rotation = quaternionMsgFromYaw(pose2D.yaw);
+		pose.mutable_orientation()->Swap(&rotation);
 		return pose;
 	}
 
 	/**
 	 * @brief Extract the roll, pitch, and yaw from a Quaternion.
 	 * 
-	 * I believe these are calculate in RPY order.
+	 * I believe these are calculated in RPY order.
 	 * 
 	 * @param quaternion The Quaternion object to extract from.
 	 * @return std::tuple<Scalar, Scalar, Scalar> A tuple containing the roll, pitch, and yaw.
 	 */
 	template <typename Scalar>
 	std::tuple<Scalar, Scalar, Scalar> RPYFromQuaternion(const ignition::math::Quaternion<Scalar> & quaternion) {
-		Scalar roll;
-		Scalar pitch;
-		Scalar yaw;
+		Scalar roll = quaternion.Roll();
+		Scalar pitch = quaternion.Pitch();
+		Scalar yaw = quaternion.Yaw();
 		return std::make_tuple(roll, pitch, yaw);
 	}
 
@@ -95,7 +101,11 @@ namespace ground_texture_sim {
 	 * @return std::tuple<double, double, double> A tuple containing the roll, pitch, and yaw.
 	 */
 	std::tuple<double, double, double> RPYFromQuaternionMsg(const ignition::msgs::Quaternion & quaternion) {
-		return std::make_tuple<double, double, double>(0.0, 0.0, 0.0);
+		ignition::math::Quaternion quaternion_math(quaternion.w(), quaternion.x(), quaternion.y(), quaternion.z());
+		double roll = quaternion_math.Roll();
+		double pitch = quaternion_math.Pitch();
+		double yaw = quaternion_math.Yaw();
+		return std::make_tuple(roll, pitch, yaw);
 	}
 
 } // namespace ground_texture_sim

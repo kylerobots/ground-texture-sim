@@ -66,7 +66,7 @@ void comparePoses(const ground_texture_sim::Pose2D & pose2d, const ignition::msg
 	ASSERT_DOUBLE_EQ(pose_msg.position().y(), pose2d.y);
 	ASSERT_DOUBLE_EQ(pose_msg.position().z(), 0.0);
 	// Leverage other helper functions to test the rotation.
-	compareQuaternions(pose_msg.orientation(), std::sin(pose2d.yaw), std::cos(pose2d.yaw));
+	compareQuaternions(pose_msg.orientation(), std::sin(pose2d.yaw / 2.0), std::cos(pose2d.yaw / 2.0));
 }
 
 //// @test Test that an identity yaw is converted to an identity Quaternion.
@@ -85,10 +85,11 @@ TEST(QuatFromYaw, Pi) {
 
 /// @test Test that a yaw of +/- Pi/4 produces the correct Quaternion.
 TEST(QuatFromYaw, PiOver4) {
-	auto result = ground_texture_sim::quaternionFromYaw(M_PI / 4.0);
-	compareQuaternions(result, std::sin(M_PI / 8.0), std::cos(M_PI / 8.0));
-	result = ground_texture_sim::quaternionFromYaw(-M_PI / 4.0);
-	compareQuaternions(result, std::sin(M_PI / 8.0), -1.0 * std::cos(M_PI / 8.0));
+	double yaw = M_PI / 4.0;
+	auto result = ground_texture_sim::quaternionFromYaw(yaw);
+	compareQuaternions(result, std::sin(yaw / 2.0), std::cos(yaw / 2.0));
+	result = ground_texture_sim::quaternionFromYaw(-1.0 * yaw);
+	compareQuaternions(result, std::sin(-1.0 * yaw / 2.0), std::cos(-1.0 * yaw / 2.0));
 }
 
 /// @test Test that the code correctly wraps a value of 2*Pi to 0.
@@ -115,10 +116,11 @@ TEST(QuatMsgFromYaw, Pi) {
 
 /// @test Test that a yaw of +/- Pi/4 produces the correct Quaternion.
 TEST(QuatMsgFromYaw, PiOver4) {
-	auto result = ground_texture_sim::quaternionMsgFromYaw(M_PI / 4.0);
-	compareQuaternions(result, std::sin(M_PI / 8.0), std::cos(M_PI / 8.0));
-	result = ground_texture_sim::quaternionMsgFromYaw(-M_PI / 4.0);
-	compareQuaternions(result, std::sin(M_PI / 8.0), -1.0 * std::cos(M_PI / 8.0));
+	double yaw = M_PI / 4.0;
+	auto result = ground_texture_sim::quaternionMsgFromYaw(yaw);
+	compareQuaternions(result, std::sin(yaw / 2.0), std::cos(yaw / 2.0));
+	result = ground_texture_sim::quaternionMsgFromYaw(-1.0 * yaw);
+	compareQuaternions(result, std::sin(-1.0 * yaw / 2.0), std::cos(-1.0 * yaw / 2.0));
 }
 
 /// @test Test that the code correctly wraps a value of 2*Pi to 0.
