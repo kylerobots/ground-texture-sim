@@ -38,7 +38,6 @@ namespace ground_texture_sim {
 	template <typename Scalar = float>
 	ignition::math::Quaternion<Scalar> quaternionFromYaw(Scalar yaw) {
 		ignition::math::Quaternion<Scalar> quaternion(Scalar(0.0), Scalar(0.0), yaw);
-		// static_cast<Scalar>(0.0), static_cast<Scalar>(0.0), yaw);
 		return quaternion;
 	}
 
@@ -51,8 +50,13 @@ namespace ground_texture_sim {
 	 * @return ignition::msgs::Quaternion The resulting Quaternion Message object.
 	 */
 	ignition::msgs::Quaternion quaternionMsgFromYaw(double yaw) {
-		ignition::msgs::Quaternion quaternion;
-		return quaternion;
+		auto quaternion = quaternionFromYaw(yaw);
+		ignition::msgs::Quaternion quaternion_msg;
+		quaternion_msg.set_x(quaternion.X());
+		quaternion_msg.set_y(quaternion.Y());
+		quaternion_msg.set_z(quaternion.Z());
+		quaternion_msg.set_w(quaternion.W());
+		return quaternion_msg;
 	}
 
 	/**
