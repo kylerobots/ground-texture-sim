@@ -1,10 +1,13 @@
 #ifndef _DATA_WRITER_H_
 #define _DATA_WRITER_H_
 
-#include <ignition/common/Image.hh>
-#include <ignition/math/Quaternion.hh>
+// #include <ignition/common/Image.hh>
+// #include <ignition/math/Quaternion.hh>
+// #include <ignition/msgs.hh>
+// #include <ostream>
+#include <filesystem>
 #include <ignition/msgs.hh>
-#include <ostream>
+#include <string>
 
 /**
  * @brief The namespace for any class created in this package.
@@ -17,68 +20,116 @@ namespace ground_texture_sim {
 	 * @brief Captures images and locations from Ignition and writes them to file.
 	 * 
 	 * This class is designed to receive measurements from the simulation environment in order to generate data. In
-	 * particular, it receives images from the camera, camara parameters, and the pose of the camera. Because each my
-	 * come in asynchronously, it uses the last updated pose whenever each camera image is received. This might lead to
-	 * some errors, but is probably close enough for data collection.
-	 * 
-	 * The current iteration will just write to file wherever the code is run. This is not ideal, but is a minimum
-	 * viable product.
+	 * particular, it receives images from the camera, camara parameters, and the pose of the camera. Each are then
+	 * written out to numerically labeled, monotonically increasing file names. (e.g. 000000.txt, 000001.txt, etc.)
 	 * 
 	 */
 	class DataWriter {
-		private:
-		/// The count of how many images have been written to file.
-		int image_count;
-		/// The most recent camera parameters received from the simulation.
-		ignition::msgs::CameraInfo current_camera_info;
-		/// The most recent image received from the simulation.
-		ignition::msgs::Image current_image;
-		/// The most recent pose received from the simulation.
-		ignition::msgs::Pose current_pose;
-
-		/**
-		 * @brief Performs the actual data writing.
-		 * 
-		 * Before writing to file, this first does some quick data conversions from msg datatypes in order to leverage
-		 * Ignition's built in image saving and quaternion conversion functionality.
-		 * 
-		 */
-		void writeData();
-
 		public:
 		/**
 		 * @brief Construct a new DataWriter object.
+		 * 
+		 * By default, the writer writes to the working directory.
 		 * 
 		 */
 		DataWriter();
 
 		/**
-		 * @brief Record the camera info published by the simulation.
+		 * @brief Construct a new Data Writer object.
 		 * 
-		 * While the info should be unchanging, it will record it each time to make sure.
+		 * The data will be written to the data_folder, which can be an absolute path or relative to the working
+		 * directory. If the folder does not exist, it will be created.
 		 * 
-		 * @param msg The published CameraInfo message.
+		 * @param data_folder Folder where the data should go. Can be absolute or relative. This folder will be created
+		 * if it does not already exist.
 		 */
-		void registerCameraInfo(const ignition::msgs::CameraInfo & msg);
+		DataWriter(const std::string & data_folder);
 
 		/**
-		 * @brief Record the latest image with associated camera info and pose.
+		 * @brief Get where the data should be written.
 		 * 
-		 * When an image is received, it records the image, then triggers the write to file actions.
-		 * 
-		 * @param msg The published Image message.
+		 * @return std::string The folder for the data. This will be absolute or relative, depending on how it was set.
 		 */
-		void registerImage(const ignition::msgs::Image & msg);
+		std::string getDataFolder() const;
 
 		/**
-		 * @brief Record the latest pose of the camera each time it is published.
+		 * @brief Set where the data should be written.
 		 * 
-		 * When received, it will extract the camera's pose and update the member variable. Since this is the only
-		 * spot where that variable is written to, no mutex is used.
+		 * This can be absolute or relative to the current working directory. If the folder does not exist, it will
+		 * be created. Calling this again will not remove previously created directories.
 		 * 
-		 * @param msg The published Pose message.
+		 * @param data_folder Folder where the data should go. Can be absolute or relative. This folder will be created
+		 * if it does not already exist.
+		 * @throws boost::filesystem::filesystem_error is thrown if the object cannot create the requested directory.
 		 */
-		void registerPose(const ignition::msgs::Pose_V & msg);
+		void setDataFolder(const std::string & data_folder);
+
+		/**
+		 * @brief Write the data to files.
+		 * 
+		 * When called, it will write the data to a series of indexed files of the following formats:
+		 * 
+		 * | data type | file format |
+		 * | --- | --- |
+		 * | image | 000000.png |
+		 * | pose | 000000.txt |
+		 * | camera_info | 000000_calib.txt |
+		 * 
+		 * The index of the file name will be incremented by one each time. If there are more than 1,000,000 images,
+		 * any value over 999999 will be used as the file name without leading zeros. In other words, earlier files
+		 * will still have 6 digits including leading zeros while latter will have no leading zeros and just the index
+		 * number.
+		 * 
+		 * @param image The Image message to write.
+		 * @param pose The Pose message to write.
+		 * @param camera_info The CameraInfo message to write.
+		 * @return true if everything was written successfully.
+		 * @return false if there was a problem writing. The index will still increase to avoid issues.
+		 */
+		bool writeData(const ignition::msgs::Image & image, const ignition::msgs::Pose & pose, ignition::msgs::CameraInfo & camera_info);
+
+		protected:
+		/**
+		 * @brief Write the given image to the file with index for the filename.
+		 * 
+		 * File names are of the form 000000.png, 000001.png, etc.
+		 * 
+		 * @param image The image to write.
+		 * @return true if the write was successful.
+		 * @return false otherwise.
+		 */
+		bool writeImage(const ignition::msgs::Image & image);
+
+		/**
+		 * @brief Write the given pose to the file with index for the filename.
+		 * 
+		 * File names are of the form 000000.txt, 000001.txt, etc. File format is:
+		 * 
+		 * x,y,z,roll,pitch,yaw
+		 * 
+		 * @param pose The pose to write.
+		 * @return true if the write was successful.
+		 * @return false otherwise.
+		 */
+		bool writePose(const ignition::msgs::Pose & pose);
+
+		/**
+		 * @brief Write the given camera info to the file with index for the filename.
+		 * 
+		 * File names are of the form 000000_calib.txt, 000001_calib.txt, etc. File format is exactly the same as
+		 * the DebugString of the message.
+		 * 
+		 * @param camera_info The camera info to write.
+		 * @return true if the write was successful.
+		 * @return false otherwise.
+		 */
+		bool writeCameraInfo(const ignition::msgs::CameraInfo & camera_info);
+
+		protected:
+		/// The directory to place the written files.
+		std::string data_folder;
+		/// The count of how many images have been written to file.
+		unsigned int index;
 	};
 
 } // namespace ground_texture_sim
