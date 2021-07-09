@@ -20,6 +20,7 @@ find_package(ignition-msgs${IGNITION_MSGS_VERSION} REQUIRED)
 find_package(ignition-transport${IGNITION_TRANSPORT_VERSION} REQUIRED)
 
 add_library(ground_texture_sim
+	src/ground_texture_sim/DataSynchronizer.cpp
 	src/ground_texture_sim/DataWriter.cpp
 	src/ground_texture_sim/transform_math.cpp
 )
@@ -32,21 +33,8 @@ target_link_libraries(ground_texture_sim
 	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
 	ignition-math${IGNITION_MATH_VERSION}::core
 	ignition-msgs${IGNITION_MSGS_VERSION}::core
+	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 )
-
-# add_executable(data_writer
-# 	src/data_writer_node.cpp
-# 	src/ground_texture_sim/DataWriter.cpp
-# )
-# target_include_directories(data_writer
-# 	PRIVATE
-# 		include/ground_texture_sim
-# )
-# target_link_libraries(data_writer
-# 	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
-# 	ignition-math${IGNITION_MATH_VERSION}::core
-# 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
-# )
 
 # add_executable(follow_trajectory
 # 	src/follow_trajectory.cpp
@@ -105,20 +93,18 @@ if(BUILD_TESTING)
 	# )
 	# add_test(TrajectoryFollower test_trajectory_follower)
 
-	# add_executable(test_data_synchronizer
-	# 	test/test_data_synchronizer.cpp
-	# 	src/ground_texture_sim/DataSynchronizer.cpp
-	# )
-	# target_include_directories(test_data_synchronizer
-	# 	PRIVATE
-	# 		include/ground_texture_sim
-	# )
-	# target_link_libraries(test_data_synchronizer
-	# 	gtest_main
-	# 	ignition-msgs${IGNITION_MSGS_VERSION}::core
-	# 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
-	# )
-	# add_test(DataSynchronizer test_data_synchronizer)
+	add_executable(test_data_synchronizer
+		test/test_data_synchronizer.cpp
+	)
+	target_include_directories(test_data_synchronizer
+		PRIVATE
+			include/ground_texture_sim
+	)
+	target_link_libraries(test_data_synchronizer
+		gtest_main
+		ground_texture_sim
+	)
+	add_test(DataSynchronizer test_data_synchronizer)
 
 	add_executable(test_data_writer
 		test/test_data_writer.cpp
