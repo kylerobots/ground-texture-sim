@@ -75,6 +75,8 @@ namespace ground_texture_sim {
 		// First construct the message.
 		ignition::msgs::Pose pose_request = poseMsgFromPose2D(pose);
 		pose_request.set_name("camera");
+		// Add the camera height.
+		pose_request.mutable_position()->set_z(getCameraHeight());
 		ignition::msgs::Boolean response;
 		bool result;
 		unsigned int timeout = 1000;
