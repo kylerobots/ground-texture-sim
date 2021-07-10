@@ -8,6 +8,8 @@ project(ground-texture-sim
 
 set(CMAKE_CXX_STANDARD 17)
 
+include(GNUInstallDirs)
+
 # Specify which versions of Ignition components to load.
 set(IGNITION_COMMON_VERSION 4)
 set(IGNITION_MATH_VERSION 6)
@@ -36,12 +38,19 @@ target_link_libraries(ground_texture_sim
 	ignition-msgs${IGNITION_MSGS_VERSION}::core
 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
 )
+set(public_headers
+	include/ground_texture_sim/DataSynchronizer.h
+	include/ground_texture_sim/DataWriter.h
+	include/ground_texture_sim/TrajectoryFollower.h
+	include/ground_texture_sim/transform_math.h
+)
+set_target_properties(ground_texture_sim PROPERTIES PUBLIC_HEADER "${public_headers}")
 
 add_executable(follow_trajectory
 	src/follow_trajectory.cpp
 )
 target_include_directories(follow_trajectory
-	PRIVATE
+	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/ground_texture_sim>
   		$<INSTALL_INTERFACE:include/ground_texture_sim>
 )
@@ -53,24 +62,8 @@ install(
 	TARGETS
 		follow_trajectory
 		ground_texture_sim
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ground_texture_sim
 )
-
-# add_executable(follow_trajectory
-# 	src/follow_trajectory.cpp
-# 	src/ground_texture_sim/DataSynchronizer.cpp
-# 	src/ground_texture_sim/DataWriter.cpp
-# 	src/ground_texture_sim/TrajectoryFollower.cpp
-# )
-# target_include_directories(follow_trajectory
-# 	PRIVATE
-# 		include/ground_texture_sim
-# )
-# target_link_libraries(follow_trajectory
-# 	ignition-common${IGNITION_COMMON_VERSION}::ignition-common${IGNITION_COMMON_VERSION}-graphics
-# 	ignition-math${IGNITION_MATH_VERSION}::core
-# 	ignition-msgs${IGNITION_MSGS_VERSION}::core
-# 	ignition-transport${IGNITION_TRANSPORT_VERSION}::core
-# )
 
 # Use Google Test for unit testing. This could probably be compiled in the image, but this was easier to implement.
 include(CTest)
