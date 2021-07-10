@@ -49,9 +49,11 @@ namespace ground_texture_sim {
 		/**
 		 * @brief Get where the data should be written.
 		 * 
-		 * @return std::string The folder for the data. This will be absolute or relative, depending on how it was set.
+		 * @param relative True if the returned string should be relative to the current directory, false if absolute.
+		 * @return std::string The folder for the data. This will be absolute or relative, depending on the value of
+		 * relative.
 		 */
-		std::string getDataFolder() const;
+		std::string getDataFolder(bool relative = false) const;
 
 		/**
 		 * @brief Set where the data should be written.

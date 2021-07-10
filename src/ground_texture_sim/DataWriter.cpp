@@ -11,7 +11,7 @@ namespace ground_texture_sim {
 		setDataFolder(data_folder);
 	}
 
-	std::string DataWriter::getDataFolder() const {
+	std::string DataWriter::getDataFolder(bool relative) const {
 		return data_folder;
 	}
 
