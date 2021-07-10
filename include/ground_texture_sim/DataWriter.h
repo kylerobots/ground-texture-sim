@@ -63,7 +63,7 @@ namespace ground_texture_sim {
 		 * 
 		 * @param data_folder Folder where the data should go. Can be absolute or relative. This folder will be created
 		 * if it does not already exist.
-		 * @throws boost::filesystem::filesystem_error is thrown if the object cannot create the requested directory.
+		 * @throws std:filesystem::filesystem_error is thrown if the object cannot create the requested directory.
 		 */
 		void setDataFolder(const std::string & data_folder);
 

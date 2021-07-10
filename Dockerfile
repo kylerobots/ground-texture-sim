@@ -50,8 +50,6 @@ CMD [ "ctest", "-VV" ]
 # From the compiled version, copy over the applications needed to run.
 FROM base AS run
 COPY --from=build \
-	/usr/local/bin/keyboard_controller \
-	/usr/local/bin/data_writer \
 	/usr/local/bin/follow_trajectory \
 	/usr/local/bin/
 # Make a local user.
