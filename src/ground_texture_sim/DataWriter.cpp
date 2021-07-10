@@ -12,16 +12,22 @@ namespace ground_texture_sim {
 	}
 
 	std::string DataWriter::getDataFolder(bool relative) const {
-		return data_folder;
+		if (relative) {
+			return std::filesystem::relative(this->data_folder);
+		} else {
+			return this->data_folder;
+		}
 	}
 
 	void DataWriter::setDataFolder(const std::string & data_folder) {
-		this->data_folder = data_folder;
-		// If the string is empty, the current directory is assumed. This exists by default, so no need to create it.
-		if (this->data_folder != "") {
-			// This doesn't error if the folder exists, so create it no matter what.
-			bool result = std::filesystem::create_directory(std::filesystem::path(this->data_folder));
+		// If nothing is provided, it will be the current path.
+		if (data_folder == "") {
+			this->data_folder = std::filesystem::current_path();
+		} else {
+			// Store the location as an absolute path.
+			this->data_folder = std::filesystem::absolute(data_folder);
 		}
+		std::filesystem::create_directories(this->data_folder);
 	}
 
 	bool DataWriter::writeData(const ignition::msgs::Image & image, const ignition::msgs::Pose & pose, ignition::msgs::CameraInfo & camera_info) {
@@ -37,8 +43,8 @@ namespace ground_texture_sim {
 	std::string DataWriter::getBaseFilename() const {
 		char buffer[20];
 		snprintf(buffer, 20, "%06d", index);
-		std::string file_name(buffer);
-		return data_folder + "/" + file_name;
+		std::filesystem::path file_name(buffer);
+		return data_folder / file_name;
 	}
 
 	bool DataWriter::writeCameraInfo(const ignition::msgs::CameraInfo & camera_info) {

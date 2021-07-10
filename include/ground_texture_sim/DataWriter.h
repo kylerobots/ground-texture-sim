@@ -140,7 +140,7 @@ namespace ground_texture_sim {
 
 		protected:
 		/// The directory to place the written files.
-		std::string data_folder;
+		std::filesystem::path data_folder;
 		/// The count of how many images have been written to file.
 		unsigned int index;
 	};
