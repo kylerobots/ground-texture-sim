@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+/// @test Verify that the camera height can be set correctly.
 TEST(TrajectoryFollower, SetHeight) {
 	ground_texture_sim::TrajectoryFollower follower;
 	// Non-negative heights are allowed.

@@ -4,7 +4,7 @@ ARG UBUNTU_VERSION=focal
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
-	version="1.2.0" \
+	version="2.0.0" \
 	license="BSD-3-Clause License"
 
 # Install Ignition Edifice and its dependencies. Because of the install via new key, 2 installs are required. One for
@@ -42,18 +42,15 @@ RUN apt update && \
 FROM base AS build
 COPY . /opt/ground-texture-sim
 WORKDIR /opt/ground-texture-sim/build
-RUN cmake -DBUILD_TESTING=on -DCMAKE_BUILD_TYPE=Release .. && \
+ARG BUILD_TEST=OFF
+RUN cmake -DBUILD_TESTING=${BUILD_TEST} -DCMAKE_BUILD_TYPE=Release .. && \
 	make -j && \
 	make install
 CMD [ "ctest", "-VV" ]
 
 # From the compiled version, copy over the applications needed to run.
 FROM base AS run
-COPY --from=build \
-	/usr/local/bin/keyboard_controller \
-	/usr/local/bin/data_writer \
-	/usr/local/bin/follow_trajectory \
-	/usr/local/bin/
+COPY --from=build /usr/local/ /usr/local/
 # Make a local user.
 RUN useradd -ms /bin/bash user
 USER user

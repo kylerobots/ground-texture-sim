@@ -2,20 +2,14 @@
 
 #include "gtest/gtest.h"
 
-/**
- * @brief Tests that the synchronizer works when requesting no topics.
- * 
- */
+/// @test Tests that the synchronizer works when requesting no topics.
 TEST(DataSynchronizer, Empty) {
 	ground_texture_sim::DataSynchronizer synchronizer;
 	auto results = synchronizer.getMessages();
 	EXPECT_EQ(results.size(), 0);
 }
 
-/**
- * @brief Tests that the synchronizer can subscribe to multiple topics of different types.
- * 
- */
+/// @test Tests that the synchronizer can subscribe to multiple topics of different types.
 TEST(DataSynchronizer, Subscribe) {
 	ground_texture_sim::DataSynchronizer synchronizer;
 	bool success = true;

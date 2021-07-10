@@ -18,11 +18,11 @@
  * ```
  * 
  * @param filename The file to read in for poses.
- * @return std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> A resulting collection of poses. If an error
- * occurs, this vector is empty.
+ * @return std::vector<ground_texture_sim::Pose2D> A resulting collection of poses. If an error occurs, this vector is
+ * empty.
  */
-std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> parseFile(const std::string & filename) {
-	std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> trajectory;
+std::vector<ground_texture_sim::Pose2D> parseFile(const std::string & filename) {
+	std::vector<ground_texture_sim::Pose2D> trajectory;
 	std::string line;
 	std::ifstream file(filename);
 	if (!file.is_open()) {
@@ -35,12 +35,12 @@ std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> parseFile(const std:
 			tokens.assign(tokenizer.begin(), tokenizer.end());
 			if (tokens.size() < 3) {
 				std::cout << "ERROR: Line does not have enough values: " << line << std::endl;
-				return std::vector<ground_texture_sim::TrajectoryFollower::Pose2D>();
+				return std::vector<ground_texture_sim::Pose2D>();
 			} else if (tokens.size() > 3) {
 				std::cout << "WARNING: Line contains extra values. They will be ignored: " << line << std::endl;
 			}
 
-			ground_texture_sim::TrajectoryFollower::Pose2D pose;
+			ground_texture_sim::Pose2D pose;
 			try {
 				pose.x = stof(tokens[0]);
 				pose.y = stof(tokens[1]);
@@ -48,10 +48,10 @@ std::vector<ground_texture_sim::TrajectoryFollower::Pose2D> parseFile(const std:
 
 			} catch (const std::invalid_argument & e) {
 				std::cout << "ERROR: Unable to parse line: " << line << std::endl;
-				return std::vector<ground_texture_sim::TrajectoryFollower::Pose2D>();
+				return std::vector<ground_texture_sim::Pose2D>();
 			} catch (const std::out_of_range & e) {
 				std::cout << "ERROR: Number in line is not convertible: " << line << std::endl;
-				return std::vector<ground_texture_sim::TrajectoryFollower::Pose2D>();
+				return std::vector<ground_texture_sim::Pose2D>();
 			}
 			trajectory.push_back(pose);
 		}

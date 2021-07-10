@@ -3,6 +3,7 @@
 	"cmake.configureOnOpen": false,
 	"files.associations": {
 		"*.sdf": "xml",
+		"*.ign": "xml",
 		"iostream": "cpp",
 		"atomic": "cpp",
 		"cctype": "cpp",
@@ -68,7 +69,8 @@
 		"thread": "cpp",
 		"cinttypes": "cpp",
 		"typeinfo": "cpp",
-		"variant": "cpp"
+		"variant": "cpp",
+		"codecvt": "cpp"
 	},
 	"cSpell.words": [
 		"ASWD"
