@@ -5,9 +5,6 @@
 #include "DataWriter.h"
 #include "transform_math.h"
 
-// #include <ignition/math/Quaternion.hh>
-// #include <ignition/msgs/boolean.pb.h>
-// #include <ignition/msgs/pose.pb.h>
 #include <ignition/transport.hh>
 #include <stdexcept>
 #include <vector>
