@@ -12,24 +12,25 @@ This project is licensed, under the BSD 3-Clause "New" or "Revised" License. See
 
 ## Installing and Running with Docker ##
 Using the Docker images defined with the project is by far the easiest route, as it avoids all the installation. The
-already built image is available at https://hub.docker.com/repository/docker/kylerobots/ground-texture-sim or you can
-build the image from the source code. The *run* stage has a minimal image that provides all needed code and simulation
-files. If you are building locally, use something like the following to build.
+already built image is available at https://hub.docker.com/repository/docker/kylerobots/ground-texture-sim. The version
+tags match the release versions. The *latest* tag matches the current tip of the *main* branch, which is not
+necessarily a tagged version. You can also build the image from the source code. The *run* stage has a minimal image
+that provides all needed code and simulation files. If you are building locally, use something like the following to
+build. The *BUILD_TEST* argument controls if unit tests are compiled (ON) or not (OFF).
 ```powershell
-docker build --target run -t ground-texture-sim:run .
+docker build --build-arg BUILD_TEST=OFF --target run -t ground-texture-sim:run .
 ```
 The online repository image and the one built in the previous command both have a default command that starts the
-correct launch file. This launch file starts the simulation and trajectory control, but there are scripts for keyboard
-control as well. Details about each node can be found below. It can be started by running the following, which uses the
-same image tag as the online repository. This assumes a Windows host, so defines the needed DISPLAY variable to show the
-GUI correctly.
+correct launch file. This launch file starts the simulation and trajectory control. It can be started by running the
+following, which uses the same image tag as the online repository. This assumes a Windows host, so defines the needed
+DISPLAY variable to show the GUI correctly.
 ```powershell
 docker run -e DISPLAY=host.docker.internal:0.0 kylerobots/ground-texture-sim:1.1.0
 ```
 
 When working from source, there is also a *test* stage if you wish to run the unit tests. Commands are similar to above.
 ```powershell
-docker build --target test -t ground-texture-sim:test .
+docker build --build-arg BUILD_TEST=ON --target test -t ground-texture-sim:test .
 docker run ground-texture-sim:test
 ```
 
@@ -74,8 +75,7 @@ You should see the GUI appear with a camera feed, like so.
 
 ### Trajectory Follower ###
 This is the preferred node for capturing data. It walks the camera through a series of predefined poses and captures
-data at each pose. Unlike the keyboard controller node below, it writes data synchronously, so the only other thing that
-needs launched is the simulation itself. To start, run this command:
+data at each pose. To start, run this command:
 ```bash
 follow_trajectory
 ```
@@ -87,33 +87,10 @@ x2, y2, yaw2
 ```
 Extra values per line will be ignored. If an error occurs on read, the system halts.
 
-### Keyboard Controller ###
-To start the keyboard control of the camera, run this command:
-```bash
-keyboard_controller
-```
-There won't be anything printed on the terminal. You can then go to the GUI and press any of the keys listed on the
-table to get the corresponding velocities. A key press will set the listed velocity for 0.5 seconds. After which, it
-will return to 0 if no other key has been pressed. You can also hold a key down to maintain the given velocity. You
-can also press multiple keys in succession to get a more complex velocity. However, holding multiple keys is
-unsupported (by the keyboards, not this software).
-
-| Key | X (m/s) | Y (m/s) | Theta (rad/s) |
-| --- | ------- | ------- | ------------- |
-| A   | 0.0     | -0.5    | 0.0           |
-| S   | -0.5    | 0.0     | 0.0           |
-| W   | 0.5     | 0.0     | 0.0           |
-| D   | 0.0     | 0.5     | 0.0           |
-| Q   | 0.0     | 0.0     | 0.25          |
-| E   | 0.0     | 0.0     | -0.25         |
-
-### Data Writer ###
-This program records data coming from the simulation. To run it, use
-```bash
-keyboard_controller
-```
-However, be advised that it writes data to whichever folder you are in when you call it. So it is recommended to
-navigate to a dedicated folder before calling.
+### Data Writing ###
+While not a unique node, it is important to cover how the data is written to file. Be advised that the program
+writes data to whichever folder you are in when you call it. So it is recommended to navigate to a dedicated folder
+before calling.
 
 Each time an image is received, it writes the raw image to a PNG file with the name based on the current number of
 images captures. (e.g. 000000.png, 000001.png, etc.). It also writes a similarly named file containing the pose of the
@@ -179,6 +156,3 @@ rectification_matrix: 0
 rectification_matrix: 0
 rectification_matrix: 1
 ```
-
-Note that, because of the asynchronous nature of the data. The first pose or camera info files may be empty if they have
-not been received prior to receiving an image.
