@@ -73,6 +73,10 @@
 		"codecvt": "cpp"
 	},
 	"cSpell.words": [
-		"ASWD"
+		"ASWD",
+		"DBUILD",
+		"DCMAKE",
+		"intrinsics",
+		"tofl"
 	]
 }

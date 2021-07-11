@@ -4,7 +4,9 @@
 
 /// @test Verify that the camera height can be set correctly.
 TEST(TrajectoryFollower, SetHeight) {
-	ground_texture_sim::TrajectoryFollower follower;
+	// We don't care about parametrs, so use the defaults.
+	ground_texture_sim::TrajectoryFollower::Parameters params;
+	ground_texture_sim::TrajectoryFollower follower(params);
 	// Non-negative heights are allowed.
 	follower.setCameraHeight(0.25);
 	EXPECT_EQ(follower.getCameraHeight(), 0.25);

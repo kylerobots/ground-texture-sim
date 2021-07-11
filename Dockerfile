@@ -57,7 +57,7 @@ RUN useradd -ms /bin/bash user
 USER user
 WORKDIR /home/user
 # Copy in the sdf file.
-COPY data/ /home/user/data/
+COPY config/ /home/user/config/
 COPY launch/ /home/user/launch/
 COPY world/ /home/user/world/
 CMD [ "ign", "launch", "launch/trajectory.ign" ]

@@ -1,0 +1,17 @@
+# This file shows all the arguments this code takes. It lists the default values for each. All values are strings,
+# except for height, which is a non-negative numeric.
+
+# The topic publishing camera parameters.
+camera_topic = "/camera_info"
+# The height of the camera above the ground.
+height = 0.25
+# The topic publishing the image.
+image_topic = "/camera"
+# The service called to move models in simulation.
+move_service = "/world/ground_texture/set_pose"
+# The topic publishing model poses.
+pose_topic = "/world/ground_texture/dynamic_pose/info"
+# The name of the camera model in the simulation.
+model = "camera"
+# The folder where output data should go.
+output = "output"
