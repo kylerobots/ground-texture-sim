@@ -8,7 +8,7 @@ Additionally, it avoids the repetition of tiles common in most simulated floors.
 [Documentation](https://kylerobots.github.io/ground-texture-sim/)
 
 ## License ##
-This project is licensed, under the BSD 3-Clause "New" or "Revised" License. See [LICENSE](LICENSE) for more info.
+This project is licensed, under the BSD 3-Clause "New" or "Revised" License. See [LICENSE](LICENSE.md) for more info.
 
 ## Installing and Running with Docker ##
 Using the Docker images defined with the project is by far the easiest route, as it avoids all the installation. The
@@ -71,7 +71,8 @@ To start the Gazebo simulation, run this from the root level of the code:
 ign gazebo world/world.sdf
 ```
 You should see the GUI appear with a camera feed, like so.
-![Example GUI](GUI.png)
+
+![Example GUI](./GUI.png "The Simulation GUI")
 
 ### Trajectory Follower ###
 This is the preferred node for capturing data. It walks the camera through a series of predefined poses and captures
