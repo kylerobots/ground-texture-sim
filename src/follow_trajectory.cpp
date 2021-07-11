@@ -63,8 +63,9 @@ std::vector<ground_texture_sim::Pose2D> parseFile(const std::string & filename) 
 int main(int argc, char ** argv) {
 	CLI::App option_parser("Ground Texture Simulator");
 	CLI11_PARSE(option_parser, argc, argv);
-	ground_texture_sim::TrajectoryFollower follower;
-	follower.setCameraHeight(0.25);
+	// Assemble the parameters for the follower
+	ground_texture_sim::TrajectoryFollower::Parameters parameters;
+	ground_texture_sim::TrajectoryFollower follower(parameters);
 	auto trajectory = parseFile("data/trajectory.txt");
 	follower.captureTrajectory(trajectory);
 	return 0;

@@ -1,11 +1,35 @@
 #include "TrajectoryFollower.h"
 
 namespace ground_texture_sim {
-	TrajectoryFollower::TrajectoryFollower() {
+	TrajectoryFollower::TrajectoryFollower(const Parameters & parameters) {
+		// Set the camera height. This already throws the right error, so let it pass up.
+		setCameraHeight(parameters.camera_height);
+
+		// Set the output path.
+		try {
+			data_writer.setDataFolder(parameters.output_folder);
+
+		} catch (const std::filesystem::filesystem_error & e) {
+			throw std::invalid_argument(e.what());
+		}
+
 		// Register the topics to capture.
-		data_synchronizer.registerTopic<ignition::msgs::Image>("/camera");
-		data_synchronizer.registerTopic<ignition::msgs::CameraInfo>("/camera_info");
-		data_synchronizer.registerTopic<ignition::msgs::Pose_V>("/world/ground_texture/dynamic_pose/info");
+		if (!data_synchronizer.registerTopic<ignition::msgs::Image>(parameters.image_topic)) {
+			throw std::invalid_argument("Unable to subscribe to " + parameters.image_topic);
+		}
+		if (!data_synchronizer.registerTopic<ignition::msgs::CameraInfo>(parameters.camera_info_topic)) {
+			throw std::invalid_argument("Unable to subscribe to " + parameters.camera_info_topic);
+		}
+		if (!data_synchronizer.registerTopic<ignition::msgs::Pose_V>(parameters.pose_topic)) {
+			throw std::invalid_argument("Unable to subscribe to " + parameters.pose_topic);
+		}
+
+		// Store the values needed later.
+		camera_info_topic = parameters.camera_info_topic;
+		camera_model_name = parameters.camera_model_name;
+		image_topic = parameters.image_topic;
+		model_move_service = parameters.model_move_service;
+		poses_topic = parameters.pose_topic;
 	}
 
 	bool TrajectoryFollower::captureTrajectory(const std::vector<Pose2D> & trajectory) {
@@ -26,12 +50,12 @@ namespace ground_texture_sim {
 			while (!pose_updated) {
 				auto messages = data_synchronizer.getMessages();
 				// Cast each message back into the expected format.
-				camera_info_msg = dynamic_cast<ignition::msgs::CameraInfo *>(messages["/camera_info"].get());
-				image_msg = dynamic_cast<ignition::msgs::Image *>(messages["/camera"].get());
-				pose_msg = dynamic_cast<ignition::msgs::Pose_V *>(messages["/world/ground_texture/dynamic_pose/info"].get());
+				camera_info_msg = dynamic_cast<ignition::msgs::CameraInfo *>(messages[camera_info_topic].get());
+				image_msg = dynamic_cast<ignition::msgs::Image *>(messages[image_topic].get());
+				pose_msg = dynamic_cast<ignition::msgs::Pose_V *>(messages[poses_topic].get());
 				// Compare values to verify updated pose. Account for floating point accuracy.
 				for (int i = 0; i < pose_msg->pose_size(); ++i) {
-					if (pose_msg->pose(i).name() == "camera") {
+					if (pose_msg->pose(i).name() == camera_model_name) {
 						extracted_pose = pose_msg->pose(i);
 					}
 				}
@@ -74,13 +98,13 @@ namespace ground_texture_sim {
 	bool TrajectoryFollower::sendPose(const Pose2D & pose) {
 		// First construct the message.
 		ignition::msgs::Pose pose_request = poseMsgFromPose2D(pose);
-		pose_request.set_name("camera");
+		pose_request.set_name(camera_model_name);
 		// Add the camera height.
 		pose_request.mutable_position()->set_z(getCameraHeight());
 		ignition::msgs::Boolean response;
 		bool result;
 		unsigned int timeout = 1000;
-		bool executed = node.Request("/world/ground_texture/set_pose", pose_request, timeout, response, result);
+		bool executed = node.Request(model_move_service, pose_request, timeout, response, result);
 		// We get three ways to check if it worked!
 		return executed && result && response.data();
 	}

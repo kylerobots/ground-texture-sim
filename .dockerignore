@@ -2,3 +2,4 @@
 .devcontainer/
 build/
 docs/
+output/
