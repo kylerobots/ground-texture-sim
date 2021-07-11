@@ -35,7 +35,8 @@ RUN apt update && \
 	DEBIAN_FRONTEND=noninteractive \
 	apt install -y \
 	doxygen \
-	gdb && \
+	gdb \
+	graphviz && \
 	rm -rf /var/lib/apt/lists/*
 
 # Use an image to compile and install the package.
