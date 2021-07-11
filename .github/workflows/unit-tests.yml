@@ -16,6 +16,6 @@ jobs:
     - uses: actions/checkout@v2
     # The build stage has all of the code built, include gtest, so it is easy to run unit tests from there.
     - name: Build the Docker image
-      run: docker build . --target build --file Dockerfile --tag ground-texture-sim:test
+      run: docker build . --build-arg BUILD_TEST=ON --target build --file Dockerfile --tag ground-texture-sim:test
     - name: Run tests
       run: docker run ground-texture-sim:test ctest -VV
