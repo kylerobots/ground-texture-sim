@@ -8,7 +8,11 @@ project(ground-texture-sim
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Provides default install locations for Ubuntu.
 include(GNUInstallDirs)
+
+# Import the argument parser.
+add_subdirectory(external/CLI11)
 
 # Specify which versions of Ignition components to load.
 set(IGNITION_COMMON_VERSION 4)
@@ -55,6 +59,7 @@ target_include_directories(follow_trajectory
   		$<INSTALL_INTERFACE:include/ground_texture_sim>
 )
 target_link_libraries(follow_trajectory
+	CLI11::CLI11
 	ground_texture_sim
 )
 
