@@ -62,11 +62,31 @@ std::vector<ground_texture_sim::Pose2D> parseFile(const std::string & filename) 
 
 int main(int argc, char ** argv) {
 	CLI::App option_parser("Ground Texture Simulator");
-	CLI11_PARSE(option_parser, argc, argv);
-	// Assemble the parameters for the follower
+	// Set customization parameters.
 	ground_texture_sim::TrajectoryFollower::Parameters parameters;
-	ground_texture_sim::TrajectoryFollower follower(parameters);
-	auto trajectory = parseFile("data/trajectory.txt");
-	follower.captureTrajectory(trajectory);
-	return 0;
+	std::string trajectory_file;
+	option_parser.add_option("trajectory_file", trajectory_file, "The CSV of trajectories")->required()->check(CLI::ExistingFile);
+	option_parser.add_option("--camera_topic", parameters.camera_info_topic, "The topic publishing camera parameters", true);
+	option_parser.add_option("--height", parameters.camera_height, "The height of the camera", true);
+	option_parser.add_option("--image_topic", parameters.image_topic, "The topic publishing images", true);
+	option_parser.add_option("--move_service", parameters.model_move_service, "The service to move the camera", true);
+	option_parser.add_option("--pose_topic", parameters.pose_topic, "The topic publishing poses", true);
+	option_parser.add_option("-m,--model", parameters.camera_model_name, "The model name of the camera in simulation", true);
+	option_parser.add_option("-o,--output", parameters.output_folder, "Where the data should be written", true);
+	CLI11_PARSE(option_parser, argc, argv);
+	auto trajectory = parseFile(trajectory_file);
+	// Set up the follower and go.
+	bool success = false;
+	try {
+		ground_texture_sim::TrajectoryFollower follower(parameters);
+		success = follower.captureTrajectory(trajectory);
+	} catch (const std::exception & e) {
+		std::cerr << e.what() << '\n';
+	}
+	if (success) {
+		return 0;
+	} else {
+		std::cerr << "Unable to capture full trajectory. Results may be incomplete or corrupted." << std::endl;
+		return -1;
+	}
 }
