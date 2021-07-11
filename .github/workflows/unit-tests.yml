@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     # The build stage has all of the code built, include gtest, so it is easy to run unit tests from there.
     - name: Build the Docker image
       run: docker build . --build-arg BUILD_TEST=ON --target build --file Dockerfile --tag ground-texture-sim:test
