@@ -5,6 +5,6 @@
 	</executable>
 
 	<executable name="trajectory_follower">
-		<command>follow_trajectory</command>
+		<command>follow_trajectory --config config/default.toml config/trajectory.txt</command>
 	</executable>
 </ignition>

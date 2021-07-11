@@ -61,8 +61,10 @@ std::vector<ground_texture_sim::Pose2D> parseFile(const std::string & filename) 
 }
 
 int main(int argc, char ** argv) {
-	CLI::App option_parser("Ground Texture Simulator");
+	CLI::App option_parser("Ground Texture Simulator", "follow_trajectory");
 	// Set customization parameters.
+	option_parser.set_config("--config", "", "Set configurations via a TOML file");
+	option_parser.allow_config_extras(true);
 	ground_texture_sim::TrajectoryFollower::Parameters parameters;
 	std::string trajectory_file;
 	option_parser.add_option("trajectory_file", trajectory_file, "The CSV of trajectories")->required()->check(CLI::ExistingFile);
