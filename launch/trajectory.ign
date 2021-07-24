@@ -7,13 +7,45 @@
 	else
 		config_arg = "--config "
 	end
+	# Check for the ground texture to use
+	if !defined?(ground) || ground == nil || ground.empty?
+		ground = "world/ground.sdf"
+	end
+	# Check for the camera model to use
+	if !defined?(camera) || camera == nil || camera.empty?
+		camera = "world/camera.sdf"
+	end
 %>
 
 <ignition version="1.0">
+	<!-- Start the simulation. -->
 	<executable name="simulation">
 		<command>ign gazebo -r world/world.sdf</command>
 	</executable>
 
+	<!-- Spawn the ground and camera into the world. -->
+	<plugin name="ignition::launch::GazeboFactory" filename="ignition-launch-gazebo-factory">
+		<!-- Spawn the ground. -->
+		<spawn>
+			<name>ground</name>
+			<sdf version="1.8">
+				<include>
+					<uri><%= ground %></uri>
+				</include>
+			</sdf>
+		</spawn>
+		<!-- Spawn the camera. -->
+		<spawn>
+			<name>camera</name>
+			<sdf version='1.8'>
+				<include>
+				<uri><%= camera %></uri>
+				</include>
+			</sdf>
+		</spawn>
+	</plugin>
+
+	<!-- Start the data collection. -->
 	<executable name="trajectory_follower">
 		<command>follow_trajectory <%= config_arg %> <%= config %> <%= trajectory %></command>
 	</executable>
