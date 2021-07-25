@@ -4,6 +4,7 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/msgs/pose.pb.h>
 #include <ignition/msgs/quaternion.pb.h>
+#include <math.h>
 #include <tuple>
 
 /**
@@ -84,6 +85,14 @@ namespace ground_texture_sim {
 	 * @return std::tuple<double, double, double> A tuple containing the roll, pitch, and yaw.
 	 */
 	std::tuple<double, double, double> RPYFromQuaternionMsg(const ignition::msgs::Quaternion & quaternion);
+
+	/**
+	 * @brief Wraps an angle, in radians, to the range of [-Pi, PI].
+	 * 
+	 * @param angle The angle to wrap, in radians.
+	 * @return double The wrapped angle. Guaranteed to be between -Pi and Pi (inclusive).
+	 */
+	double wrapAngle(double angle);
 
 } // namespace ground_texture_sim
 

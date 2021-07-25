@@ -29,4 +29,10 @@ namespace ground_texture_sim {
 		double yaw = quaternion_math.Yaw();
 		return std::make_tuple(roll, pitch, yaw);
 	}
+
+	double wrapAngle(double angle) {
+		// This uses a method provided in Ignition's math library:
+		// https://github.com/ignitionrobotics/ign-math/blob/db5edbfd7fbe519fae02601dfd2335c5b895d12c/include/ignition/math/Angle.hh
+		return atan2(sin(angle), cos(angle));
+	}
 } // namespace ground_texture_sim
