@@ -233,3 +233,25 @@ TEST(RPYFromQuaternionMsg, WrappedYaw) {
 	ASSERT_DOUBLE_EQ(pitch, 0.0);
 	ASSERT_DOUBLE_EQ(yaw, M_PI);
 }
+
+/// @test Test that angles already within the range aren't changed.
+TEST(WrapAngle, UnchangedValues) {
+	ASSERT_DOUBLE_EQ(0.0, ground_texture_sim::wrapAngle(0.0));
+	ASSERT_DOUBLE_EQ(M_PI_2, ground_texture_sim::wrapAngle(M_PI_2));
+	ASSERT_DOUBLE_EQ(-M_PI_2, ground_texture_sim::wrapAngle(-M_PI_2));
+}
+
+/// @test Test that angles outside of the range are wrapped correctly.
+TEST(WrapAngle, ChangedValues) {
+	ASSERT_DOUBLE_EQ(-M_PI_2, ground_texture_sim::wrapAngle(3.0 * M_PI_2));
+	ASSERT_DOUBLE_EQ(M_PI_2, ground_texture_sim::wrapAngle(-3.0 * M_PI_2));
+	ASSERT_DOUBLE_EQ(M_PI - 0.0002, ground_texture_sim::wrapAngle(-M_PI - 0.0002));
+}
+
+/// @test Test angles on the boundaries are wrapped correctly.
+TEST(WrapAngle, Boundary) {
+	ASSERT_DOUBLE_EQ(M_PI, ground_texture_sim::wrapAngle(3.0 * M_PI));
+	ASSERT_DOUBLE_EQ(-M_PI, ground_texture_sim::wrapAngle(-3.0 * M_PI));
+	ASSERT_DOUBLE_EQ(M_PI, ground_texture_sim::wrapAngle(M_PI));
+	ASSERT_DOUBLE_EQ(-M_PI, ground_texture_sim::wrapAngle(-M_PI));
+}
