@@ -44,7 +44,8 @@ FROM base AS build
 COPY . /opt/ground-texture-sim
 WORKDIR /opt/ground-texture-sim/build
 ARG BUILD_TEST=OFF
-RUN pwd
+RUN make -j && \
+	make install
 CMD [ "ctest", "-VV" ]
 
 # From the compiled version, copy over the applications needed to run.
