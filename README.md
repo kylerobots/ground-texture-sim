@@ -229,7 +229,7 @@ specify a trajectory file. It also allows you to optionally specify a configurat
 model. If any of these three are not specified, it will use default values described above. At this time, you cannot
 specify other command line options without editing the file itself. An example usage is shown below.
 ```bash
-ign launch launch/trajectory.ign trajectory:=path/to/trajectory config:=path/to/config ground:=path/to/ground.sdf camera:=file:///absolute/path/camera.sdf
+ign launch launch/generate_data.ign trajectory:=path/to/trajectory config:=path/to/config ground:=path/to/ground.sdf camera:=file:///absolute/path/camera.sdf
 ```
 
 ### Quick Docker Note ###
@@ -241,7 +241,7 @@ Additionally, you are using the default camera and ground models. To run the com
 assumes Windows with an X11 server, so the DISPLAY value is set to forward the
 GUI.
 ```powershell
-docker run -e DISPLAY=host.docker.internal:0.0 -v "C:\Users\kylerobots\Desktop\data:/home/user/data" ground-texture-sim:run ign launch launch/trajectory.ign config:=data/config.toml trajectory:=data/trajectory.txt
+docker run -e DISPLAY=host.docker.internal:0.0 -v "C:\Users\kylerobots\Desktop\data:/home/user/data" ground-texture-sim:run ign launch launch/generate_data.ign config:=data/config.toml trajectory:=data/trajectory.txt
 ```
 You should see the GUI and script output print to the terminal the same as if you were working in your container. After,
 you should find that the data has been written to the correct subfolder.
