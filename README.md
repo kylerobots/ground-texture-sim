@@ -68,22 +68,38 @@ tests, change DBUILD_TESTING to ON.
 
 ## Running the Code ##
 This section describes the various settings used to control the code. There are two nodes that need run - the simulation
-and the data collection. Each will be described in order. Then, the available launch file will be covered. Lastly, this
-guide provides a quick tip about running everything via Docker.
+and the data collection. Each will be described in order. Then, a convenience launch file that starts both will be
+covered. Lastly, this guide provides a quick tip about running everything via Docker.
 
 ### Simulation Node ###
 The first node in the package is the Ignition simulation itself. This creates a world with realistic ground texture,
 realistic lighting, and a downward facing camera for capturing images.
 [Ignition's website](https://ignitionrobotics.org/docs) has detailed information about creating these worlds. This
 repository also comes with a simple environment. To start that environment, run the following from the repository root.
+
 ```bash
-ign gazebo -r world/world.sdf
+ign launch launch/simulate.ign
 ```
 You should see the GUI appear with a camera feed, like so.
 
 ![Example GUI](./GUI.png "The Simulation GUI")
 
-You can also point to other world files via relative or absolute paths.
+The provided launch file starts the simulation and then spawns two models into it; the ground texture model and camera
+model. There are launch file parameters that allow specification of other models if you want to provide a different
+camera type or ground texture. The way to specify them is as follows:
+
+```bash
+ign launch launch/simulate.ign ground:=path/to/ground.sdf camera:=path/to/camera.sdf
+```
+
+The values provided for *ground* and *camera* can be absolute or relative paths to a valid SDF file. They can also be a
+valid URI for a valid SDF file. The SDF file should contain a single *model* following the
+[SDFormat specification](http://sdformat.org/spec?ver=1.8&elem=model). See the examples in *world/ground.sdf* and
+*world/camera.sdf* for examples of how these can be formatted.
+
+At this time, changes in lighting require modification of the *world/world.sdf* file. Model spawning uses SDFormat's
+*include* tag, which only supports a single model, actor, or light. So there is no way to spawn an arbitrary number of
+light sources.
 
 ### Trajectory Following ###
 The next node does the work of moving the camera around, collecting data, and writing it to file.
@@ -208,20 +224,21 @@ rectification_matrix: 1
 ```
 
 ### Launch File ###
-For convenience, there is a launch file that starts both the simulation and data collection. It allows you to optionally
-specify a configuration file and requires you to specify a trajectory file. If you don't specify a configuration file,
-all default values will be used. At this time, you cannot specify other command line options without editing the file
-itself. An example usage is shown below.
+For convenience, there is a launch file that starts both the simulation and data collection. It requires that you
+specify a trajectory file. It also allows you to optionally specify a configuration file, ground model, and camera
+model. If any of these three are not specified, it will use default values described above. At this time, you cannot
+specify other command line options without editing the file itself. An example usage is shown below.
 ```bash
-ign launch launch/trajectory.ign config:=path/to/config trajectory:=path/to/trajectory
+ign launch launch/trajectory.ign trajectory:=path/to/trajectory config:=path/to/config ground:=path/to/ground.sdf camera:=file:///absolute/path/camera.sdf
 ```
 
 ### Quick Docker Note ###
 The above commands can easily be used within the built Docker container. You can also specify them via the CLI with the
 Docker run command. This is especially useful if you want to also mount a volume to write data to. As an example,
 suppose you have a folder on your Desktop called *data* that already has a configuration file and trajectory file. The
-configuration file specifies an *output* value of *data/output*, meaning it will be written in a subfolder. To run the
-command via Docker, use the below. This assumes Windows with an X11 server, so the DISPLAY value is set to forward the
+configuration file specifies an *output* value of *data/output*, meaning it will be written in a subfolder.
+Additionally, you are using the default camera and ground models. To run the command via Docker, use the below. This
+assumes Windows with an X11 server, so the DISPLAY value is set to forward the
 GUI.
 ```powershell
 docker run -e DISPLAY=host.docker.internal:0.0 -v "C:\Users\kylerobots\Desktop\data:/home/user/data" ground-texture-sim:run ign launch launch/trajectory.ign config:=data/config.toml trajectory:=data/trajectory.txt
