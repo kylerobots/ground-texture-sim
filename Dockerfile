@@ -44,7 +44,8 @@ FROM base AS build
 COPY . /opt/ground-texture-sim
 WORKDIR /opt/ground-texture-sim/build
 ARG BUILD_TEST=OFF
-RUN cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release .. && make -j && make install
+RUN pwd && \
+	cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 CMD [ "ctest", "-VV" ]
 
 # From the compiled version, copy over the applications needed to run.
