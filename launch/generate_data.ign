@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+	This file provides a convenient means of starting the simulation and trajectory data collection from a single file.
+	It also exposes several parameters to provide configuration of the world and data collection.
+-->
+
+<%
+	# Check if config is not defined or is empty/nil
+	if !defined?(config) || config == nil || config.empty?
+		config_arg = ""
+		config = ""
+	else
+		config_arg = "--config "
+	end
+	# Check for the ground texture to use
+	if !defined?(ground) || ground == nil || ground.empty?
+		ground = "world/ground.sdf"
+	end
+	# Check for the camera model to use
+	if !defined?(camera) || camera == nil || camera.empty?
+		camera = "world/camera.sdf"
+	end
+%>
+
+<ignition version="1.0">
+	<!-- Call the other launch file, simulate.ign, to start the simulation. Pass through the relevant parameters. -->
+	<executable name="simulate_launch">
+		<command>ign launch launch/simulate.ign ground:=<%= ground %> camera:=<%= camera %></command>
+	</executable>
+
+	<!-- Start the data collection. -->
+	<executable name="trajectory_follower">
+		<command>follow_trajectory <%= config_arg %> <%= config %> <%= trajectory %></command>
+	</executable>
+</ignition>
