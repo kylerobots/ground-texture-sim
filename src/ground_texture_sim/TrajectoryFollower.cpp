@@ -35,7 +35,10 @@ namespace ground_texture_sim {
 	bool TrajectoryFollower::captureTrajectory(const std::vector<Pose2D> & trajectory) {
 		for (auto && pose : trajectory) {
 			std::cout << "Capturing: (" << pose.x << ", " << pose.y << ", " << pose.yaw << ")" << std::endl;
-			bool success = capturePose(pose);
+			// First, create a normalized angle version of the pose, as Gazebo causes issues if outside of [-Pi, Pi]
+			Pose2D wrapped_pose = pose;
+			wrapped_pose.yaw = ground_texture_sim::wrapAngle(pose.yaw);
+			bool success = capturePose(wrapped_pose);
 			if (!success) {
 				std::cout << "ERROR: Failed to move to pose!" << std::endl;
 				return false;
@@ -61,12 +64,12 @@ namespace ground_texture_sim {
 				}
 				// We want all pose values to be updated, so flip to false if any aren't within eps.
 				pose_updated = true;
-				double eps = 1e-8;
-				pose_updated &= abs(extracted_pose.position().x() - pose.x) <= eps;
-				pose_updated &= abs(extracted_pose.position().y() - pose.y) <= eps;
+				double eps = 1e-6;
+				pose_updated &= abs(extracted_pose.position().x() - wrapped_pose.x) <= eps;
+				pose_updated &= abs(extracted_pose.position().y() - wrapped_pose.y) <= eps;
 				// We have to pull out the quaternion values.
 				ignition::math::Quaternion quaternion(extracted_pose.orientation().w(), extracted_pose.orientation().x(), extracted_pose.orientation().y(), extracted_pose.orientation().z());
-				pose_updated &= abs(quaternion.Yaw() - pose.yaw) <= eps;
+				pose_updated &= abs(quaternion.Yaw() - wrapped_pose.yaw) <= eps;
 			}
 
 			// Write them to file.
