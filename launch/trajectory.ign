@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+	This file provides a convenient means of starting the simulation and trajectory data collection from a single file.
+	It also exposes several parameters to provide configuration of the world and data collection.
+-->
+
 <%
 	# Check if config is not defined or is empty/nil
 	if !defined?(config) || config == nil || config.empty?
@@ -18,32 +23,10 @@
 %>
 
 <ignition version="1.0">
-	<!-- Start the simulation. -->
-	<executable name="simulation">
-		<command>ign gazebo -r world/world.sdf</command>
+	<!-- Call the other launch file, simulate.ign, to start the simulation. Pass through the relevant parameters. -->
+	<executable name="simulate_launch">
+		<command>ign launch launch/simulate.ign ground:=<%= ground %> camera:=<%= camera %></command>
 	</executable>
-
-	<!-- Spawn the ground and camera into the world. -->
-	<plugin name="ignition::launch::GazeboFactory" filename="ignition-launch-gazebo-factory">
-		<!-- Spawn the ground. -->
-		<spawn>
-			<name>ground</name>
-			<sdf version="1.8">
-				<include>
-					<uri><%= ground %></uri>
-				</include>
-			</sdf>
-		</spawn>
-		<!-- Spawn the camera. -->
-		<spawn>
-			<name>camera</name>
-			<sdf version='1.8'>
-				<include>
-				<uri><%= camera %></uri>
-				</include>
-			</sdf>
-		</spawn>
-	</plugin>
 
 	<!-- Start the data collection. -->
 	<executable name="trajectory_follower">
