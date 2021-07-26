@@ -44,7 +44,8 @@ FROM base AS build
 COPY . /opt/ground-texture-sim
 WORKDIR /opt/ground-texture-sim/build
 ARG BUILD_TEST=OFF
-RUN make -j && \
+RUN cmake -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release -S /opt/ground-texture-sim -B /opt/ground-texture-sim/build && \
+	make -j && \
 	make install
 CMD [ "ctest", "-VV" ]
 
