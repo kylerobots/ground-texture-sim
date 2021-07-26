@@ -22,6 +22,7 @@ jobs:
         with:
           build-args: BUILD_TEST=ON
           context: .
+          load: true
           push: false
           tags: ground-texture-sim:test
           target: build
