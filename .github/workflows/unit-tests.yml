@@ -20,25 +20,12 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v2
         with:
-          build-args: BUILD_TEST=OFF
+          build-args: BUILD_TEST=ON
           context: .
           load: true
+          no-cache: true
           push: false
           tags: ground-texture-sim:test
           target: build
       - name: Run Unit Tests
         run: docker run ground-texture-sim:test ctest -VV
-
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    # The build stage has all of the code built, include gtest, so it is easy to run unit tests from there.
-    - name: Build the Docker image
-      run: docker build . --build-arg BUILD_TEST=ON --target build --file Dockerfile --tag ground-texture-sim:test
-    - name: Run tests
-      run: docker run ground-texture-sim:test ctest -VV
