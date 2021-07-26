@@ -20,7 +20,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v2
         with:
-          build-args: BUILD_TEST=ON
+          build-args: BUILD_TEST=OFF
           context: .
           load: true
           push: false
