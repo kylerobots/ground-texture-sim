@@ -1,6 +1,6 @@
 # Ground Texture Simulation #
 
-![Unit Tests](https://github.com/kylerobots/ground-texture-sim/actions/workflows/unit-tests.yml/badge.svg?branch=main)
+![Unit Tests](https://github.com/kylerobots/ground-texture-sim/actions/workflows/tests.yml/badge.svg?branch=main)
 ![Deploy Documentation](https://github.com/kylerobots/ground-texture-sim/actions/workflows/deploy_pages.yml/badge.svg?branch=main)
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/kylerobots/ground-texture-sim)
 
