@@ -4,7 +4,7 @@ ARG UBUNTU_VERSION=focal
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
-	version="2.0.0" \
+	version="2.1.0" \
 	license="BSD-3-Clause License"
 
 # Install Ignition Edifice and its dependencies. Because of the install via new key, 2 installs are required. One for
