@@ -14,12 +14,18 @@
 	if !defined?(camera) || camera == nil || camera.empty?
 		camera = "world/camera.sdf"
 	end
+	# Only provide the GUI if explicitly asked for, otherwise run in headless mode.
+	if !defined?(gui) || gui == nil || gui.empty? || ((gui.casecmp "true") != 0)
+		gazebo_command = "ign gazebo -s -r world/world.sdf"
+	else
+		gazebo_command = "ign gazebo -r world/world.sdf"
+	end
 %>
 
 <ignition version="1.0">
 	<!-- Start the empty simulation with just lights. -->
 	<executable name="simulation">
-		<command>ign gazebo -r world/world.sdf</command>
+		<command><%= gazebo_command %></command>
 	</executable>
 
 	<!-- Spawn the ground and camera into the world. -->

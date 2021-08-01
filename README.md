@@ -83,15 +83,17 @@ realistic lighting, and a downward facing camera for capturing images.
 repository also comes with a simple environment. To start that environment, run the following from the repository root.
 
 ```bash
-ign launch launch/simulate.ign
+ign launch launch/simulate.ign gui:=true
 ```
 You should see the GUI appear with a camera feed, like so.
 
 ![Example GUI](./GUI.png "The Simulation GUI")
 
 The provided launch file starts the simulation and then spawns two models into it; the ground texture model and camera
-model. There are launch file parameters that allow specification of other models if you want to provide a different
-camera type or ground texture. The way to specify them is as follows:
+model. The *gui* parameter controls if the GUI should be displayed or not. A value of *true* displays the GUI and
+anything else, including not providing the parameter, hides the GUI. This is useful if running with limited resources.
+There are also launch file parameters that allow specification of other models if you want to provide a different camera
+type or ground texture. The way to specify them is as follows:
 
 ```bash
 ign launch launch/simulate.ign ground:=path/to/ground.sdf camera:=path/to/camera.sdf
@@ -230,11 +232,12 @@ rectification_matrix: 1
 
 ### Launch File ###
 For convenience, there is a launch file that starts both the simulation and data collection. It requires that you
-specify a trajectory file. It also allows you to optionally specify a configuration file, ground model, and camera
-model. If any of these three are not specified, it will use default values described above. At this time, you cannot
-specify other command line options without editing the file itself. An example usage is shown below.
+specify a trajectory file. It also allows you to optionally specify a configuration file, ground model, camera model,
+and whether or not to display the GUI. If any of these three are not specified, it will use default values described
+above. At this time, you cannot specify other command line options without editing the file itself. An example usage is
+shown below.
 ```bash
-ign launch launch/generate_data.ign trajectory:=path/to/trajectory config:=path/to/config ground:=path/to/ground.sdf camera:=file:///absolute/path/camera.sdf
+ign launch launch/generate_data.ign trajectory:=path/to/trajectory config:=path/to/config ground:=path/to/ground.sdf camera:=file:///absolute/path/camera.sdf gui:=true
 ```
 
 ### Quick Docker Note ###

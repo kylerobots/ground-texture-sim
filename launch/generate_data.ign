@@ -20,12 +20,16 @@
 	if !defined?(camera) || camera == nil || camera.empty?
 		camera = "world/camera.sdf"
 	end
+	# Pass the gui command on to the simulation
+	if !defined?(gui) || gui == nil || gui.empty?
+		gui = "false"
+	end
 %>
 
 <ignition version="1.0">
 	<!-- Call the other launch file, simulate.ign, to start the simulation. Pass through the relevant parameters. -->
 	<executable name="simulate_launch">
-		<command>ign launch launch/simulate.ign ground:=<%= ground %> camera:=<%= camera %></command>
+		<command>ign launch launch/simulate.ign ground:=<%= ground %> camera:=<%= camera %> gui:=<%= gui %></command>
 	</executable>
 
 	<!-- Start the data collection. -->
