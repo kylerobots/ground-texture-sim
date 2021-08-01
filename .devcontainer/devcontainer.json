@@ -1,8 +1,11 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.177.0/containers/docker-existing-dockerfile
 {
-	"name": "Ground Texture",
 	"build": {
+		"args": {
+			"IGNITION_VERSION": "edifice",
+			"UBUNTU_VERSION": "20.04",
+		},
 		"context": "..",
 		"dockerfile": "../Dockerfile",
 		"target": "dev",
@@ -16,5 +19,6 @@
 		"ms-vscode.cpptools",
 		"streetsidesoftware.code-spell-checker",
 		"twxs.cmake",
-	]
+	],
+	"name": "Ground Texture",
 }
