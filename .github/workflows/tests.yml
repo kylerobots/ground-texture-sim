@@ -51,6 +51,7 @@ jobs:
           target: build
       - name: Run Sim and Code
         run: |
-          docker run --name integration-test -d ground-texture-sim:test ign launch launch/simulate.ign gui:=false
+          docker run --name integration-test -d -t ground-texture-sim:test bash
+          docker exec -d integration-test ign launch launch/simulate.ign gui:=false
           docker exec integration-test follow_trajectory config/trajectory.txt
           docker kill integration-test
