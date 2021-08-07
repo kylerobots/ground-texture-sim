@@ -7,7 +7,7 @@ services:
         environment: 
             DISPLAY: host.docker.internal:0.0
             IGN_PARTITION: relay
-        image: ground-texture-sim:run
+        image: ground-texture-sim:integration
     data:
         command: ["follow_trajectory", "config/trajectory.txt"]
         container_name: data
