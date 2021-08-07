@@ -50,5 +50,5 @@ jobs:
           tags: ground-texture-sim:test
           target: build
       - name: Run Sim and Code
-          # Use the result of the script as the result of the entire container. This will stop everything too.
           run: docker-compose -f test/docker-compose.test.yml up --exit-code-from data
+          
