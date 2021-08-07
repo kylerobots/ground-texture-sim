@@ -47,7 +47,7 @@ jobs:
           load: true
           no-cache: true
           push: false
-          tags: ground-texture-sim:test
-          target: build
+          tags: ground-texture-sim:integration
+          target: run
       - name: Run Sim and Code
         run: docker-compose -f test/docker-compose.test.yml up --exit-code-from data

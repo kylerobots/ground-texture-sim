@@ -15,4 +15,4 @@ services:
             - simulation
         environment: 
             IGN_PARTITION: relay
-        image: ground-texture-sim:run
+        image: ground-texture-sim:integration
