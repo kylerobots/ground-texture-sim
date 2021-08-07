@@ -5,7 +5,6 @@ services:
         command: ["ign", "launch", "launch/simulate.ign", "gui:=false"]
         container_name: simulation
         environment: 
-            DISPLAY: host.docker.internal:0.0
             IGN_PARTITION: relay
         image: ground-texture-sim:integration
     data:
