@@ -50,5 +50,4 @@ jobs:
           tags: ground-texture-sim:test
           target: build
       - name: Run Sim and Code
-          run: docker-compose -f test/docker-compose.test.yml up --exit-code-from data
-          
+        run: docker-compose -f test/docker-compose.test.yml up --exit-code-from data
