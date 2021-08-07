@@ -1,0 +1,18 @@
+services:
+    # Start containers for both the simulation and data generation. These assume a predefined image that will be
+    # build by the test workflow. This will allow multiple build args to be tested.
+    simulation:
+        command: ["ign", "launch", "launch/simulate.ign", "gui:=false"]
+        container_name: simulation
+        environment: 
+            DISPLAY: host.docker.internal:0.0
+            IGN_PARTITION: relay
+        image: ground-texture-sim:run
+    data:
+        command: ["follow_trajectory", "config/trajectory.txt"]
+        container_name: data
+        depends_on:
+            - simulation
+        environment: 
+            IGN_PARTITION: relay
+        image: ground-texture-sim:run
