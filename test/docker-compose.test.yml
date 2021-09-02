@@ -4,9 +4,14 @@ services:
     simulation:
         command: ["ign", "launch", "launch/simulate.ign", "gui:=false"]
         container_name: simulation
-        environment: 
+        environment:
+            DISPLAY: ${DISPLAY}
             IGN_PARTITION: relay
         image: ground-texture-sim:integration
+        volumes: 
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - ${HOME}/.Xauthority:/home/user/.Xauthority
+
     data:
         command: ["follow_trajectory", "config/trajectory.txt"]
         container_name: data
