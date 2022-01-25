@@ -11,10 +11,14 @@
 		"DISPLAY": "host.docker.internal:0.0"
 	},
 	"extensions": [
-		"cschlosser.doxdocgen",
-		"ms-vscode.cmake-tools",
-		"ms-vscode.cpptools",
-		"streetsidesoftware.code-spell-checker",
-		"twxs.cmake",
-	]
+		"ms-python.python",
+		"ms-python.vscode-pylance"
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "/usr/bin/python3",
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": true,
+		"python.formatting.autopep8Path": "/usr/local/bin/autopep8",
+		"python.linting.pylintPath": "/usr/local/bin/pylint"
+	},
 }

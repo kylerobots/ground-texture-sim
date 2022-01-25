@@ -1,5 +1,3 @@
 .git/
 .devcontainer/
-build/
-docs/
 output/
