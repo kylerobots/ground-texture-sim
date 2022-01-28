@@ -23,9 +23,9 @@ def read_poses(filename: str) -> List[List[float]]:
     @param filename The file to read from. May be absolute or relative path.
     @return A list of poses, where each item in the list is a list of the form
     [x, y, theta].
-    @raises RuntimeError Raised if the pose format does not follow the correct
+    @exception RuntimeError Raised if the pose format does not follow the correct
     structure.
-    @raises FileNotFoundError Raised if the file provided in filename does not
+    @exception FileNotFoundError Raised if the file provided in filename does not
     exist.
     """
     result = []
