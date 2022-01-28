@@ -4,7 +4,7 @@ FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
 	version="3.0.0" \
-	license="BSD-3-Clause License"
+	license="SPDX-License-Identifier: GPL-3.0-or-later"
 
 # Install Python and Blender
 RUN apt update \

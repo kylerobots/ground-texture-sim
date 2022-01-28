@@ -9,4 +9,9 @@ Additionally, it avoids the repetition of tiles common in most simulated floors.
 [Source Code](https://github.com/kylerobots/ground-texture-sim)
 
 ## License ##
-TBD. See [LICENSE](LICENSE.md) for more info.
+Copyright 2022 Kyle M. Hart
+
+See [LICENSE](LICENSE.md) for more info.
+
+Since v3.0.0 and on relies on Blender's API, it is licensed under GPLv3 and later. There is not code reuse between
+v3.0.0 and previous versions, so no conflict with previous licenses.

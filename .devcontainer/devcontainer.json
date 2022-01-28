@@ -12,7 +12,8 @@
 	},
 	"extensions": [
 		"ms-python.python",
-		"ms-python.vscode-pylance"
+		"ms-python.vscode-pylance",
+		"streetsidesoftware.code-spell-checker"
 	],
 	"settings": {
 		"python.defaultInterpreterPath": "/usr/bin/python3",
