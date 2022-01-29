@@ -25,6 +25,5 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     # There are not dependencies at the moment, otherwise they would be installed here.
-    - name: Install dependencies
     - name: Test with unittest
       run: python -m unittest -v
