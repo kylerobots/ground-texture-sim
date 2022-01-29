@@ -27,6 +27,7 @@ RUN apt update \
 	# Don't do a requirements file, since it is only needed for development.
 	&& pip install --upgrade \
 	autopep8 \
+	coverage \
 	pylint
 
 CMD [ "blender" ]

@@ -44,6 +44,9 @@ class TestReadPoses(unittest.TestCase):
         input_string = '0.0,0.0,0.0\n0.0,0.0,\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             self.assertRaises(RuntimeError, read_poses, 'trajectory.txt')
+        input_string = '0.0,0.0\n'
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(RuntimeError, read_poses, 'trajectory.txt')
 
     def test_not_numbers(self) -> None:
         """!
