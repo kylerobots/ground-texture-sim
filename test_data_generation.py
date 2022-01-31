@@ -6,7 +6,50 @@ SPDX-License-Identifier: GPL-3.0-or-later
 from json import JSONDecodeError
 import unittest
 from unittest.mock import mock_open, patch
-from data_generation import read_config, read_poses
+from data_generation import parse_args, read_config, read_poses
+
+
+class TestParseArgs(unittest.TestCase):
+    """!
+    This class tests the parse_args function.
+    """
+
+    def test_help_flag(self) -> None:
+        """!
+        Test that the system exists if the -h flag is passed.
+        """
+        args = ['blender', '--python',
+                'data_generation.py', '-b', '--', '-h']
+        self.assertRaises(SystemExit, parse_args, args)
+
+    def test_no_args(self) -> None:
+        """!
+        Test that the system exists if no JSON file is provided.
+
+        @return None
+        """
+        args = ['blender', '--python', 'data_generation.py', '-b']
+        self.assertRaises(SystemExit, parse_args, args)
+
+    def test_too_many_args(self) -> None:
+        """!
+        Test that the system exists if too many arguments are present.
+        """
+        args = ['blender', '--python', 'data_generation.py',
+                '-b', '--', 'config.json', 'other_config.json']
+        self.assertRaises(SystemExit, parse_args, args)
+
+    def test_with_filename(self) -> None:
+        """!
+        Test that the argument for the JSON is correctly parsed.
+
+        @return None
+        """
+        args = ['blender', '--python',
+                'data_generation.py', '-b', '--', 'config.json']
+        result = parse_args(args)
+        self.assertEqual(result, 'config.json',
+                         msg='Unable to successfully extract JSON file.')
 
 
 class TestReadConfig(unittest.TestCase):
