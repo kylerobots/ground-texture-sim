@@ -14,6 +14,16 @@ import sys
 from typing import Dict, List
 
 
+def generate_data(configs: Dict, trajectory: List[List[float]]) -> None:
+    """!
+    Interact with Blender to make the images.
+
+    @param configs The configuration values specified in the JSON file.
+    @param trajectory A list of poses, of the form [x, y, theta].
+    @return None
+    """
+
+
 def read_config(filename: str) -> Dict:
     """!
     Reads in the configuration JSON and verifies required components.
@@ -108,5 +118,20 @@ def parse_args(args_list: List[str]) -> str:
     return param_file
 
 
+def main() -> None:  # pragma: no cover
+    """!
+    Run through the program script.
+
+    First, find the JSON. Then, load it and the trajectory specified by it.
+    Last, interact with Blender to create the data.
+
+    @return None
+    """
+    config_file = parse_args(sys.argv)
+    config_dict = read_config(config_file)
+    trajectory_list = read_poses(config_dict['trajectory'])
+    generate_data(config_dict, trajectory_list)
+
+
 if __name__ == '__main__':  # pragma: no cover
-    parameter_file = parse_args(sys.argv)
+    main()

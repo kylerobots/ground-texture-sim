@@ -17,6 +17,8 @@ class TestParseArgs(unittest.TestCase):
     def test_help_flag(self) -> None:
         """!
         Test that the system exists if the -h flag is passed.
+
+        @return None
         """
         args = ['blender', '--python',
                 'data_generation.py', '-b', '--', '-h']
@@ -34,6 +36,8 @@ class TestParseArgs(unittest.TestCase):
     def test_too_many_args(self) -> None:
         """!
         Test that the system exists if too many arguments are present.
+
+        @return None
         """
         args = ['blender', '--python', 'data_generation.py',
                 '-b', '--', 'config.json', 'other_config.json']
