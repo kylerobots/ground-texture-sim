@@ -105,10 +105,11 @@ class TestReadConfig(unittest.TestCase):
 
         @return None
         """
-        input_string = '{\n"trajectory": "trajectory.txt",\n"output": "output/",\n"gpu": true\n}'
+        input_string = '{\n"trajectory": "trajectory.txt",\n"output": "output/",\n"camera height": 1.0,\n"gpu": true\n}'
         expected_result = {
             'output': 'output/',
             'trajectory': 'trajectory.txt',
+            'camera height': 1.0,
             'gpu': True
         }
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):

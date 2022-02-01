@@ -1,0 +1,5 @@
+{
+  "trajectory": "trajectories/corners_1x1.txt",
+  "output": "output",
+  "camera height": 5.0
+}

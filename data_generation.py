@@ -9,9 +9,11 @@ specified directory.
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 import argparse
+from math import pi
 import json
 import sys
 from typing import Dict, List
+import bpy
 
 
 def generate_data(configs: Dict, trajectory: List[List[float]]) -> None:
@@ -22,6 +24,46 @@ def generate_data(configs: Dict, trajectory: List[List[float]]) -> None:
     @param trajectory A list of poses, of the form [x, y, theta].
     @return None
     """
+    camera = bpy.data.objects['Camera']
+    # Set the camera angle and height, since those don't change.
+    camera.location.z = configs['camera height']
+    camera.rotation_euler.x = 0.0
+    camera.rotation_euler.y = 0.0
+    for i, pose in enumerate(trajectory):
+        camera.location.x = pose[0]
+        camera.location.y = pose[1]
+        # Offset the pose by -pi/2, since at 0, the top of the image is towards
+        # positive y.
+        camera.rotation_euler.z = pose[2] - pi/2.0
+        bpy.context.scene.render.filepath = F'{configs["output"]}/{i:06d}.png'
+        bpy.ops.render.render(write_still=True)
+    # Lastly, write the camera parameters to file. See
+    # https://visp-doc.inria.fr/doxygen/visp-3.4.0/tutorial-tracking-mb-generic-rgbd-Blender.html
+    # for details.
+    focal_length = camera.data.lens
+    scene = bpy.context.scene
+    resolution_x_px = scene.render.resolution_x
+    resolution_y_px = scene.render.resolution_y
+    scale = scene.render.resolution_percentage / 100.0
+    sensor_width_mm = camera.data.sensor_width
+    sensor_height_mm = camera.data.sensor_height
+    aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
+    if camera.data.sensor_fit == 'VERTICAL':
+        s_u = resolution_x_px * scale / sensor_width_mm / aspect_ratio
+        s_v = resolution_y_px * scale / sensor_height_mm
+    else:
+        aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
+        s_u = resolution_x_px * scale / sensor_width_mm
+        s_v = resolution_y_px * scale * aspect_ratio / sensor_height_mm
+    alpha_u = focal_length * s_u
+    alpha_v = focal_length * s_v
+    u_0 = resolution_x_px * scale / 2
+    v_0 = resolution_y_px * scale / 2
+    skew = 0
+    with open(file=F'{configs["output"]}/calibration.txt', mode='w', encoding='utf8') as file:
+        file.write(F'{alpha_u}, {skew}, {u_0}\n')
+        file.write(F'0.0, {alpha_v}, {v_0}\n')
+        file.write('0.0, 0.0, 1.0\n')
 
 
 def read_config(filename: str) -> Dict:
@@ -41,11 +83,12 @@ def read_config(filename: str) -> Dict:
     @exception JSONDecoderError Raised if the file is not in JSON format.
     """
     with open(file=filename, mode='r', encoding='utf8') as file:
-        parameters = json.load(fp=file)
+        configs = json.load(fp=file)
     # Check for required options
-    if 'trajectory' not in parameters.keys() or 'output' not in parameters.keys():
-        raise KeyError('Required values "output" and "trajectory" not in JSON')
-    return parameters
+    required_keys = ['camera height', 'output', 'trajectory']
+    if not all(key in configs for key in required_keys):
+        raise KeyError('Required value missing from JSON')
+    return configs
 
 
 def read_poses(filename: str) -> List[List[float]]:
@@ -104,11 +147,6 @@ def parse_args(args_list: List[str]) -> str:
         args_list = []
     else:
         args_list = args_list[args_list.index('--') + 1:]
-
-    print('##########')
-    for temp_arg in args_list:
-        print(temp_arg)
-    print('##########')
     parser = argparse.ArgumentParser(
         description='A script to generate texture data in Blender.')
     parser.add_argument(

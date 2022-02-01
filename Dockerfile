@@ -31,3 +31,11 @@ RUN apt update \
 	pylint
 
 CMD [ "blender" ]
+
+FROM base AS run
+# Make a local user
+RUN useradd -ms /bin/bash user
+USER user
+WORKDIR /home/user/ground_texture_sim
+COPY . /home/user/ground_texture_sim
+CMD [ "blender", "environment.blend", "-b", "--python", "data_generation.py", "--", "config.json" ]
