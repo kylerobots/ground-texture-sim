@@ -1,4 +1,7 @@
-name: Tests
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Run Tests
 
 on:
   push:
@@ -7,25 +10,20 @@ on:
     branches: [ main ]
 
 jobs:
+  build:
 
-  unit-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, "3.10"]
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Build Docker image
-        uses: docker/build-push-action@v2
-        with:
-          build-args: BUILD_TEST=ON
-          context: .
-          load: true
-          no-cache: true
-          push: false
-          tags: ground-texture-sim:test
-          target: build
-      - name: Run Unit Tests
-        run: docker run ground-texture-sim:test ctest -VV
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    # There are not dependencies at the moment, otherwise they would be installed here.
+    - name: Test with unittest
+      run: python -m unittest -v
