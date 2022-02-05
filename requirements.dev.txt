@@ -1,0 +1,4 @@
+autopep8
+coverage
+fake-bpy-module-2.82
+pylint
