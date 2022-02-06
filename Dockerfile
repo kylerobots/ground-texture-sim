@@ -16,6 +16,8 @@ RUN apt update \
 # The development image will have development tools, like Git, installed.
 FROM base AS dev
 
+COPY requirements.dev.txt /tmp/
+
 RUN apt update \
 	&& DEBIAN_FRONTEND=noninteractive \
 	apt install -y \
@@ -25,10 +27,7 @@ RUN apt update \
 	python3-pip \
 	&& rm -rf /var/lib/apt/lists/* \
 	# Don't do a requirements file, since it is only needed for development.
-	&& pip install --upgrade \
-	autopep8 \
-	coverage \
-	pylint
+	&& pip install --upgrade -r /tmp/requirements.dev.txt
 
 CMD [ "blender" ]
 
