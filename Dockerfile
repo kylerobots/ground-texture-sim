@@ -16,7 +16,7 @@ RUN apt update \
 # The development image will have development tools, like Git, installed.
 FROM base AS dev
 
-COPY requirements_dev.txt /tmp/
+COPY requirements.dev.txt /tmp/
 
 RUN apt update \
 	&& DEBIAN_FRONTEND=noninteractive \
