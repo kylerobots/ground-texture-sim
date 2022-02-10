@@ -1,0 +1,27 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Ground Texture Sim
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - given-names: Kyle
+    name-particle: M.
+    family-names: Hart
+    orcid: 'https://orcid.org/0000-0001-8254-5722'
+repository-code: 'https://github.com/kylerobots/ground-texture-sim'
+url: 'https://kylerobots.github.io/ground-texture-sim/'
+abstract: >-
+  A package to help create realistic ground texture
+  synthetic images for use by a monocular SLAM
+  application. To promote fidelity, it uses physics
+  based rendering (PBR) to accurately simulate the
+  appearance of the ground texture. Additionally, it
+  avoids the repetition of tiles common in most
+  simulated floors.
+keywords:
+  - SLAM
+  - robotics
+  - blender
+license: GPL-3.0-or-later
