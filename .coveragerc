@@ -1,0 +1,7 @@
+[run]
+  branch = True
+  include = data_generation.py
+  parallel = True
+  relative_files = True
+[report]
+  show_missing = True
