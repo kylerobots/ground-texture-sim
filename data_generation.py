@@ -156,6 +156,28 @@ def parse_args(args_list: List[str]) -> str:
     return param_file
 
 
+def write_trajectory(filename: str, trajectory: List[List[float]]) -> None:
+    """!
+    Rewrite the trajectory list into a file in the output directory.
+
+    @param filename The location to write to.
+    @param trajectory The list of poses to write, in [x, y, theta] format.
+    @return None
+    @exception RuntimeError Raised if the pose format does not follow the
+    correct structure.
+    """
+    # Create the string to write and verify the format along the way.
+    trajectory_string = ''
+    try:
+        for pose in trajectory:
+            trajectory_string += F'{pose[0]:f}, {pose[1]:f}, {pose[2]:f}\n'
+    except Exception as ex:
+        raise RuntimeError(
+            F'Pose must be [x, y, theta] format, not {pose}.') from ex
+    with open(file=filename, mode='w', encoding='utf8') as output:
+        output.write(trajectory_string)
+
+
 def main() -> None:  # pragma: no cover
     """!
     Run through the program script.

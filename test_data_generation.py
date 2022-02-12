@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 from json import JSONDecodeError
 import unittest
 from unittest.mock import mock_open, patch
-from data_generation import parse_args, read_config, read_poses
+from data_generation import parse_args, read_config, read_poses, write_trajectory
 
 
 class TestParseArgs(unittest.TestCase):
@@ -200,6 +200,55 @@ class TestReadPoses(unittest.TestCase):
             results = read_poses('trajectory.txt')
             self.assertListEqual(list1=results, list2=expected_results,
                                  msg='Poses not successfully read from file.')
+
+
+class TestWriteTrajectory(unittest.TestCase):
+    """!
+    This class verifies that the trajectory is written to file correctly.
+    """
+
+    def test_empty_list(self) -> None:
+        """!
+        This method verifies an empty file is written if the provided trajectory
+        is empty.
+
+        @return None
+        """
+        trajectory = []
+        with patch(target='builtins.open', new=mock_open()) as mock:
+            write_trajectory('trajectory.txt', trajectory)
+            mock.assert_called_once_with(
+                file='trajectory.txt', mode='w', encoding='utf8')
+            mock().write.assert_called_once_with('')
+
+    def test_success(self) -> None:
+        """!
+        This method verifies the correct file format is written when provided an expected response.
+
+        @return None
+        """
+        trajectory = [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]]
+        expected_output = '0.000000, 0.000000, 0.000000\n1.000000, 1.000000, 1.000000\n'
+        with patch(target='builtins.open', new=mock_open()) as mock:
+            write_trajectory('trajectory.txt', trajectory)
+            mock.assert_called_once_with(
+                file='trajectory.txt', mode='w', encoding='utf8')
+            mock().write.assert_called_once_with(expected_output)
+
+    def test_wrong_type(self) -> None:
+        """!
+        This method verifies nothing is written if the list is poorly formed.
+
+        @return None
+        """
+        trajectory_string = [[0.0, 0.0, 0.0], ['1.0', 1.0, 1.0]]
+        trajectory_length = [[0.0, 0.0, 0.0], [1.0, 1.0]]
+        bad_trajectories = [trajectory_string, trajectory_length]
+        with patch(target='builtins.open', new=mock_open()) as mock:
+            for trajectory in bad_trajectories:
+                self.assertRaises(RuntimeError, write_trajectory,
+                                  'trajectory.txt', trajectory)
+                mock.assert_not_called()
 
 
 if __name__ == '__main__':  # pragma: no cover
