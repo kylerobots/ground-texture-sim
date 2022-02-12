@@ -1,6 +1,7 @@
 # Ground Texture Simulation #
 
 ![Run Tests](https://github.com/kylerobots/ground-texture-sim/actions/workflows/tests.yml/badge.svg?branch=main)
+![Coverage badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/wiki/kylerobots/ground-texture-sim/python-coverage-comment-action-badge.json)
 ![Deploy Documentation](https://github.com/kylerobots/ground-texture-sim/actions/workflows/deploy_pages.yml/badge.svg?branch=main)
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/kylerobots/ground-texture-sim)
 
