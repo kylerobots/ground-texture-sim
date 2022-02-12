@@ -1,0 +1,17 @@
+name: Post Coverage Comment
+on:
+  workflow_run:
+    workflows: ['Run Tests']
+    types:
+    - completed
+jobs:
+  comment:
+    name: Display Coverage
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    steps:
+    - name: Post Comment
+      uses: ewjoachim/python-coverage-comment-action@v2
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PR_RUN_ID: ${{ github.event.workflow_run.id }}
