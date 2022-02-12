@@ -5,6 +5,18 @@
 ![Deploy Documentation](https://github.com/kylerobots/ground-texture-sim/actions/workflows/deploy_pages.yml/badge.svg?branch=main)
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/kylerobots/ground-texture-sim)
 
+## Table of Contents ##
+1. [License](#license)
+2. [Install](#install)
+    1. [Local Blender](#blender-installed-locally)
+    2. [Local Container](#build-container-locally)
+    3. [Prebuilt Container](#pull-docker-hub-container)
+3. [Running](#running)
+4. [Customization](#customization)
+    1. [Customizing the Output](#customizing-the-output)
+    2. [Customizing the Environment](#customizing-the-environment)
+
+
 This package helps create realistic ground texture synthetic images for use by a monocular SLAM application. To promote
 fidelity, it uses physics based rendering (PBR) to accurately simulate the appearance of the ground texture.
 Additionally, it avoids the repetition of tiles common in most simulated floors.
@@ -63,23 +75,51 @@ generates data for the example provided in example_setup.
 blender example_setup/environment.blend -b --python data_generation.py -- config.json
 ```
 
-You can substitute `environment.blend` for another environment you may have. Likewise, `config.json` should be replaced
-with the name of the configuration JSON file that specifies everything for your project. An example file can be found
-at the root directory of this project.
+You can substitute `example_setup/environment.blend` for another environment you may have. Likewise, `config.json`
+should be replaced with the name of the configuration JSON file that specifies everything for your project. An example
+JSON file can be found at the root directory of this project.
 
 The `-b` flag will run Blender in the background, so you don't need to open it up. However, you may use Blender as
-usual to adjust lighting, the scene, or anything else not currently supported by this script. The images will write to
-the specified folder, as shown below. A file called `calibration.txt` will also be written. It contains the camera
-intrinsic matrix for this simulation run.
+usual to adjust lighting, the scene, or anything else not currently supported by this script.
+
+The images are output to the location specified by `output` in the JSON. Each image is numbered sequentially in the form
+`000000.png`. Additionally, there are two other text files written to the same folder. `calibration.txt` contains the
+camera's intrinsic matrix, with each line in the file containing one row of the matrix. `trajectory.txt` contains the
+list of poses associated with each image, one per line in `x, y, theta` format.
 
 Note that, depending on your settings and computing power, this script may take some time to execute. The script will
 continually provide progress updates as it goes.
 
-### Customizing the Run ###
-All settings can be specified in the configuration JSON file. The allowed values are as follows:
+## Customization ##
+
+### Customizing the Output ###
+The below table shows the values that can currently be specified in the configuration JSON. It also lists if they are
+required or not. The JSON should be modified before running the script.
 
 | Parameter Key | Required? | Default Value | Description |
 | ------------- | :-------: | :-----------: | ----------- |
 | camera height | Yes       | *N/A*         | The height, in meters the camera is above the ground plane. |
 | output        | Yes       | *N/A*         | The folder the images and calibration file should be written to. Can be absolute or relative |
 | trajectory    | Yes       | *N/A*         | The name of the file to read the list of poses. Each line in the file should be of the form: `x, y, yaw` |
+
+### Customizing the Environment ###
+For any other setting, such as different textures or image size, you will need to open up Blender and edit the .blend
+file. This is due to the extremely large number of settings that are possible. Consequently, this guide will not
+cover them all. However, here are some common items to consider. This assumes basic familiarity with Blender.
+
+* The device used for rendering can be selected on the `render properties` pane, under `Device`. It is encouraged to use
+the GPU if available.
+* The quality of the render can be changed by adjusted the `Render > Samples` setting on the `render properties` pane.
+The higher the number, the higher quality the image (and longer render time).
+* The size of the output image is found in the `Output Properties` pane, under `Format`.
+* To change the ground texture, navigate to the `Shading` workspace and select the `Ground` object in the Scene
+Collection. You will see a bunch of nodes connected together. The four brown ones are the PBR files. Each one is named
+for the type of file it should hold (e.g. `normal` for the `normal` file). Use the file browser on each node to change
+to a new texture.
+* The size of the ground can be changed by selecting `Ground` in the Scene Collection, then navigating to the
+`Object Properties` pane. Use the X and Y scale. The example file has a ground that is 2x2 meters. The texture will
+stretch to fit whatever the ground size is.
+* The camera parameters are not set as a matrix, but rather as a combination of the image resolution and properties
+specified in the `Object Data Properties` pane found when selecting the `Camera` from the Scene Collection. See
+https://visp-doc.inria.fr/doxygen/visp-3.4.0/tutorial-tracking-mb-generic-rgbd-Blender.html for a good overview of how
+these parameters impact the intrinsic matrix.
