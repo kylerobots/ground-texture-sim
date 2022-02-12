@@ -56,10 +56,11 @@ docker pull kylerobots/ground-texture-sim:TAG
 Make sure the tag is at least `3.0.0`
 
 ## Running ##
-To run the script, enter the following from the command line in the root directory of the project:
+To run the script, enter the following from the command line in the root directory of the project, This example
+generates data for the example provided in example_setup.
 
 ```bash
-blender environment.blend -b --python data_generation.py -- config.json
+blender example_setup/environment.blend -b --python data_generation.py -- config.json
 ```
 
 You can substitute `environment.blend` for another environment you may have. Likewise, `config.json` should be replaced
