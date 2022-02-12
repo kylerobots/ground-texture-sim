@@ -191,6 +191,8 @@ def main() -> None:  # pragma: no cover
     config_dict = read_config(config_file)
     trajectory_list = read_poses(config_dict['trajectory'])
     generate_data(config_dict, trajectory_list)
+    write_trajectory(config_dict['output'] +
+                     '/trajectory.txt', trajectory_list)
 
 
 if __name__ == '__main__':  # pragma: no cover
