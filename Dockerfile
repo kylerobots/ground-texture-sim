@@ -3,7 +3,7 @@ ARG UBUNTU_VERSION=focal
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
-	version="3.0.0" \
+	version="3.1.0" \
 	license="SPDX-License-Identifier: GPL-3.0-or-later"
 
 # Install Python and Blender
