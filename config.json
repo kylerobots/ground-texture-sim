@@ -1,5 +1,12 @@
 {
   "trajectory": "example_setup/trajectories/corners_1x1.txt",
   "output": "output",
-  "camera height": 5.0
+  "camera_properties": {
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.25,
+    "roll": 0.0,
+    "pitch": 0.0,
+    "yaw": 0.0
+  }
 }

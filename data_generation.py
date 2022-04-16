@@ -9,7 +9,7 @@ specified directory.
 SPDX-License-Identifier: GPL-3.0-or-later
 """
 import argparse
-from math import pi
+from math import cos, pi, sin
 import json
 import sys
 from typing import Dict, List
@@ -66,6 +66,49 @@ def generate_data(configs: Dict, trajectory: List[List[float]]) -> None:
         file.write('0.0, 0.0, 1.0\n')
 
 
+def read_camera_properties(config_dict: Dict) -> Dict:
+    """!
+    Parse any camera properties provided by the user, assuming defaults if not
+    present.
+
+    This method performs validation of any camera properties used by the system.
+    It checks if the values are present and fills in defaults if they are not.
+    Defaults are as follows:
+    | Key | Default | Description |
+    | --- | --- | --- |
+    | x | 0.0 | X translation from the robot/trajectory origin |
+    | y | 0.0 | Y translation from the robot/trajectory origin |
+    | z | 0.0 | Z translation from the robot/trajectory origin |
+    | roll | 0.0 | X axis rotation from the robot/trajectory origin |
+    | pitch | 90.0 degrees | Y axis rotation from the robot/trajectory origin |
+    | yaw | 0.0 | Z axis rotation from the robot/trajectory origin |
+    @param config_dict The unparsed dictionary of config values provided by the
+    user.
+    @return A formatted dictionary of properties, with all values guaranteed to
+    be present.
+    @exception TypeError Raised if any user provided properties cannot be
+    converted into the correct type.
+    """
+    # Create a default dictionary first, then only overwrite values if they are
+    # found.
+    camera_properties = {
+        'x': 0.0,
+        'y': 0.0,
+        'z': 0.0,
+        'roll': 0.0,
+        'pitch': pi / 2.0,
+        'yaw': 0.0
+    }
+    if 'camera_properties' in config_dict.keys():
+        camera_properties['x'] = config_dict['camera_properties']['x']
+        camera_properties['y'] = config_dict['camera_properties']['y']
+        camera_properties['z'] = config_dict['camera_properties']['z']
+        camera_properties['roll'] = config_dict['camera_properties']['roll']
+        camera_properties['pitch'] = config_dict['camera_properties']['pitch']
+        camera_properties['yaw'] = config_dict['camera_properties']['yaw']
+    return camera_properties
+
+
 def read_config(filename: str) -> Dict:
     """!
     Reads in the configuration JSON and verifies required components.
@@ -85,7 +128,7 @@ def read_config(filename: str) -> Dict:
     with open(file=filename, mode='r', encoding='utf8') as file:
         configs = json.load(fp=file)
     # Check for required options
-    required_keys = ['camera height', 'output', 'trajectory']
+    required_keys = ['output', 'trajectory']
     if not all(key in configs for key in required_keys):
         raise KeyError('Required value missing from JSON')
     return configs
@@ -156,6 +199,44 @@ def parse_args(args_list: List[str]) -> str:
     return param_file
 
 
+def write_camera_pose(filename: str, camera_properties: Dict) -> None:
+    """!
+    Create a file containing the homogenous transform matrix of the transform
+    between the robot origin and camera origin.
+
+    This will be a text file with 4 lines with 4 numbers per line, seperated by
+    a comma and a space. The elements of this file correspond to the 4x4
+    homogenous transform matrix that shows the pose of the camera as measured
+    from the robot's/trajectory's frame of reference.
+
+    @param filename The location to write to.
+    @param camera_properties A formatted dictionary with all 6 pose elements, as
+    specified by @ref read_camera_properties.
+    @return None
+    """
+    x_pos = camera_properties['x']
+    y_pos = camera_properties['y']
+    z_pos = camera_properties['z']
+    roll = camera_properties['roll']
+    pitch = camera_properties['pitch']
+    yaw = camera_properties['yaw']
+    a11 = cos(pitch)*cos(yaw)
+    a12 = -cos(roll)*sin(yaw) + sin(roll)*sin(pitch)*cos(yaw)
+    a13 = sin(roll)*sin(yaw) + cos(roll)*sin(pitch)*cos(yaw)
+    a21 = cos(pitch)*sin(yaw)
+    a22 = cos(roll)*cos(yaw) + sin(roll)*sin(pitch)*sin(yaw)
+    a23 = -sin(roll)*cos(yaw) + cos(roll)*sin(pitch)*sin(yaw)
+    a31 = -sin(pitch)
+    a32 = sin(roll)*cos(pitch)
+    a33 = cos(roll)*cos(pitch)
+    matrix_string = F'{a11:.6f}, {a12:.6f}, {a13:.6f}, {x_pos:.6f}\n' \
+        F'{a21:.6f}, {a22:.6f}, {a23:.6f}, {y_pos:.6f}\n' \
+        F'{a31:.6f}, {a32:.6f}, {a33:.6f}, {z_pos:.6f}\n' \
+        '0.000000, 0.000000, 0.000000, 1.000000\n'
+    with open(file=filename, mode='w', encoding='utf8') as output:
+        output.write(matrix_string)
+
+
 def write_trajectory(filename: str, trajectory: List[List[float]]) -> None:
     """!
     Rewrite the trajectory list into a file in the output directory.
@@ -190,7 +271,10 @@ def main() -> None:  # pragma: no cover
     config_file = parse_args(sys.argv)
     config_dict = read_config(config_file)
     trajectory_list = read_poses(config_dict['trajectory'])
+    camera_properties = read_camera_properties(config_dict)
     generate_data(config_dict, trajectory_list)
+    write_camera_pose(config_dict['output'] +
+                      '/camera_pose.txt', camera_properties)
     write_trajectory(config_dict['output'] +
                      '/trajectory.txt', trajectory_list)
 
