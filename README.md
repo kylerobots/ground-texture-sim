@@ -96,11 +96,34 @@ continually provide progress updates as it goes.
 The below table shows the values that can currently be specified in the configuration JSON. It also lists if they are
 required or not. The JSON should be modified before running the script.
 
-| Parameter Key | Required? | Default Value | Description |
-| ------------- | :-------: | :-----------: | ----------- |
-| camera height | Yes       | *N/A*         | The height, in meters the camera is above the ground plane. |
-| output        | Yes       | *N/A*         | The folder the images and calibration file should be written to. Can be absolute or relative |
-| trajectory    | Yes       | *N/A*         | The name of the file to read the list of poses. Each line in the file should be of the form: `x, y, yaw` |
+| Parameter Key     | Required? | Default Value | Description |
+| ----------------- | :-------: | :-----------: | ----------- |
+| output            | Yes       | *N/A*         | The folder the images and calibration file should be written to. Can be absolute or relative |
+| trajectory        | Yes       | *N/A*         | The name of the file to read the list of poses. Each line in the file should be of the form: `x, y, yaw` |
+| camera_properties | No        | *See notes*   | Several aspects controlling the camera's position. |
+
+The camera_properties are specified as a nested JSON, like shown below. The values in the example are the default values
+if none are specified in the file.
+```json
+{
+    "camera_properties": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "roll": 0.0,
+        "pitch": 1.5708,
+        "yaw": 0.0
+    }
+}
+```
+The six pose elements represent the pose of the camera relative to each trajectory pose. In other words, if the
+trajectories specified in the trajectory file are a robot's origin on the ground plane, these values are the pose of the
+camera with respect to the robot's origin. This is provided to allow easy data generation of cases where the camera may
+be misaligned or off-center. Importantly, the roll, pitch, and yaw are Euler angles applied in that order and are
+*extrinsic* rotations. The values are in meters and radians. Additionally, values of zero on all six dimensions will
+align the camera image with the robot's frame of reference, so it won't be pointed at the ground. You will typically
+want a pitch of pi / 2.0 or close to that for a downward facing camera. While this is counterintuitive for this
+application, this adheres to frame conventions in the greater robotics community.
 
 ### Customizing the Environment ###
 For any other setting, such as different textures or image size, you will need to open up Blender and edit the .blend
