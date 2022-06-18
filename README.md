@@ -73,7 +73,7 @@ To run the script, enter the following from the command line in the root directo
 generates data for the example provided in example_setup.
 
 ```bash
-blender example_setup/environment.blend -b --python data_generation.py --python-use-system-env -- config.json
+blender example_setup/environment.blend -b --python generate_data.py --python-use-system-env -- config.json
 ```
 
 You can substitute `example_setup/environment.blend` for another environment you may have. Likewise, `config.json`
