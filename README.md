@@ -37,7 +37,8 @@ The example texture provided in this repository comes from [Poly Haven](https://
 is licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 
 ## Install ##
-There are three ways to use this, depending on your preferred setup.
+There are three ways to use this, depending on your preferred setup. Regardless of the setup, make sure your PYTHONPATH
+environmental variable contains the directory of this code so that Blender can find all of the scripts.
 
 ### Blender Installed Locally ###
 If you already have Blender installed locally, you only need to clone the repository to your computer:
@@ -72,7 +73,7 @@ To run the script, enter the following from the command line in the root directo
 generates data for the example provided in example_setup.
 
 ```bash
-blender example_setup/environment.blend -b --python data_generation.py -- config.json
+blender example_setup/environment.blend -b --python data_generation.py --python-use-system-env -- config.json
 ```
 
 You can substitute `example_setup/environment.blend` for another environment you may have. Likewise, `config.json`
@@ -81,6 +82,9 @@ JSON file can be found at the root directory of this project.
 
 The `-b` flag will run Blender in the background, so you don't need to open it up. However, you may use Blender as
 usual to adjust lighting, the scene, or anything else not currently supported by this script.
+
+The `--python-use-system-env` flag allows Blender to search for modules on your PYTHONPATH instead of just within
+Blender's instance of Python. This is essential for all the necessary code to run.
 
 The images are output to the location specified by `output` in the JSON. Each image is numbered sequentially in the form
 `000000.png`. Additionally, there are two other text files written to the same folder. `calibration.txt` contains the
