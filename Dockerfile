@@ -37,4 +37,4 @@ RUN useradd -ms /bin/bash user
 USER user
 WORKDIR /home/user/ground_texture_sim
 COPY . /home/user/ground_texture_sim
-CMD [ "blender", "environment.blend", "-b", "--python", "data_generation.py", "--", "config.json" ]
+CMD [ "blender", "environment.blend", "-b", "--python", "generate_data.py", "--", "config.json" ]

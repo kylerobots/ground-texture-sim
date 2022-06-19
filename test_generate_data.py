@@ -1,5 +1,5 @@
 """!
-This module provides the unit tests for the data_generation module.
+This module provides the unit tests for the generate_data module.
 
 SPDX-License-Identifier: GPL-3.0-or-later
 """
@@ -19,7 +19,7 @@ class TestParseArgs(unittest.TestCase):
         @return None
         """
         args = ['blender', '--python',
-                'data_generation.py', '-b', '--', '-h']
+                'generate_data.py', '-b', '--', '-h']
         self.assertRaises(SystemExit, generate_data.parse_args, args)
 
     def test_no_args(self) -> None:
@@ -28,7 +28,7 @@ class TestParseArgs(unittest.TestCase):
 
         @return None
         """
-        args = ['blender', '--python', 'data_generation.py', '-b']
+        args = ['blender', '--python', 'generate_data.py', '-b']
         self.assertRaises(SystemExit, generate_data.parse_args, args)
 
     def test_too_many_args(self) -> None:
@@ -37,7 +37,7 @@ class TestParseArgs(unittest.TestCase):
 
         @return None
         """
-        args = ['blender', '--python', 'data_generation.py',
+        args = ['blender', '--python', 'generate_data.py',
                 '-b', '--', 'config.json', 'other_config.json']
         self.assertRaises(SystemExit, generate_data.parse_args, args)
 
@@ -48,7 +48,7 @@ class TestParseArgs(unittest.TestCase):
         @return None
         """
         args = ['blender', '--python',
-                'data_generation.py', '-b', '--', 'config.json']
+                'generate_data.py', '-b', '--', 'config.json']
         result = generate_data.parse_args(args)
         self.assertEqual(result, 'config.json',
                          msg='Unable to successfully extract JSON file.')
