@@ -49,9 +49,12 @@ def _load_config(filename: str) -> Dict:
     with open(file=filename, mode='r', encoding='utf8') as file:
         configs = json.load(fp=file)
     # Check for required options
-    required_keys = ['output', 'trajectory']
+    required_keys = ['output', 'trajectory', 'camera_properties']
     if not all(key in configs for key in required_keys):
         raise KeyError('Required value missing from JSON')
+    # The camera name is also required
+    if 'name' not in configs['camera_properties'].keys():
+        raise KeyError('Camera name missing from camera_properties in JSON')
     # Fill in default values, if not provided.
     default_camera_properties = {
         'x': 0.0,

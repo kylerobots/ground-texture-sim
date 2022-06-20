@@ -3,8 +3,9 @@ This module tests the configuration_loader module.
 """
 import unittest
 from unittest.mock import mock_open, patch
-from json import JSONDecodeError
+import json
 from math import pi
+from typing import Dict
 from data_generation.configuration_loader import _load_config, _load_trajectory, _parse_args
 
 
@@ -12,6 +13,12 @@ class TestLoadConfig(unittest.TestCase):
     """!
     This class tests the load_config function.
     """
+
+    def _dict_to_string(self, input_dict: Dict) -> str:
+        """!
+        A helper function to convert Dicts to correctly formatted JSON strings.
+        """
+        return json.dumps(input_dict, indent=4)
 
     def test_missing_required_entries(self) -> None:
         """!
@@ -23,7 +30,11 @@ class TestLoadConfig(unittest.TestCase):
 
         @return None
         """
-        input_string = '{\n"trajectory": "trajectory.txt",\n"gpu": true\n}'
+        input_dict = {
+            'trajectory': 'trajectory.txt',
+            'gpu': True
+        }
+        input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             self.assertRaises(KeyError, _load_config, 'trajectory.txt',)
 
@@ -49,7 +60,8 @@ class TestLoadConfig(unittest.TestCase):
         """
         input_string = 'not a json\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(JSONDecodeError, _load_config, 'trajectory.txt')
+            self.assertRaises(json.JSONDecodeError,
+                              _load_config, 'trajectory.txt')
 
     def test_optional_missing(self) -> None:
         """!
@@ -58,12 +70,20 @@ class TestLoadConfig(unittest.TestCase):
         @return None
         """
         # Test if only some optional values are provided.
-        input_string = '{\n"trajectory": "trajectory.txt",\n"output": "output/"' \
-            ',\n"camera_properties": {\n"x": 1.0\n}\n}'
+        input_dict = {
+            'trajectory': 'trajectory.txt',
+            'output': 'output/',
+            'camera_properties': {
+                'name': 'c10',
+                'x': 1.0
+            }
+        }
+        input_string = self._dict_to_string(input_dict)
         expected_results = {
             'output': 'output/',
             'trajectory': 'trajectory.txt',
             'camera_properties': {
+                'name': 'c10',
                 'x': 1.0,
                 'y': 0.0,
                 'z': 0.0,
@@ -77,7 +97,14 @@ class TestLoadConfig(unittest.TestCase):
             self.assertDictEqual(d1=result, d2=expected_results,
                                  msg='Optional values not filled in.')
         # Test if no options are provided.
-        input_string = '{\n"trajectory": "trajectory.txt",\n"output": "output/"\n}'
+        input_dict = {
+            'trajectory': 'trajectory.txt',
+            'output': 'output/',
+            'camera_properties': {
+                'name': 'c10'
+            }
+        }
+        input_string = self._dict_to_string(input_dict)
         expected_results['camera_properties']['x'] = 0.0
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             result = _load_config('config.json')
@@ -90,13 +117,11 @@ class TestLoadConfig(unittest.TestCase):
 
         @return None
         """
-        input_string = '{\n"trajectory": "trajectory.txt",\n"output": "output/"' \
-            ',\n"camera_properties": {\n"x": 1.0,\n"y": 2.0,\n"z": 3.0,\n"roll": 0.0,\n' \
-            '"pitch": 1.0,\n"yaw": 2.0\n}\n}'
-        expected_results = {
-            'output': 'output/',
+        input_dict = {
             'trajectory': 'trajectory.txt',
+            'output': 'output/',
             'camera_properties': {
+                'name': 'c10',
                 'x': 1.0,
                 'y': 2.0,
                 'z': 3.0,
@@ -105,9 +130,10 @@ class TestLoadConfig(unittest.TestCase):
                 'yaw': 2.0
             }
         }
+        input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             result = _load_config('config.json')
-            self.assertDictEqual(d1=result, d2=expected_results,
+            self.assertDictEqual(d1=result, d2=input_dict,
                                  msg='Unable to read JSON into Dict')
 
 
