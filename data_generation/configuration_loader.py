@@ -4,10 +4,33 @@ provided trajectory data.
 """
 import json
 from math import pi
-from typing import Dict, List
+from typing import Dict, List, Tuple
+import argparse
 
 
-def load_config(filename: str) -> Dict:
+def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]:
+    """!
+    @brief Parse the command line and read configuration information provided by the arguments.
+
+    This function calls @ref _parse_args to determine which configuration file to load,
+    @ref _load_config to actually read it in and verify correctness, and @ref _load_trajectory to
+    read in the list of poses. If any fail, it throws an error.
+
+    @param args_list The arguments straight from the command line.
+    @return A tuple containing a well-formatted Dict of settings and a list of trajectories, where
+    each item in the list is a list of the form [x, y, theta].
+    @exception FileNotFoundError Raised if the config or trajectory files do not exist
+    @exception JSONDecoderError Raised if the file is not in JSON format.
+    @exception KeyError Raised if the required entries are not present in the JSON.
+    @exception RuntimeError Raised if the pose format does not follow the correct structure.
+    """
+    config_file = _parse_args(args_list=args_list)
+    config_dict = _load_config(config_file)
+    trajectory_list = _load_trajectory(config_dict['trajectory'])
+    return config_dict, trajectory_list
+
+
+def _load_config(filename: str) -> Dict:
     """!
     Read in the user provided configuration JSON.
 
@@ -46,7 +69,7 @@ def load_config(filename: str) -> Dict:
     return configs
 
 
-def load_trajectory(filename: str) -> List[List[float]]:
+def _load_trajectory(filename: str) -> List[List[float]]:
     """!
     Read in the poses from the trajectory file.
 
@@ -81,3 +104,27 @@ def load_trajectory(filename: str) -> List[List[float]]:
                 raise RuntimeError(
                     F'Each pose must be 3 floats, separated by commas. Got: {line}') from error
     return result
+
+
+def _parse_args(args_list: List[str]) -> str:
+    """!
+    @brief Parse the command line for the location of the configuration file.
+
+    Since this is only ever called as part of Blender, it must first remove any Blender-specific
+    arguments. Blender ignores everything after a '--', so use that to split. Then, the only
+    required argument is the JSON file location.
+
+    @param args_list The arguments straight from the command line
+    @return The filename of the JSON.
+    """
+    if '--' not in args_list:
+        args_list = []
+    else:
+        args_list = args_list[args_list.index('--') + 1:]
+    parser = argparse.ArgumentParser(
+        description='A script to generate texture data in Blender.')
+    parser.add_argument(
+        'parameter_file', help='The JSON file specifying all parameters.')
+    parsed_args = parser.parse_args(args_list)
+    param_file = parsed_args.parameter_file
+    return param_file

@@ -56,7 +56,7 @@ def write_camera_pose(filename: str, camera_properties: Dict) -> None:
 
     @param filename The location to write to.
     @param camera_properties A formatted dictionary with all 6 pose elements, as provided by
-    @ref configuration_setup::load_config
+    @ref configuration_loader::load_configuration
     @return None
     """
     x_pos = camera_properties['x']

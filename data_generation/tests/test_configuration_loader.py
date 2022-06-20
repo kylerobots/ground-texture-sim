@@ -1,11 +1,11 @@
 """!
-This module tests the configuration_setup module.
+This module tests the configuration_loader module.
 """
 import unittest
 from unittest.mock import mock_open, patch
 from json import JSONDecodeError
 from math import pi
-from data_generation import configuration_setup
+from data_generation.configuration_loader import _load_config, _load_trajectory, _parse_args
 
 
 class TestLoadConfig(unittest.TestCase):
@@ -25,8 +25,7 @@ class TestLoadConfig(unittest.TestCase):
         """
         input_string = '{\n"trajectory": "trajectory.txt",\n"gpu": true\n}'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(
-                KeyError, configuration_setup.load_config, 'trajectory.txt',)
+            self.assertRaises(KeyError, _load_config, 'trajectory.txt',)
 
     def test_nonexistent_file(self) -> None:
         """!
@@ -38,7 +37,7 @@ class TestLoadConfig(unittest.TestCase):
 
         @return None
         """
-        self.assertRaises(FileNotFoundError, configuration_setup.load_config,
+        self.assertRaises(FileNotFoundError, _load_config,
                           'non_a_real_file.json')
 
     def test_not_json(self) -> None:
@@ -50,8 +49,7 @@ class TestLoadConfig(unittest.TestCase):
         """
         input_string = 'not a json\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(
-                JSONDecodeError, configuration_setup.load_config, 'trajectory.txt')
+            self.assertRaises(JSONDecodeError, _load_config, 'trajectory.txt')
 
     def test_optional_missing(self) -> None:
         """!
@@ -75,14 +73,14 @@ class TestLoadConfig(unittest.TestCase):
             }
         }
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            result = configuration_setup.load_config('config.json')
+            result = _load_config('config.json')
             self.assertDictEqual(d1=result, d2=expected_results,
                                  msg='Optional values not filled in.')
         # Test if no options are provided.
         input_string = '{\n"trajectory": "trajectory.txt",\n"output": "output/"\n}'
         expected_results['camera_properties']['x'] = 0.0
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            result = configuration_setup.load_config('config.json')
+            result = _load_config('config.json')
             self.assertDictEqual(d1=result, d2=expected_results,
                                  msg='Optional values not filled in.')
 
@@ -108,7 +106,7 @@ class TestLoadConfig(unittest.TestCase):
             }
         }
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            result = configuration_setup.load_config('config.json')
+            result = _load_config('config.json')
             self.assertDictEqual(d1=result, d2=expected_results,
                                  msg='Unable to read JSON into Dict')
 
@@ -127,7 +125,7 @@ class TestLoadTrajectory(unittest.TestCase):
         """
         input_string = '\n\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            result = configuration_setup.load_trajectory('trajectory.txt')
+            result = _load_trajectory('trajectory.txt')
             self.assertEqual(len(result), 0)
 
     def test_nonexistent_file(self) -> None:
@@ -140,8 +138,8 @@ class TestLoadTrajectory(unittest.TestCase):
 
         @return None
         """
-        self.assertRaises(FileNotFoundError,
-                          configuration_setup.load_trajectory, 'non_a_real_file.txt')
+        self.assertRaises(FileNotFoundError, _load_trajectory,
+                          'non_a_real_file.txt')
 
     def test_not_full_pose(self) -> None:
         """!
@@ -152,12 +150,10 @@ class TestLoadTrajectory(unittest.TestCase):
         """
         input_string = '0.0,0.0,0.0\n0.0,0.0,\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(
-                RuntimeError, configuration_setup.load_trajectory, 'trajectory.txt')
+            self.assertRaises(RuntimeError, _load_trajectory, 'trajectory.txt')
         input_string = '0.0,0.0\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(
-                RuntimeError, configuration_setup.load_trajectory, 'trajectory.txt')
+            self.assertRaises(RuntimeError, _load_trajectory, 'trajectory.txt')
 
     def test_not_numbers(self) -> None:
         """!
@@ -168,8 +164,7 @@ class TestLoadTrajectory(unittest.TestCase):
         """
         input_string = '0.0,0.0,0.0\n0.0,0.0,the\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(
-                RuntimeError, configuration_setup.load_trajectory, 'trajectory.txt')
+            self.assertRaises(RuntimeError, _load_trajectory, 'trajectory.txt')
 
     def test_no_whitespace(self) -> None:
         """!
@@ -181,7 +176,7 @@ class TestLoadTrajectory(unittest.TestCase):
         input_string = '0.0,0.0,0.0\n1.0,2.0,3.0'
         expected_result = [[0.0, 0.0, 0.0], [1.0, 2.0, 3.0]]
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            results = configuration_setup.load_trajectory('trajectory.txt')
+            results = _load_trajectory('trajectory.txt')
             self.assertListEqual(list1=results, list2=expected_result,
                                  msg='Poses not successfully read from file.')
 
@@ -195,6 +190,53 @@ class TestLoadTrajectory(unittest.TestCase):
         input_string = '0.0, 0.0, 0.0\n1.0, 2.0, 3.0\n\n'
         expected_results = [[0.0, 0.0, 0.0], [1.0, 2.0, 3.0]]
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            results = configuration_setup.load_trajectory('trajectory.txt')
+            results = _load_trajectory('trajectory.txt')
             self.assertListEqual(list1=results, list2=expected_results,
                                  msg='Poses not successfully read from file.')
+
+
+class TestParseArgs(unittest.TestCase):
+    """!
+    This class tests the parse_args function.
+    """
+
+    def test_help_flag(self) -> None:
+        """!
+        Test that the system exists if the -h flag is passed.
+
+        @return None
+        """
+        args = ['blender', '--python',
+                'generate_data.py', '-b', '--', '-h']
+        self.assertRaises(SystemExit, _parse_args, args)
+
+    def test_no_args(self) -> None:
+        """!
+        Test that the system exists if no JSON file is provided.
+
+        @return None
+        """
+        args = ['blender', '--python', 'generate_data.py', '-b']
+        self.assertRaises(SystemExit, _parse_args, args)
+
+    def test_too_many_args(self) -> None:
+        """!
+        Test that the system exists if too many arguments are present.
+
+        @return None
+        """
+        args = ['blender', '--python', 'generate_data.py',
+                '-b', '--', 'config.json', 'other_config.json']
+        self.assertRaises(SystemExit, _parse_args, args)
+
+    def test_with_filename(self) -> None:
+        """!
+        Test that the argument for the JSON is correctly parsed.
+
+        @return None
+        """
+        args = ['blender', '--python',
+                'generate_data.py', '-b', '--', 'config.json']
+        result = _parse_args(args)
+        self.assertEqual(result, 'config.json',
+                         msg='Unable to successfully extract JSON file.')
