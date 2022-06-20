@@ -2,6 +2,7 @@
 This module tests the data_output module.
 """
 from math import pi
+from os import getcwd
 from unittest.mock import mock_open, patch
 import unittest
 from data_generation import data_output
@@ -20,6 +21,7 @@ class TestWriteCameraPose(unittest.TestCase):
         @return None
         """
         camera_properties = {
+            'name': 'camera',
             'x': 0.0,
             'y': 0.0,
             'z': 0.0,
@@ -32,10 +34,9 @@ class TestWriteCameraPose(unittest.TestCase):
             '-0.000000, 0.000000, 1.000000, 0.000000\n' \
             '0.000000, 0.000000, 0.000000, 1.000000\n'
         with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_camera_pose(
-                'camera_pose.txt', camera_properties)
+            data_output.write_camera_pose(camera_properties, getcwd())
             mock.assert_called_once_with(
-                file='camera_pose.txt', mode='w', encoding='utf8')
+                file=F'{getcwd()}/camera_properties/camera_pose.txt', mode='w', encoding='utf8')
             mock().write.assert_called_once_with(expected_output)
 
     def test_example(self) -> None:
@@ -46,6 +47,7 @@ class TestWriteCameraPose(unittest.TestCase):
         @return None
         """
         camera_properties = {
+            'name': 'c15',
             'x': 1.0,
             'y': 2.0,
             'z': 3.0,
@@ -58,10 +60,9 @@ class TestWriteCameraPose(unittest.TestCase):
             '1.000000, 0.000000, 0.000000, 3.000000\n' \
             '0.000000, 0.000000, 0.000000, 1.000000\n'
         with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_camera_pose(
-                'camera_pose.txt', camera_properties)
+            data_output.write_camera_pose(camera_properties, getcwd())
             mock.assert_called_once_with(
-                file='camera_pose.txt', mode='w', encoding='utf8')
+                file=F'{getcwd()}/camera_properties/c15_pose.txt', mode='w', encoding='utf8')
             mock().write.assert_called_once_with(expected_output)
 
 

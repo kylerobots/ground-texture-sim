@@ -33,19 +33,22 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
                 F'{matrix_string[i]} {matrix_string[i+1]} {matrix_string[i+2]}\n')
 
 
-def write_camera_pose(filename: str, camera_properties: Dict) -> None:
+def write_camera_pose(camera_properties: Dict, output_folder: str) -> None:
     """!
-    Create a file containing the homogenous transform matrix of the transform
-    between the robot origin and camera origin.
+    Create a file containing the homogenous transform matrix of the transform between the robot
+    origin and camera origin.
 
-    This will be a text file with 4 lines with 4 numbers per line, separated by
-    a comma and a space. The elements of this file correspond to the 4x4
-    homogenous transform matrix that shows the pose of the camera as measured
-    from the robot's/trajectory's frame of reference.
+    This will be a text file with 4 lines with 4 numbers per line, separated by a space. The
+    elements of this file correspond to the 4x4 homogenous transform matrix that shows the pose of
+    the camera as measured from the robot's/trajectory's frame of reference.
 
-    @param filename The location to write to.
+    The file will be called `name_pose.txt` where `name` is the name of the camera in Blender as
+    specified by the `camera_properties.name` entry in the configuration JSON. This file is placed
+    in a subfolder of output_folder called `camera_properties`.
+
     @param camera_properties A formatted dictionary with all 6 pose elements, as provided by
     @ref configuration_loader::load_configuration
+    @param output_folder The folder to create the subfolder in.
     @return None
     """
     x_pos = camera_properties['x']
@@ -67,6 +70,11 @@ def write_camera_pose(filename: str, camera_properties: Dict) -> None:
         F'{a21:.6f}, {a22:.6f}, {a23:.6f}, {y_pos:.6f}\n' \
         F'{a31:.6f}, {a32:.6f}, {a33:.6f}, {z_pos:.6f}\n' \
         '0.000000, 0.000000, 0.000000, 1.000000\n'
+    # Make sure the subdirectory exists before writing.
+    subfolder = os.path.join(output_folder, 'camera_properties')
+    if not os.path.exists(subfolder):
+        os.makedirs(subfolder)
+    filename = os.path.join(subfolder, F'{camera_properties["name"]}_pose.txt')
     with open(file=filename, mode='w', encoding='utf8') as output:
         output.write(matrix_string)
 
