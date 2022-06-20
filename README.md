@@ -104,13 +104,14 @@ required or not. The JSON should be modified before running the script.
 | ----------------- | :-------: | :-----------: | ----------- |
 | output            | Yes       | *N/A*         | The folder the images and calibration file should be written to. Can be absolute or relative |
 | trajectory        | Yes       | *N/A*         | The name of the file to read the list of poses. Each line in the file should be of the form: `x, y, yaw` |
-| camera_properties | No        | *See notes*   | Several aspects controlling the camera's position. |
+| camera_properties | Partial   | *See notes*   | Several aspects controlling the camera's position. |
 
-The camera_properties are specified as a nested JSON, like shown below. The values in the example are the default values
-if none are specified in the file.
+The camera_properties are specified as a nested JSON, like shown below. The property `name` is required. The other
+values are optional and the below example shows their default values if not specified.
 ```json
 {
     "camera_properties": {
+        "name": "c01",
         "x": 0.0,
         "y": 0.0,
         "z": 0.0,
