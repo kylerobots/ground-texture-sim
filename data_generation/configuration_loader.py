@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple
 import argparse
 
 
-def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]:
+def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]:  # pragma: no cover
     """!
     @brief Parse the command line and read configuration information provided by the arguments.
 
@@ -64,8 +64,6 @@ def _load_config(filename: str) -> Dict:
         'pitch': pi / 2.0,
         'yaw': 0.0
     }
-    if 'camera_properties' not in configs.keys():
-        configs['camera_properties'] = default_camera_properties
     for key, _ in default_camera_properties.items():
         if key not in configs['camera_properties'].keys():
             configs['camera_properties'][key] = default_camera_properties[key]

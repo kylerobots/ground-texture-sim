@@ -17,8 +17,35 @@ class TestLoadConfig(unittest.TestCase):
     def _dict_to_string(self, input_dict: Dict) -> str:
         """!
         A helper function to convert Dicts to correctly formatted JSON strings.
+
+        @param input_dict The dictionary to format as a JSON string.
+        @return A JSON string
         """
         return json.dumps(input_dict, indent=4)
+
+    def test_missing_camera_name(self) -> None:
+        """!
+        Test the camera name must be included in the user provided JSON.
+
+        @return None
+        """
+        input_dict = {
+            'trajectory': 'trajectory.txt',
+            'output': 'output/',
+        }
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(KeyError, _load_config, 'config.json',)
+        input_dict = {
+            'trajectory': 'trajectory.txt',
+            'output': 'output/',
+            'camera_properties': {
+                'x': 1.0
+            }
+        }
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(KeyError, _load_config, 'config.json',)
 
     def test_missing_required_entries(self) -> None:
         """!
@@ -36,7 +63,7 @@ class TestLoadConfig(unittest.TestCase):
         }
         input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
-            self.assertRaises(KeyError, _load_config, 'trajectory.txt',)
+            self.assertRaises(KeyError, _load_config, 'config.json',)
 
     def test_nonexistent_file(self) -> None:
         """!
@@ -61,7 +88,7 @@ class TestLoadConfig(unittest.TestCase):
         input_string = 'not a json\n'
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             self.assertRaises(json.JSONDecodeError,
-                              _load_config, 'trajectory.txt')
+                              _load_config, 'config.json')
 
     def test_optional_missing(self) -> None:
         """!
@@ -266,3 +293,7 @@ class TestParseArgs(unittest.TestCase):
         result = _parse_args(args)
         self.assertEqual(result, 'config.json',
                          msg='Unable to successfully extract JSON file.')
+
+
+if __name__ == '__main__':  # pragma: no cover
+    unittest.main()
