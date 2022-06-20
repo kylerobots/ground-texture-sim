@@ -113,3 +113,7 @@ class TestWriteTrajectory(unittest.TestCase):
                 self.assertRaises(RuntimeError, data_output.write_trajectory,
                                   'trajectory.txt', trajectory)
                 mock.assert_not_called()
+
+
+if __name__ == '__main__':
+    unittest.main()
