@@ -5,7 +5,7 @@
 	"build": {
 		"context": "..",
 		"dockerfile": "../Dockerfile",
-		"target": "dev",
+		"target": "dev"
 	},
 	"containerEnv": {
 		"DISPLAY": "host.docker.internal:0.0"
@@ -22,4 +22,7 @@
 		"python.formatting.autopep8Path": "/usr/local/bin/autopep8",
 		"python.linting.pylintPath": "/usr/local/bin/pylint"
 	},
+	"remoteEnv": {
+		"PYTHONPATH": "/workspaces/ground-texture-sim"
+	}
 }
