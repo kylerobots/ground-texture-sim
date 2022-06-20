@@ -2,7 +2,7 @@
   "trajectory": "example_setup/trajectories/corners_1x1.txt",
   "output": "output",
   "camera_properties": {
-    "name": "c10",
+    "name": "Camera",
     "x": 0.0,
     "y": 0.0,
     "z": 0.25,

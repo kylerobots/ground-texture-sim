@@ -106,8 +106,9 @@ required or not. The JSON should be modified before running the script.
 | trajectory        | Yes       | *N/A*         | The name of the file to read the list of poses. Each line in the file should be of the form: `x, y, yaw` |
 | camera_properties | Partial   | *See notes*   | Several aspects controlling the camera's position. |
 
-The camera_properties are specified as a nested JSON, like shown below. The property `name` is required. The other
-values are optional and the below example shows their default values if not specified.
+The camera_properties are specified as a nested JSON, like shown below. The property `name` is required and should match
+the camera name in Blender. The other values are optional and the below example shows their default values if not
+specified.
 ```json
 {
     "camera_properties": {

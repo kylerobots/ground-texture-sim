@@ -3,45 +3,28 @@ This module provides the functions necessary to write data to file.
 """
 from math import cos, sin
 from typing import Dict, List
-import bpy
+from data_generation import blender_interface
 
 
-def write_camera_calibration(filename: str) -> None:
+def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
     """!
     Create a file with the camera's intrinsic matrix.
 
-    This is a 3x3 matrix, with one row of the matrix per line. Each element is separated by a comma.
-    The formula for deriving the matrix is from
-    https://visp-doc.inria.fr/doxygen/visp-3.4.0/tutorial-tracking-mb-generic-rgbd-Blender.html
+    This is a 3x3 matrix, with one row of the matrix per line. Each element is separated by a space.
+    The name of the file will be `name_intrinsic_matrix.txt` where `name` is the value in
+    @ref camera_name.
 
-    @param filename The location to store the file.
+    @param camera_name The name of the camera in Blender.
+    @param output_folder The location to store the file.
     @return None
     """
-    camera = bpy.data.objects['Camera']
-    focal_length = camera.data.lens
-    scene = bpy.context.scene
-    resolution_x_px = scene.render.resolution_x
-    resolution_y_px = scene.render.resolution_y
-    scale = scene.render.resolution_percentage / 100.0
-    sensor_width_mm = camera.data.sensor_width
-    sensor_height_mm = camera.data.sensor_height
-    aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
-    if camera.data.sensor_fit == 'VERTICAL':
-        s_u = resolution_x_px * scale / sensor_width_mm / aspect_ratio
-        s_v = resolution_y_px * scale / sensor_height_mm
-    else:
-        aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
-        s_u = resolution_x_px * scale / sensor_width_mm
-        s_v = resolution_y_px * scale * aspect_ratio / sensor_height_mm
-    alpha_u = focal_length * s_u
-    alpha_v = focal_length * s_v
-    u_0 = resolution_x_px * scale / 2
-    v_0 = resolution_y_px * scale / 2
-    skew = 0
+    matrix_string = blender_interface.get_camera_intrinsic_matrix(
+        camera_name=camera_name)
+    filename = output_folder + F'/{camera_name}_intrinsic_matrix.txt'
     with open(file=filename, mode='w', encoding='utf8') as file:
-        file.write(F'{alpha_u}, {skew}, {u_0}\n')
-        file.write(F'0.0, {alpha_v}, {v_0}\n')
-        file.write('0.0, 0.0, 1.0\n')
+        for i in [0, 3, 6]:
+            file.write(
+                F'{matrix_string[i]} {matrix_string[i+1]} {matrix_string[i+2]}\n')
 
 
 def write_camera_pose(filename: str, camera_properties: Dict) -> None:
