@@ -13,7 +13,7 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
 
     This is a 3x3 matrix, with one row of the matrix per line. Each element is separated by a space.
     The name of the file will be `name_intrinsic_matrix.txt` where `name` is the value in
-    @ref camera_name. This file is located in a subdirectory of the specified output folder called
+    camera_name. This file is located in a subdirectory of the specified output folder called
     `camera_properties`.
 
     @param camera_name The name of the camera in Blender.
