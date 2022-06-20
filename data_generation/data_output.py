@@ -1,6 +1,7 @@
 """!
 This module provides the functions necessary to write data to file.
 """
+import os
 from math import cos, sin
 from typing import Dict, List
 from data_generation import blender_interface
@@ -12,7 +13,8 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
 
     This is a 3x3 matrix, with one row of the matrix per line. Each element is separated by a space.
     The name of the file will be `name_intrinsic_matrix.txt` where `name` is the value in
-    @ref camera_name.
+    @ref camera_name. This file is located in a subdirectory of the specified output folder called
+    `camera_properties`.
 
     @param camera_name The name of the camera in Blender.
     @param output_folder The location to store the file.
@@ -20,7 +22,11 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
     """
     matrix_string = blender_interface.get_camera_intrinsic_matrix(
         camera_name=camera_name)
-    filename = output_folder + F'/{camera_name}_intrinsic_matrix.txt'
+    # Make sure the subdirectory exists before writing.
+    subfolder = os.path.join(output_folder, 'camera_properties')
+    if not os.path.exists(subfolder):
+        os.makedirs(subfolder)
+    filename = os.path.join(subfolder, F'{camera_name}_intrinsic_matrix.txt')
     with open(file=filename, mode='w', encoding='utf8') as file:
         for i in [0, 3, 6]:
             file.write(
