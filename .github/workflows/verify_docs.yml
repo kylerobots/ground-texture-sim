@@ -3,7 +3,7 @@
 # documented prior to merging.
 name: Verify Documentation
 
-on: push, pull_request
+on: [push, pull_request]
 
 jobs:
   verify-documentation:
