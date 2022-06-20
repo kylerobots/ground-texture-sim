@@ -1,6 +1,10 @@
 [run]
   branch = True
-  include = data_generation.py
+  include = 
+    generate_data.py
+    data_generation/*
+  omit = 
+    data_generation/tests/*
   parallel = True
   relative_files = True
 [report]
