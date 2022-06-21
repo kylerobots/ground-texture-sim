@@ -2,10 +2,49 @@
 This module tests the data_output module.
 """
 from math import pi
-from os import getcwd
 from unittest.mock import mock_open, patch
 import unittest
 from data_generation import data_output
+
+
+class TestPrepareOutputFolder(unittest.TestCase):
+    """!
+    This class verifies that the prepare_output_folder function works.
+    """
+
+    def test_exists(self) -> None:
+        """!
+        This verifies nothing happens if the folders already exist.
+
+        @return None
+        """
+        with patch('os.path.exists') as mock_exist:
+            mock_exist.return_value = True
+            with patch('os.makedirs') as mock_make:
+                data_output.prepare_output_folder('/fake_dir')
+                mock_exist.assert_called_once_with(
+                    '/fake_dir/camera_properties')
+                mock_make.assert_not_called()
+
+    def test_not_exist(self) -> None:
+        """!
+        This method verifies the directory is created if neither the output nor subdirectory exists.
+
+        @return None
+        """
+        with patch(target='os.makedirs') as mock:
+            data_output.prepare_output_folder('/fake_dir')
+            mock.assert_called_once_with('/fake_dir/camera_properties')
+
+    def test_root_exists(self) -> None:
+        """!
+        This method verifies the subfolder directory is created if it doesn't exist.
+
+        @return None
+        """
+        with patch(target='os.makedirs') as mock:
+            data_output.prepare_output_folder('/opt/')
+            mock.assert_called_once_with('/opt/camera_properties')
 
 
 class TestWriteCameraPose(unittest.TestCase):
@@ -34,9 +73,9 @@ class TestWriteCameraPose(unittest.TestCase):
             '-0.000000, 0.000000, 1.000000, 0.000000\n' \
             '0.000000, 0.000000, 0.000000, 1.000000\n'
         with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_camera_pose(camera_properties, getcwd())
+            data_output.write_camera_pose(camera_properties, '/output_folder')
             mock.assert_called_once_with(
-                file=F'{getcwd()}/camera_properties/camera_pose.txt', mode='w', encoding='utf8')
+                file='/output_folder/camera_properties/camera_pose.txt', mode='w', encoding='utf8')
             mock().write.assert_called_once_with(expected_output)
 
     def test_example(self) -> None:
@@ -60,9 +99,9 @@ class TestWriteCameraPose(unittest.TestCase):
             '1.000000, 0.000000, 0.000000, 3.000000\n' \
             '0.000000, 0.000000, 0.000000, 1.000000\n'
         with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_camera_pose(camera_properties, getcwd())
+            data_output.write_camera_pose(camera_properties, 'output_folder')
             mock.assert_called_once_with(
-                file=F'{getcwd()}/camera_properties/c15_pose.txt', mode='w', encoding='utf8')
+                file='output_folder/camera_properties/c15_pose.txt', mode='w', encoding='utf8')
             mock().write.assert_called_once_with(expected_output)
 
 

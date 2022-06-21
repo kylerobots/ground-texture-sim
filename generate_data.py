@@ -25,6 +25,7 @@ def main() -> None:  # pragma: no cover
         sys.argv)
     data_generation.blender_interface.generate_images(
         config_dict, trajectory_list)
+    data_generation.data_output.prepare_output_folder(config_dict['output'])
     data_generation.data_output.write_camera_intrinsic_matrix(
         config_dict['camera_properties']['name'], config_dict['output'])
     data_generation.data_output.write_camera_pose(

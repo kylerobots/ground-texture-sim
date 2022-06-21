@@ -7,6 +7,19 @@ from typing import Dict, List
 from data_generation import blender_interface
 
 
+def prepare_output_folder(output_folder: str) -> None:
+    """!
+    Creates the output folder and subfolders if they don't exist already.
+
+    This ensures output_folder exists and the subfolder `camera_properties` exists as well.
+
+    @param output_folder The folder to create.
+    """
+    subfolder_camera = os.path.join(output_folder, 'camera_properties')
+    if not os.path.exists(subfolder_camera):
+        os.makedirs(subfolder_camera)
+
+
 def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
     """!
     Create a file with the camera's intrinsic matrix.
@@ -22,11 +35,8 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
     """
     matrix_string = blender_interface.get_camera_intrinsic_matrix(
         camera_name=camera_name)
-    # Make sure the subdirectory exists before writing.
-    subfolder = os.path.join(output_folder, 'camera_properties')
-    if not os.path.exists(subfolder):
-        os.makedirs(subfolder)
-    filename = os.path.join(subfolder, F'{camera_name}_intrinsic_matrix.txt')
+    filename = os.path.join(
+        output_folder, 'camera_properties', F'{camera_name}_intrinsic_matrix.txt')
     with open(file=filename, mode='w', encoding='utf8') as file:
         for i in [0, 3, 6]:
             file.write(
@@ -70,11 +80,8 @@ def write_camera_pose(camera_properties: Dict, output_folder: str) -> None:
         F'{a21:.6f}, {a22:.6f}, {a23:.6f}, {y_pos:.6f}\n' \
         F'{a31:.6f}, {a32:.6f}, {a33:.6f}, {z_pos:.6f}\n' \
         '0.000000, 0.000000, 0.000000, 1.000000\n'
-    # Make sure the subdirectory exists before writing.
-    subfolder = os.path.join(output_folder, 'camera_properties')
-    if not os.path.exists(subfolder):
-        os.makedirs(subfolder)
-    filename = os.path.join(subfolder, F'{camera_properties["name"]}_pose.txt')
+    filename = os.path.join(
+        output_folder, 'camera_properties', F'{camera_properties["name"]}_pose.txt')
     with open(file=filename, mode='w', encoding='utf8') as output:
         output.write(matrix_string)
 
