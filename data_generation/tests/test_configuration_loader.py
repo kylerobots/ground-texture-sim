@@ -100,6 +100,11 @@ class TestLoadConfig(unittest.TestCase):
         input_dict = {
             'trajectory': 'trajectory.txt',
             'output': 'output/',
+            'sequence_info': {
+                "texture_number": 1,
+                "sequence_type": "regular",
+                "sequence_number": 1
+            },
             'camera_properties': {
                 'name': 'c10',
                 'x': 1.0
@@ -109,6 +114,11 @@ class TestLoadConfig(unittest.TestCase):
         expected_results = {
             'output': 'output/',
             'trajectory': 'trajectory.txt',
+            'sequence_info': {
+                "texture_number": 1,
+                "sequence_type": "regular",
+                "sequence_number": 1
+            },
             'camera_properties': {
                 'name': 'c10',
                 'x': 1.0,
@@ -127,6 +137,11 @@ class TestLoadConfig(unittest.TestCase):
         input_dict = {
             'trajectory': 'trajectory.txt',
             'output': 'output/',
+            'sequence_info': {
+                "texture_number": 1,
+                "sequence_type": "regular",
+                "sequence_number": 1
+            },
             'camera_properties': {
                 'name': 'c10'
             }
@@ -147,6 +162,11 @@ class TestLoadConfig(unittest.TestCase):
         input_dict = {
             'trajectory': 'trajectory.txt',
             'output': 'output/',
+            'sequence_info': {
+                "texture_number": 1,
+                "sequence_type": "regular",
+                "sequence_number": 1
+            },
             'camera_properties': {
                 'name': 'c10',
                 'x': 1.0,
