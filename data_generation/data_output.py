@@ -46,8 +46,11 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
     with open(file=filename, mode='w', encoding='utf8') as file:
         output_string = ''
         for i in [0, 3, 6]:
-            output_string += F'{matrix_string[i]:.6f} {matrix_string[i+1]:.6f} \
-                {matrix_string[i+2]:.6f}\n'
+            output_string += (
+                F'{matrix_string[i]:.6f} '
+                F'{matrix_string[i+1]:.6f} '
+                F'{matrix_string[i+2]:.6f}\n'
+            )
         file.write(output_string)
 
 
