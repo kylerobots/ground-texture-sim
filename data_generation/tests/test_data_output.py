@@ -47,10 +47,44 @@ class TestPrepareOutputFolder(unittest.TestCase):
             mock.assert_called_once_with('/opt/camera_properties')
 
 
+class TestWriteCameraIntrinsicMatrix(unittest.TestCase):
+    """!
+    This class verifies that the function to write the intrinsic matrix works.
+    """
+
+    def test_name_not_found(self) -> None:
+        """!
+        Verifies an error is raised if the camera name is bad.
+
+        @return None
+        """
+        with patch(target='data_generation.blender_interface.get_camera_intrinsic_matrix') as mock:
+            mock.side_effect = Exception('Cannot find camera')
+            with self.assertRaises(NameError, msg='Does not raise error on incorrect name'):
+                data_output.write_camera_intrinsic_matrix(
+                    'fake_name', 'output')
+
+    def test_success(self) -> None:
+        """!
+        Verifies the matrix is written correctly if everything is good.
+
+        @return None
+        """
+        expected_output = '0.000000 1.000000 2.000000\n' \
+            '3.000000 4.000000 5.000000\n' \
+            '6.000000 7.000000 8.000000\n'
+        with patch('data_generation.blender_interface.get_camera_intrinsic_matrix') as mock_blender:
+            mock_blender.return_value = [
+                0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+            with patch(target='builtins.open', new=mock_open()) as mock_output:
+                data_output.write_camera_intrinsic_matrix(
+                    'camera', 'output_folder')
+                mock_output().write.assert_called_once_with(expected_output)
+
+
 class TestWriteCameraPose(unittest.TestCase):
     """!
-    This class verifies that the camera pose is written as a homogenous matrix
-    to file.
+    This class verifies that the camera pose is written as a homogenous matrix to file.
     """
 
     def test_identity(self) -> None:
@@ -68,10 +102,10 @@ class TestWriteCameraPose(unittest.TestCase):
             'pitch': 0.0,
             'yaw': 0.0
         }
-        expected_output = '1.000000, 0.000000, 0.000000, 0.000000\n' \
-            '0.000000, 1.000000, 0.000000, 0.000000\n' \
-            '-0.000000, 0.000000, 1.000000, 0.000000\n' \
-            '0.000000, 0.000000, 0.000000, 1.000000\n'
+        expected_output = '1.000000 0.000000 0.000000 0.000000\n' \
+            '0.000000 1.000000 0.000000 0.000000\n' \
+            '-0.000000 0.000000 1.000000 0.000000\n' \
+            '0.000000 0.000000 0.000000 1.000000\n'
         with patch(target='builtins.open', new=mock_open()) as mock:
             data_output.write_camera_pose(camera_properties, '/output_folder')
             mock.assert_called_once_with(
@@ -94,10 +128,10 @@ class TestWriteCameraPose(unittest.TestCase):
             'pitch': -pi / 2.0,
             'yaw': pi
         }
-        expected_output = '-0.000000, 1.000000, 0.000000, 1.000000\n' \
-            '0.000000, -0.000000, 1.000000, 2.000000\n' \
-            '1.000000, 0.000000, 0.000000, 3.000000\n' \
-            '0.000000, 0.000000, 0.000000, 1.000000\n'
+        expected_output = '-0.000000 1.000000 0.000000 1.000000\n' \
+            '0.000000 -0.000000 1.000000 2.000000\n' \
+            '1.000000 0.000000 0.000000 3.000000\n' \
+            '0.000000 0.000000 0.000000 1.000000\n'
         with patch(target='builtins.open', new=mock_open()) as mock:
             data_output.write_camera_pose(camera_properties, 'output_folder')
             mock.assert_called_once_with(

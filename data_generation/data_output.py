@@ -14,6 +14,7 @@ def prepare_output_folder(output_folder: str) -> None:
     This ensures output_folder exists and the subfolder `camera_properties` exists as well.
 
     @param output_folder The folder to create.
+    @return None
     """
     subfolder_camera = os.path.join(output_folder, 'camera_properties')
     if not os.path.exists(subfolder_camera):
@@ -32,15 +33,22 @@ def write_camera_intrinsic_matrix(camera_name: str, output_folder: str) -> None:
     @param camera_name The name of the camera in Blender.
     @param output_folder The location to store the file.
     @return None
+    @exception NameError thrown if the camera name doesn't exist in the simulation.
     """
-    matrix_string = blender_interface.get_camera_intrinsic_matrix(
-        camera_name=camera_name)
+    try:
+        matrix_string = blender_interface.get_camera_intrinsic_matrix(
+            camera_name=camera_name)
+    except Exception as exc:
+        raise NameError(
+            F'Unable to get camera properties for {camera_name}') from exc
     filename = os.path.join(
         output_folder, 'camera_properties', F'{camera_name}_intrinsic_matrix.txt')
     with open(file=filename, mode='w', encoding='utf8') as file:
+        output_string = ''
         for i in [0, 3, 6]:
-            file.write(
-                F'{matrix_string[i]} {matrix_string[i+1]} {matrix_string[i+2]}\n')
+            output_string += F'{matrix_string[i]:.6f} {matrix_string[i+1]:.6f} \
+                {matrix_string[i+2]:.6f}\n'
+        file.write(output_string)
 
 
 def write_camera_pose(camera_properties: Dict, output_folder: str) -> None:
@@ -76,10 +84,10 @@ def write_camera_pose(camera_properties: Dict, output_folder: str) -> None:
     a31 = -sin(pitch)
     a32 = sin(roll)*cos(pitch)
     a33 = cos(roll)*cos(pitch)
-    matrix_string = F'{a11:.6f}, {a12:.6f}, {a13:.6f}, {x_pos:.6f}\n' \
-        F'{a21:.6f}, {a22:.6f}, {a23:.6f}, {y_pos:.6f}\n' \
-        F'{a31:.6f}, {a32:.6f}, {a33:.6f}, {z_pos:.6f}\n' \
-        '0.000000, 0.000000, 0.000000, 1.000000\n'
+    matrix_string = F'{a11:.6f} {a12:.6f} {a13:.6f} {x_pos:.6f}\n' \
+        F'{a21:.6f} {a22:.6f} {a23:.6f} {y_pos:.6f}\n' \
+        F'{a31:.6f} {a32:.6f} {a33:.6f} {z_pos:.6f}\n' \
+        '0.000000 0.000000 0.000000 1.000000\n'
     filename = os.path.join(
         output_folder, 'camera_properties', F'{camera_properties["name"]}_pose.txt')
     with open(file=filename, mode='w', encoding='utf8') as output:
