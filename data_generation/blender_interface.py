@@ -53,3 +53,38 @@ def generate_images(configs: Dict, trajectory: List[List[float]]) -> None:
         # Render the image into the output directory
         bpy.context.scene.render.filepath = F'{configs["output"]}/{i:06d}.png'
         bpy.ops.render.render(write_still=True)
+
+
+def get_camera_intrinsic_matrix(camera_name: str) -> List[float]:
+    """!
+    Calculate the intrinsic calibration matrix of Blender's camera.
+
+    This is a 3x3 matrix derived from Blender using these steps:
+    https://visp-doc.inria.fr/doxygen/visp-3.4.0/tutorial-tracking-mb-generic-rgbd-Blender.html
+
+    @param camera_name The name of the camera in Blender.
+    @return A 9 element list representing the 3x3, row major intrinsic matrix.
+    """
+    camera = bpy.data.objects[camera_name]
+    focal_length = camera.data.lens
+    scene = bpy.context.scene
+    resolution_x_px = scene.render.resolution_x
+    resolution_y_px = scene.render.resolution_y
+    scale = scene.render.resolution_percentage / 100.0
+    sensor_width_mm = camera.data.sensor_width
+    sensor_height_mm = camera.data.sensor_height
+    aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
+    if camera.data.sensor_fit == 'VERTICAL':
+        s_u = resolution_x_px * scale / sensor_width_mm / aspect_ratio
+        s_v = resolution_y_px * scale / sensor_height_mm
+    else:
+        aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
+        s_u = resolution_x_px * scale / sensor_width_mm
+        s_v = resolution_y_px * scale * aspect_ratio / sensor_height_mm
+    alpha_u = focal_length * s_u
+    alpha_v = focal_length * s_v
+    u_0 = resolution_x_px * scale / 2
+    v_0 = resolution_y_px * scale / 2
+    skew = 0
+    matrix = [alpha_u, skew, u_0, 0.0, alpha_v, v_0, 0.0, 0.0, 1.0]
+    return matrix
