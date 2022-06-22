@@ -4,7 +4,6 @@ This module tests the configuration_loader module.
 import unittest
 from unittest.mock import mock_open, patch
 import json
-from math import pi
 from typing import Dict
 from data_generation.configuration_loader import _load_config, _load_trajectory, _parse_args
 
@@ -13,6 +12,34 @@ class TestLoadConfig(unittest.TestCase):
     """!
     This class tests the load_config function.
     """
+
+    def _create_correct_config(self, include_options: bool = True) -> Dict:
+        """!
+        A helper function to create correctly formatted Dicts, with or without options.
+
+        @param include_options Whether or not to include all optional keys with default values.
+        @return The Dict
+        """
+        result = {
+            'camera': {
+                'name': 'Camera'
+            },
+            'output': 'output/',
+            'sequence': {
+                'sequence_number': 1,
+                'sequence_type': 'regular',
+                'texture_number': 1
+            },
+            'trajectory': 'trajectory.txt'
+        }
+        if include_options:
+            result['camera']['x'] = 0.0
+            result['camera']['y'] = 0.0
+            result['camera']['z'] = 0.0
+            result['camera']['roll'] = 0.0
+            result['camera']['pitch'] = 1.5708
+            result['camera']['yaw'] = 0.0
+        return result
 
     def _dict_to_string(self, input_dict: Dict) -> str:
         """!
@@ -23,44 +50,65 @@ class TestLoadConfig(unittest.TestCase):
         """
         return json.dumps(input_dict, indent=4)
 
-    def test_missing_camera_name(self) -> None:
+    def test_missing_camera_elements(self) -> None:
         """!
-        Test the camera name must be included in the user provided JSON.
+        Test that the camera name must be included in the user provided JSON.
 
         @return None
         """
-        input_dict = {
-            'trajectory': 'trajectory.txt',
-            'output': 'output/',
-        }
+        # Name must be specified
+        input_dict = self._create_correct_config(True)
+        input_dict['camera'].pop('name')
         input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             self.assertRaises(KeyError, _load_config, 'config.json',)
-        input_dict = {
-            'trajectory': 'trajectory.txt',
-            'output': 'output/',
-            'camera_properties': {
-                'x': 1.0
-            }
-        }
+        # Camera must also be specified
+        input_dict.pop('camera')
         input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             self.assertRaises(KeyError, _load_config, 'config.json',)
 
-    def test_missing_required_entries(self) -> None:
+    def test_missing_sequence_elements(self) -> None:
         """!
-        Test the function raises an Exception if required entries are not
-        present.
-
-        At a minimum, the JSON should specify the output directory and the
-        trajectory file.
+        Test that all required sequence keys are checked for.
 
         @return None
         """
-        input_dict = {
-            'trajectory': 'trajectory.txt',
-            'gpu': True
-        }
+        # Texture number
+        input_dict = self._create_correct_config(True)
+        input_dict['sequence'].pop('texture_number')
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(KeyError, _load_config, 'config.json',)
+        # Sequence type
+        input_dict = self._create_correct_config(True)
+        input_dict['sequence'].pop('sequence_type')
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(KeyError, _load_config, 'config.json',)
+        # Sequence number
+        input_dict = self._create_correct_config(True)
+        input_dict['sequence'].pop('sequence_number')
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(KeyError, _load_config, 'config.json',)
+
+    def test_missing_top_levels(self) -> None:
+        """!
+        Test the function raises an Exception if certain required entries are not present.
+
+        This ensures that 'trajectory' and 'output' are both required.
+
+        @return None
+        """
+        # Test that trajectory must be there.
+        input_dict = self._create_correct_config(True)
+        input_dict.pop('trajectory')
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(KeyError, _load_config, 'config.json',)
+        input_dict = self._create_correct_config(True)
+        input_dict.pop('output')
         input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             self.assertRaises(KeyError, _load_config, 'config.json',)
@@ -96,58 +144,18 @@ class TestLoadConfig(unittest.TestCase):
 
         @return None
         """
-        # Test if only some optional values are provided.
-        input_dict = {
-            'trajectory': 'trajectory.txt',
-            'output': 'output/',
-            'sequence_info': {
-                "texture_number": 1,
-                "sequence_type": "regular",
-                "sequence_number": 1
-            },
-            'camera_properties': {
-                'name': 'c10',
-                'x': 1.0
-            }
-        }
+        # Test if no optional values are provided.
+        input_dict = self._create_correct_config(False)
+        expected_results = self._create_correct_config(True)
         input_string = self._dict_to_string(input_dict)
-        expected_results = {
-            'output': 'output/',
-            'trajectory': 'trajectory.txt',
-            'sequence_info': {
-                "texture_number": 1,
-                "sequence_type": "regular",
-                "sequence_number": 1
-            },
-            'camera_properties': {
-                'name': 'c10',
-                'x': 1.0,
-                'y': 0.0,
-                'z': 0.0,
-                'roll': 0.0,
-                'pitch': pi / 2.0,
-                'yaw': 0.0
-            }
-        }
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             result = _load_config('config.json')
             self.assertDictEqual(d1=result, d2=expected_results,
                                  msg='Optional values not filled in.')
-        # Test if no options are provided.
-        input_dict = {
-            'trajectory': 'trajectory.txt',
-            'output': 'output/',
-            'sequence_info': {
-                "texture_number": 1,
-                "sequence_type": "regular",
-                "sequence_number": 1
-            },
-            'camera_properties': {
-                'name': 'c10'
-            }
-        }
+        # Test if only some options are provided
+        input_dict['camera']['x'] = 5.0
+        expected_results['camera']['x'] = 5.0
         input_string = self._dict_to_string(input_dict)
-        expected_results['camera_properties']['x'] = 0.0
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             result = _load_config('config.json')
             self.assertDictEqual(d1=result, d2=expected_results,
@@ -159,24 +167,7 @@ class TestLoadConfig(unittest.TestCase):
 
         @return None
         """
-        input_dict = {
-            'trajectory': 'trajectory.txt',
-            'output': 'output/',
-            'sequence_info': {
-                "texture_number": 1,
-                "sequence_type": "regular",
-                "sequence_number": 1
-            },
-            'camera_properties': {
-                'name': 'c10',
-                'x': 1.0,
-                'y': 2.0,
-                'z': 3.0,
-                'roll': 0.0,
-                'pitch': 1.0,
-                'yaw': 2.0
-            }
-        }
+        input_dict = self._create_correct_config(True)
         input_string = self._dict_to_string(input_dict)
         with patch(target='builtins.open', new=mock_open(read_data=input_string)):
             result = _load_config('config.json')

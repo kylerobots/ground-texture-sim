@@ -3,7 +3,6 @@ This module provides the functions necessary to read in all the user's configura
 provided trajectory data.
 """
 import json
-from math import pi
 from typing import Dict, List, Tuple
 import argparse
 
@@ -48,31 +47,32 @@ def _load_config(filename: str) -> Dict:
     """
     with open(file=filename, mode='r', encoding='utf8') as file:
         configs = json.load(fp=file)
-    # Check for required options
-    required_keys = ['output', 'trajectory',
-                     'camera_properties', 'sequence_info']
+    # Check for required top level options
+    required_keys = ['output', 'trajectory', 'camera', 'sequence']
     if not all(key in configs for key in required_keys):
         raise KeyError('Required value missing from JSON')
-    # The camera name is also required
-    if 'name' not in configs['camera_properties'].keys():
+    # Verify the required camera values are present.
+    required_camera_keys = ['name']
+    if not all(key in configs['camera'] for key in required_camera_keys):
         raise KeyError('Camera name missing from camera_properties in JSON')
-    # As are the following sequence information entries
-    required_sequence_keys = ['texture_number',
-                              'sequence_type', 'sequence_number']
-    if not all(key in configs['sequence_info'] for key in required_sequence_keys):
-        raise KeyError('Required sequence information is missing')
-    # Fill in default values, if not provided.
+    # Fill in any optional camera values
     default_camera_properties = {
         'x': 0.0,
         'y': 0.0,
         'z': 0.0,
         'roll': 0.0,
-        'pitch': pi / 2.0,
+        'pitch': 1.5708,
         'yaw': 0.0
     }
     for key, _ in default_camera_properties.items():
-        if key not in configs['camera_properties'].keys():
-            configs['camera_properties'][key] = default_camera_properties[key]
+        if key not in configs['camera'].keys():
+            configs['camera'][key] = default_camera_properties[key]
+    # Verify the required sequence values are present
+    required_sequence_keys = ['texture_number',
+                              'sequence_type', 'sequence_number']
+    if not all(key in configs['sequence'] for key in required_sequence_keys):
+        raise KeyError('Required sequence information is missing')
+    # Fill in default values, if not provided.
     return configs
 
 
