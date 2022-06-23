@@ -161,6 +161,30 @@ class TestLoadConfig(unittest.TestCase):
             self.assertDictEqual(d1=result, d2=expected_results,
                                  msg='Optional values not filled in.')
 
+    def test_sequence_number_is_number(self) -> None:
+        """!
+        Test the loader verifies the sequence number is an actual number.
+
+        @return None
+        """
+        input_dict = self._create_correct_config(True)
+        # Switch to a string
+        input_dict['sequence']['sequence_number'] = "blah"
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(TypeError, _load_config, 'config.json')
+        # Floats aren't supported either
+        input_dict['sequence']['sequence_number'] = "2.1"
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(TypeError, _load_config, 'config.json')
+        # Strings that can convert to ints are fine though
+        input_dict['sequence']['sequence_number'] = "2"
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            result = _load_config('config.json')
+            self.assertEqual(result['sequence']['sequence_number'], 2)
+
     def test_successful(self) -> None:
         """!
         Test the function works as expected if the specified file is correct.
@@ -173,6 +197,30 @@ class TestLoadConfig(unittest.TestCase):
             result = _load_config('config.json')
             self.assertDictEqual(d1=result, d2=input_dict,
                                  msg='Unable to read JSON into Dict')
+
+    def test_texture_number_is_number(self) -> None:
+        """!
+        Test the loader verifies the sequence number is an actual number.
+
+        @return None
+        """
+        input_dict = self._create_correct_config(True)
+        # Switch to a string
+        input_dict['sequence']['texture_number'] = "blah"
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(TypeError, _load_config, 'config.json')
+        # Floats aren't supported either
+        input_dict['sequence']['texture_number'] = "2.1"
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            self.assertRaises(TypeError, _load_config, 'config.json')
+        # Strings that can convert to ints are fine though
+        input_dict['sequence']['texture_number'] = "2"
+        input_string = self._dict_to_string(input_dict)
+        with patch(target='builtins.open', new=mock_open(read_data=input_string)):
+            result = _load_config('config.json')
+            self.assertEqual(result['sequence']['texture_number'], 2)
 
 
 class TestLoadTrajectory(unittest.TestCase):

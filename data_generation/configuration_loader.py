@@ -44,6 +44,7 @@ def _load_config(filename: str) -> Dict:
     @exception KeyError Raised if the required entries are not present in the
     JSON.
     @exception JSONDecoderError Raised if the file is not in JSON format.
+    @exception TypeError Raised if any values are the incorrect types.
     """
     with open(file=filename, mode='r', encoding='utf8') as file:
         configs = json.load(fp=file)
@@ -72,7 +73,17 @@ def _load_config(filename: str) -> Dict:
                               'sequence_type', 'sequence_number']
     if not all(key in configs['sequence'] for key in required_sequence_keys):
         raise KeyError('Required sequence information is missing')
-    # Fill in default values, if not provided.
+    # Convert the texture number and sequence number to ints if not already
+    try:
+        configs['sequence']['sequence_number'] = int(
+            configs['sequence']['sequence_number'])
+    except (TypeError, ValueError) as ex:
+        raise TypeError('sequence_number must be an integer') from ex
+    try:
+        configs['sequence']['texture_number'] = int(
+            configs['sequence']['texture_number'])
+    except (TypeError, ValueError) as ex:
+        raise TypeError('texture_number must be an integer') from ex
     return configs
 
 
