@@ -3,7 +3,6 @@ This module provides the functions necessary to read in all the user's configura
 provided trajectory data.
 """
 import json
-from math import pi
 from typing import Dict, List, Tuple
 import argparse
 
@@ -45,28 +44,46 @@ def _load_config(filename: str) -> Dict:
     @exception KeyError Raised if the required entries are not present in the
     JSON.
     @exception JSONDecoderError Raised if the file is not in JSON format.
+    @exception TypeError Raised if any values are the incorrect types.
     """
     with open(file=filename, mode='r', encoding='utf8') as file:
         configs = json.load(fp=file)
-    # Check for required options
-    required_keys = ['output', 'trajectory', 'camera_properties']
+    # Check for required top level options
+    required_keys = ['output', 'trajectory', 'camera', 'sequence']
     if not all(key in configs for key in required_keys):
         raise KeyError('Required value missing from JSON')
-    # The camera name is also required
-    if 'name' not in configs['camera_properties'].keys():
+    # Verify the required camera values are present.
+    required_camera_keys = ['name']
+    if not all(key in configs['camera'] for key in required_camera_keys):
         raise KeyError('Camera name missing from camera_properties in JSON')
-    # Fill in default values, if not provided.
+    # Fill in any optional camera values
     default_camera_properties = {
         'x': 0.0,
         'y': 0.0,
         'z': 0.0,
         'roll': 0.0,
-        'pitch': pi / 2.0,
+        'pitch': 1.5708,
         'yaw': 0.0
     }
     for key, _ in default_camera_properties.items():
-        if key not in configs['camera_properties'].keys():
-            configs['camera_properties'][key] = default_camera_properties[key]
+        if key not in configs['camera'].keys():
+            configs['camera'][key] = default_camera_properties[key]
+    # Verify the required sequence values are present
+    required_sequence_keys = ['texture_number',
+                              'sequence_type', 'sequence_number']
+    if not all(key in configs['sequence'] for key in required_sequence_keys):
+        raise KeyError('Required sequence information is missing')
+    # Convert the texture number and sequence number to ints if not already
+    try:
+        configs['sequence']['sequence_number'] = int(
+            configs['sequence']['sequence_number'])
+    except (TypeError, ValueError) as ex:
+        raise TypeError('sequence_number must be an integer') from ex
+    try:
+        configs['sequence']['texture_number'] = int(
+            configs['sequence']['texture_number'])
+    except (TypeError, ValueError) as ex:
+        raise TypeError('texture_number must be an integer') from ex
     return configs
 
 
