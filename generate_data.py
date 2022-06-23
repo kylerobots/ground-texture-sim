@@ -27,9 +27,9 @@ def main() -> None:  # pragma: no cover
         config_dict, trajectory_list)
     data_generation.data_output.prepare_output_folder(config_dict['output'])
     data_generation.data_output.write_camera_intrinsic_matrix(
-        config_dict['camera_properties']['name'], config_dict['output'])
+        config_dict['camera']['name'], config_dict['output'])
     data_generation.data_output.write_camera_pose(
-        config_dict['camera_properties'], config_dict['output'])
+        config_dict['camera'], config_dict['output'])
     data_generation.data_output.write_trajectory(config_dict['output'] +
                                                  '/trajectory.txt', trajectory_list)
 
