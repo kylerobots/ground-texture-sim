@@ -30,8 +30,7 @@ def main() -> None:  # pragma: no cover
         config_dict['camera']['name'], config_dict['output'])
     data_generation.data_output.write_camera_pose(
         config_dict['camera'], config_dict['output'])
-    data_generation.data_output.write_trajectory(config_dict['output'] +
-                                                 '/trajectory.txt', trajectory_list)
+    data_generation.data_output.write_list_files(config_dict, trajectory_list)
 
 
 if __name__ == '__main__':  # pragma: no cover

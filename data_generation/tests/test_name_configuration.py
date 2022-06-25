@@ -81,7 +81,7 @@ class TestCreateFileListBase(unittest.TestCase):
         Assuming a well-formed configuration dictionary, test that the base name follows the
         expected format.
 
-        The name should be "<sequence_type>_<date in YYMMDD>
+        The name should be *sequence_type*_*date in YYMMDD*
 
         @return None
         """
