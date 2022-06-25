@@ -25,7 +25,7 @@ def create_image_path(index: int, configs: Dict) -> str:
     # First, assemble the directory
     sequence_type_folder = configs['sequence']['sequence_type']
     date_folder = current_date.strftime('%y%m%d')
-    sequence_number_folder = F'seq{configs["sequence"]["sequence_number"]:03d}'
+    sequence_number_folder = F'seq{configs["sequence"]["sequence_number"]:04d}'
     file_directory = path.join(
         configs['output'], sequence_type_folder, date_folder, sequence_number_folder)
     # Then the filename

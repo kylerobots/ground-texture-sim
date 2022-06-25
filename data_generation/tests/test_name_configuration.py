@@ -32,7 +32,7 @@ class TestCreateImagePath(unittest.TestCase):
         image_number = 5
         current_date = datetime.date.today()
         base_directory = path.join(
-            input_dict['output'], 'regular', current_date.strftime('%y%m%d'), 'seq003')
+            input_dict['output'], 'regular', current_date.strftime('%y%m%d'), 'seq0003')
         base_directory = path.abspath(base_directory)
         file_name = F'HDG2_t002_regular_{current_date.strftime("%Y-%m-%d")}_s0003_c01_i0000005.png'
         expected_result = path.join(base_directory, file_name)
@@ -61,7 +61,7 @@ class TestCreateImagePath(unittest.TestCase):
         image_number = 5
         current_date = datetime.date.today()
         base_directory = path.join(
-            input_dict['output'], 'regular', current_date.strftime('%y%m%d'), 'seq003')
+            input_dict['output'], 'regular', current_date.strftime('%y%m%d'), 'seq0003')
         base_directory = path.abspath(base_directory)
         file_name = F'HDG2_t002_regular_{current_date.strftime("%Y-%m-%d")}_s0003_c01_i0000005.png'
         expected_result = path.join(base_directory, file_name)
