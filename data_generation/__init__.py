@@ -5,3 +5,4 @@ simulation, and write the data. It also contains the unit tests for each functio
 from data_generation import blender_interface
 from data_generation import configuration_loader
 from data_generation import data_output
+from data_generation import name_configuration
