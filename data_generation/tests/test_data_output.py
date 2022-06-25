@@ -1,9 +1,11 @@
 """!
 This module tests the data_output module.
 """
+import datetime
+import unittest
 from math import pi
 from unittest.mock import mock_open, patch
-import unittest
+from typing import Dict, List, Tuple
 from data_generation import data_output
 
 
@@ -139,53 +141,97 @@ class TestWriteCameraPose(unittest.TestCase):
             mock().write.assert_called_once_with(expected_output)
 
 
-class TestWriteTrajectory(unittest.TestCase):
+class TestWriteListFiles(unittest.TestCase):
     """!
-    This class verifies that the trajectory is written to file correctly.
+    This class verifies that the list files are written correctly.
     """
 
-    def test_empty_list(self) -> None:
+    def _create_inputs(self) -> Tuple[Dict, List[List[float]]]:
         """!
-        This method verifies an empty file is written if the provided trajectory
-        is empty.
+        Convenience function to create the inputs to the write_list_files function.
+
+        @return A tuple containing the configs Dict and trajectory List
+        """
+        configs = {
+            'camera': {
+                'name': 'c01'
+            },
+            'output': '/opt/output',
+            'sequence': {
+                'sequence_type': 'test1',
+                'sequence_number': 1,
+                'texture_number': 245
+            }
+        }
+        trajectory = [
+            [0.0, 0.0, 0.0],
+            [1.2, 3.5, pi / 2.0]
+        ]
+        return configs, trajectory
+
+    def test_success_absolute(self) -> None:
+        """!
+        Test the function writes correctly with an absolute output path.
 
         @return None
         """
-        trajectory = []
+        configs, trajectory = self._create_inputs()
+        current_date = datetime.date.today()
+        date_string = current_date.strftime('%y%m%d')
+        image_string = current_date.strftime('%Y-%m-%d')
+        # Create the expected lines that will be written.
+        image_strings = [
+            F'test1/{date_string}/seq0001/HDG2_t245_test1_{image_string}_s0001_c01_i0000000.png\n',
+            F'test1/{date_string}/seq0001/HDG2_t245_test1_{image_string}_s0001_c01_i0000001.png\n'
+        ]
+        ground_truth_strings = [
+            '1.000000 -0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000\n',
+            '0.000000 -1.000000 1.200000 1.000000 0.000000 3.500000 0.000000 0.000000 1.000000\n'
+        ]
+        pixel_strings = [
+            ' \n',
+            ' \n'
+        ]
         with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_trajectory('trajectory.txt', trajectory)
-            mock.assert_called_once_with(
-                file='trajectory.txt', mode='w', encoding='utf8')
-            mock().write.assert_called_once_with('')
+            data_output.write_list_files(configs, trajectory)
+            # Verify the correct files are written to
+            mock.assert_any_call(
+                file=F'/opt/output/test1_{date_string}.test', mode='w', encoding='utf-8')
+            mock.assert_any_call(
+                file=F'/opt/output/test1_{date_string}.txt', mode='w', encoding='utf-8')
+            mock.assert_any_call(
+                file=F'/opt/output/test1_{date_string}_meters.txt', mode='w', encoding='utf-8')
+            # Verify the right information is written. This won't verify the order though or that
+            # each one is in the correct file. Just the formatting.
+            mock().write.assert_any_call(image_strings[0])
+            mock().write.assert_any_call(image_strings[1])
+            mock().write.assert_any_call(ground_truth_strings[0])
+            mock().write.assert_any_call(ground_truth_strings[1])
+            mock().write.assert_any_call(pixel_strings[0])
+            mock().write.assert_any_call(pixel_strings[1])
 
-    def test_success(self) -> None:
+    def test_success_relative(self) -> None:
         """!
-        This method verifies the correct file format is written when provided an expected response.
+        Test the function writes correctly with a relative output path.
+
+        This doesn't need to check the actual file contents, as that will be covered by
+        @ref test_success_absolute
 
         @return None
         """
-        trajectory = [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]]
-        expected_output = '0.000000, 0.000000, 0.000000\n1.000000, 1.000000, 1.000000\n'
+        configs, trajectory = self._create_inputs()
+        configs['output'] = 'output'
+        current_date = datetime.date.today()
+        date_string = current_date.strftime('%y%m%d')
         with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_trajectory('trajectory.txt', trajectory)
-            mock.assert_called_once_with(
-                file='trajectory.txt', mode='w', encoding='utf8')
-            mock().write.assert_called_once_with(expected_output)
-
-    def test_wrong_type(self) -> None:
-        """!
-        This method verifies nothing is written if the list is poorly formed.
-
-        @return None
-        """
-        trajectory_string = [[0.0, 0.0, 0.0], ['1.0', 1.0, 1.0]]
-        trajectory_length = [[0.0, 0.0, 0.0], [1.0, 1.0]]
-        bad_trajectories = [trajectory_string, trajectory_length]
-        with patch(target='builtins.open', new=mock_open()) as mock:
-            for trajectory in bad_trajectories:
-                self.assertRaises(RuntimeError, data_output.write_trajectory,
-                                  'trajectory.txt', trajectory)
-                mock.assert_not_called()
+            data_output.write_list_files(configs, trajectory)
+            # Verify the correct files are written to
+            mock.assert_any_call(
+                file=F'output/test1_{date_string}.test', mode='w', encoding='utf-8')
+            mock.assert_any_call(
+                file=F'output/test1_{date_string}.txt', mode='w', encoding='utf-8')
+            mock.assert_any_call(
+                file=F'output/test1_{date_string}_meters.txt', mode='w', encoding='utf-8')
 
 
 if __name__ == '__main__':

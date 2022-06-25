@@ -4,7 +4,7 @@ This module provides the functions necessary to write data to file.
 import os
 from math import cos, sin
 from typing import Dict, List
-from data_generation import blender_interface
+from data_generation import blender_interface, name_configuration
 
 
 def prepare_output_folder(output_folder: str) -> None:
@@ -97,24 +97,56 @@ def write_camera_pose(camera_properties: Dict, output_folder: str) -> None:
         output.write(matrix_string)
 
 
-def write_trajectory(filename: str, trajectory: List[List[float]]) -> None:
+def write_list_files(configs: Dict, trajectory_list: List[List[float]]) -> None:
     """!
-    Write the poses in the trajectory to a file.
+    Write the three files that serve as the records of poses and image files.
 
-    This creates a single file with one line per pose. The line is of the form "x, y, theta".
+    All files have a similar name scheme of *sequence_type*_*date*. The differences are:
+    1. One ends in a *.test* extension and lists only the image files, relative to the directory of
+    this list file.
+    2. One ends in a *.txt* extension and alternates between the image file name and the pixel
+    coordinates pose of the top left corner of the image.
+    3. One ends in a *_meters.txt* suffix and extension and alternates between the image file name
+    and the real world coordinates of the robot when each image is taken.
 
-    @param filename The location to write to.
-    @param trajectory The list of poses to write, in [x, y, theta] format.
+    @param configs The Dict of settings, used to create the file names and contents.
+    @param trajectory_list The list of x, y, theta, trajectories as read from file.
     @return None
-    @exception RuntimeError Raised if the pose format does not follow the correct structure.
     """
-    # Create the string to write and verify the format along the way.
-    trajectory_string = ''
-    try:
-        for pose in trajectory:
-            trajectory_string += F'{pose[0]:f}, {pose[1]:f}, {pose[2]:f}\n'
-    except Exception as ex:
-        raise RuntimeError(
-            F'Pose must be [x, y, theta] format, not {pose}.') from ex
-    with open(file=filename, mode='w', encoding='utf8') as output:
-        output.write(trajectory_string)
+    base_name = name_configuration.create_file_list_base(configs)
+    # These files will be located at the output folder
+    base_name_and_path = os.path.join(configs["output"], base_name)
+    # Assemble the list of images first, since they are used in each file.
+    image_path_list = []
+    for i in range(len(trajectory_list)):
+        image_path_abs = name_configuration.create_image_path(i, configs)
+        # Since the above path is absolute, get its relative location from the output folder
+        image_path_rel = os.path.relpath(image_path_abs, configs['output'])
+        image_path_rel += '\n'
+        image_path_list.append(image_path_rel)
+    # Write the image paths
+    with open(file=F'{base_name_and_path}.test', mode='w', encoding='utf-8') as test_file:
+        for image_path in image_path_list:
+            test_file.write(image_path)
+    # Now write the image paths with the ground truths to the _meters file.
+    with open(file=F'{base_name_and_path}_meters.txt', mode='w',
+              encoding='utf-8') as ground_truth_file:
+        for i, trajectory in enumerate(trajectory_list):
+            ground_truth_file.write(image_path_list[i])
+            pose_x = trajectory[0]
+            pose_y = trajectory[1]
+            pose_t = trajectory[2]
+            ground_truth_string = F'{cos(pose_t):0.6f} {-sin(pose_t):0.6f} {pose_x:0.6f} ' \
+                F'{sin(pose_t):0.6f} {cos(pose_t):0.6f} {pose_y:0.6f} ' \
+                F'{0:0.6f} {0:0.6f} {1:0.6f}\n'
+            ground_truth_file.write(ground_truth_string)
+    # Now write the image paths with the pixel corners.
+    with open(file=F'{base_name_and_path}.txt', mode='w', encoding='utf-8') as ground_truth_file:
+        for i, trajectory in enumerate(trajectory_list):
+            ground_truth_file.write(image_path_list[i])
+            pose_t = trajectory[2]
+            pixel_string = F'{cos(pose_t):0.6f} {-sin(pose_t):0.6f} {0:0.6f} ' \
+                F'{sin(pose_t):0.6f} {cos(pose_t):0.6f} {0:0.6f} ' \
+                F'{0:0.6f} {0:0.6f} {1:0.6f}\n'
+            pixel_string = ' \n'
+            ground_truth_file.write(pixel_string)
