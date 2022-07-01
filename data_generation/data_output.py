@@ -4,7 +4,52 @@ This module provides the functions necessary to write data to file.
 import os
 from math import cos, sin
 from typing import Dict, List
-from data_generation import blender_interface, name_configuration
+import numpy
+from data_generation import blender_interface, configuration_loader, name_configuration
+
+
+def _project_image_corner(camera_matrix: numpy.ndarray, camera_pose: numpy.ndarray,
+                          robot_pose: numpy.ndarray) -> numpy.ndarray:
+    """!
+    Take the top left corner of the camera image and project it into a global camera pixel frame.
+
+    To do this, first project into the frame of the robot. Then, transform that to the origin. Then,
+    project into an imaginary camera that is located as if its robot was at the origin.
+
+    @param camera_matrix The 3x3 camera intrinsic matrix.
+    @param camera_pose The 4x4 homogenous transform that represents the pose of the camera as
+    measured from the robot frame.
+    @param robot_pose The 4x4 homogenous transform that represents the pose of the robot as measured
+    from the origin.
+    @return A 2 element array that represents the point in a global camera frame.
+    """
+    # The top left corner is always the origin in the pixel coordinate system
+    point_pixel = numpy.array([0.0, 0.0, 1.0])
+    # Assume the camera height is the Z component of its pose.
+    camera_height = camera_pose[2, 3]
+    # Project into the image frame. This normally is only up to a scale factor, but we know the
+    # height so can make that scale.
+    point_image = numpy.linalg.inv(camera_matrix) @ point_pixel * camera_height
+    point_image = numpy.append(point_image, numpy.array([1.0]))
+    # The rotation into the camera frame is always the same
+    image_2_camera_transform = numpy.array([
+        [0.0, 0.0, 1.0, 0.0],
+        [-1.0, 0.0, 0.0, 0.0],
+        [0.0, -1.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0]
+    ])
+    # Transform into the global frame
+    point_robot = camera_pose @ image_2_camera_transform @ point_image
+    point_origin = robot_pose @ point_robot
+    # Now project back into an imaginary camera as if the robot was at the origin.
+    point_fake_image = numpy.linalg.inv(
+        image_2_camera_transform) @ numpy.linalg.inv(camera_pose) @ point_origin
+    # Use the height and camera matrix to project into pixels. Drop the Z, since it will be
+    # normalized out
+    point_fake_image = numpy.delete(point_fake_image, 3)
+    point_fake_pixels = camera_matrix @ (point_fake_image / camera_height)
+    # We only need the x and y values.
+    return point_fake_pixels[0:2].flatten()
 
 
 def prepare_output_folder(output_folder: str) -> None:
@@ -141,12 +186,26 @@ def write_list_files(configs: Dict, trajectory_list: List[List[float]]) -> None:
                 F'{0:0.6f} {0:0.6f} {1:0.6f}\n'
             ground_truth_file.write(ground_truth_string)
     # Now write the image paths with the pixel corners.
+    # This requires the camera matrix and camera pose transform.
+    camera_matrix = numpy.array(blender_interface.get_camera_intrinsic_matrix(
+        configs['camera']['name'])).reshape((3, 3))
+    camera_pose = configuration_loader.create_camera_pose(configs['camera'])
     with open(file=F'{base_name_and_path}.txt', mode='w', encoding='utf-8') as ground_truth_file:
         for i, trajectory in enumerate(trajectory_list):
             ground_truth_file.write(image_path_list[i])
+            # Create the robot pose and use to project the top-left pixel into a global frame
+            pose_x = trajectory[0]
+            pose_y = trajectory[1]
             pose_t = trajectory[2]
-            pixel_string = F'{cos(pose_t):0.6f} {-sin(pose_t):0.6f} {0:0.6f} ' \
-                F'{sin(pose_t):0.6f} {cos(pose_t):0.6f} {0:0.6f} ' \
+            robot_pose = numpy.array([
+                [cos(pose_t), -sin(pose_t), 0.0, pose_x],
+                [sin(pose_t), cos(pose_t), 0.0, pose_y],
+                [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0]
+            ])
+            pixel_pose = _project_image_corner(
+                camera_matrix, camera_pose, robot_pose)
+            pixel_string = F'{cos(pose_t):0.6f} {-sin(pose_t):0.6f} {pixel_pose[0]:0.6f} ' \
+                F'{sin(pose_t):0.6f} {cos(pose_t):0.6f} {pixel_pose[1]:0.6f} ' \
                 F'{0:0.6f} {0:0.6f} {1:0.6f}\n'
-            pixel_string = ' \n'
             ground_truth_file.write(pixel_string)
