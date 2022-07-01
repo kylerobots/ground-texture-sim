@@ -4,9 +4,71 @@ This module tests the data_output module.
 import datetime
 import unittest
 from math import pi
-from unittest.mock import mock_open, patch
 from typing import Dict, List, Tuple
+from unittest.mock import mock_open, patch
+import numpy
 from data_generation import data_output
+from data_generation.data_output import _project_image_corner
+
+
+class TestProjectImageCorner(unittest.TestCase):
+    """!
+    This class verifies that the _project_image_corner function works.
+    """
+
+    def test_identity(self) -> None:
+        """!
+        This verifies the same result is returned for a robot at the origin.
+
+        @return None
+        """
+        camera_matrix = numpy.array([
+            [2.5, 0.0, 500.0],
+            [0.0, 2.5, 500.0],
+            [0.0, 0.0, 1.0]
+        ])
+        camera_pose = numpy.array([
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [-1.0, 0.0, 0.0, 0.25],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        robot_pose = numpy.identity(4)
+        result = _project_image_corner(camera_matrix, camera_pose, robot_pose)
+        expected_result = numpy.array([0.0, 0.0])
+        self.assertTrue(numpy.allclose(result, expected_result),
+                        msg='Identity not projected in image.')
+
+    def test_offset(self) -> None:
+        """!
+        This verifies the correct result is returned when the robot is not at the origin.
+
+        These specific numbers come from the HD Ground texture dataset.
+
+        @return None
+        """
+        camera_matrix = numpy.array([
+            [2195.70853, 0.0, 820.7289683],
+            [0.0, 2195.56073, 606.242723],
+            [0.0, 0.0, 1.0]
+        ])
+        camera_pose = numpy.array([
+            [0.0, -1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [-1.0, 0.0, 0.0, 0.247],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        robot_pose = numpy.array([
+            [0.997298, 0.073462, 0.0, 0.017451],
+            [-0.073462, 0.997298, 0.0, -0.010523],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.000000, 0.000000, 0.0, 1.000000]
+        ])
+        result = _project_image_corner(camera_matrix, camera_pose, robot_pose)
+        expected_result = numpy.array([201.891, 34.8891])
+        # There is a lot of math, so put some rough tolerances on the results.
+        self.assertTrue(numpy.allclose(result, expected_result, 1e-4),
+                        msg='Offset not projected in image.')
 
 
 class TestPrepareOutputFolder(unittest.TestCase):
@@ -146,15 +208,21 @@ class TestWriteListFiles(unittest.TestCase):
     This class verifies that the list files are written correctly.
     """
 
-    def _create_inputs(self) -> Tuple[Dict, List[List[float]]]:
+    def _create_inputs(self) -> Tuple[Dict, List[List[float]], numpy.ndarray, numpy.ndarray]:
         """!
         Convenience function to create the inputs to the write_list_files function.
 
-        @return A tuple containing the configs Dict and trajectory List
+        @return A tuple containing the configs Dict, trajectory List, and camera matrix.
         """
         configs = {
             'camera': {
-                'name': 'c01'
+                'name': 'c01',
+                'x': 0.0,
+                'y': 0.0,
+                'z': 0.247,
+                'roll': -numpy.pi / 2.0,
+                'pitch': 0.0,
+                'yaw': numpy.pi / 2.0
             },
             'output': '/opt/output',
             'sequence': {
@@ -165,9 +233,14 @@ class TestWriteListFiles(unittest.TestCase):
         }
         trajectory = [
             [0.0, 0.0, 0.0],
-            [1.2, 3.5, pi / 2.0]
+            [0.017451, -0.010523, -0.0735282]
         ]
-        return configs, trajectory
+        camera_matrix = numpy.array([
+            [2195.70853, 0.0, 820.7289683],
+            [0.0, 2195.56073, 606.242723],
+            [0.0, 0.0, 1.0]
+        ])
+        return configs, trajectory, camera_matrix
 
     def test_success_absolute(self) -> None:
         """!
@@ -175,7 +248,7 @@ class TestWriteListFiles(unittest.TestCase):
 
         @return None
         """
-        configs, trajectory = self._create_inputs()
+        configs, trajectory, camera_matrix = self._create_inputs()
         current_date = datetime.date.today()
         date_string = current_date.strftime('%y%m%d')
         image_string = current_date.strftime('%Y-%m-%d')
@@ -186,29 +259,33 @@ class TestWriteListFiles(unittest.TestCase):
         ]
         ground_truth_strings = [
             '1.000000 -0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000\n',
-            '0.000000 -1.000000 1.200000 1.000000 0.000000 3.500000 0.000000 0.000000 1.000000\n'
+            '0.997298 0.073462 0.017451 -0.073462 0.997298 -0.010523 0.000000 0.000000 1.000000\n'
         ]
         pixel_strings = [
-            ' \n',
-            ' \n'
+            '1.000000 -0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000\n',
+            '0.997298 0.073462 201.887181 -0.073462 0.997298 34.887751 0.000000 0.000000 1.000000\n'
         ]
-        with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_list_files(configs, trajectory)
-            # Verify the correct files are written to
-            mock.assert_any_call(
-                file=F'/opt/output/test1_{date_string}.test', mode='w', encoding='utf-8')
-            mock.assert_any_call(
-                file=F'/opt/output/test1_{date_string}.txt', mode='w', encoding='utf-8')
-            mock.assert_any_call(
-                file=F'/opt/output/test1_{date_string}_meters.txt', mode='w', encoding='utf-8')
-            # Verify the right information is written. This won't verify the order though or that
-            # each one is in the correct file. Just the formatting.
-            mock().write.assert_any_call(image_strings[0])
-            mock().write.assert_any_call(image_strings[1])
-            mock().write.assert_any_call(ground_truth_strings[0])
-            mock().write.assert_any_call(ground_truth_strings[1])
-            mock().write.assert_any_call(pixel_strings[0])
-            mock().write.assert_any_call(pixel_strings[1])
+        # Mock the calls to get the camera matrix from Blender
+        with patch(target='data_generation.blender_interface.get_camera_intrinsic_matrix') \
+                as mock_blender:
+            mock_blender.return_value = camera_matrix
+            with patch(target='builtins.open', new=mock_open()) as mock:
+                data_output.write_list_files(configs, trajectory)
+                # Verify the correct files are written to
+                mock.assert_any_call(
+                    file=F'/opt/output/test1_{date_string}.test', mode='w', encoding='utf-8')
+                mock.assert_any_call(
+                    file=F'/opt/output/test1_{date_string}.txt', mode='w', encoding='utf-8')
+                mock.assert_any_call(
+                    file=F'/opt/output/test1_{date_string}_meters.txt', mode='w', encoding='utf-8')
+                # Verify the right information is written. This won't verify the order though or that
+                # each one is in the correct file. Just the formatting.
+                mock().write.assert_any_call(image_strings[0])
+                mock().write.assert_any_call(image_strings[1])
+                mock().write.assert_any_call(ground_truth_strings[0])
+                mock().write.assert_any_call(ground_truth_strings[1])
+                mock().write.assert_any_call(pixel_strings[0])
+                mock().write.assert_any_call(pixel_strings[1])
 
     def test_success_relative(self) -> None:
         """!
@@ -219,19 +296,23 @@ class TestWriteListFiles(unittest.TestCase):
 
         @return None
         """
-        configs, trajectory = self._create_inputs()
+        configs, trajectory, camera_matrix = self._create_inputs()
         configs['output'] = 'output'
         current_date = datetime.date.today()
         date_string = current_date.strftime('%y%m%d')
-        with patch(target='builtins.open', new=mock_open()) as mock:
-            data_output.write_list_files(configs, trajectory)
-            # Verify the correct files are written to
-            mock.assert_any_call(
-                file=F'output/test1_{date_string}.test', mode='w', encoding='utf-8')
-            mock.assert_any_call(
-                file=F'output/test1_{date_string}.txt', mode='w', encoding='utf-8')
-            mock.assert_any_call(
-                file=F'output/test1_{date_string}_meters.txt', mode='w', encoding='utf-8')
+        # Mock the calls to get the camera matrix from Blender
+        with patch(target='data_generation.blender_interface.get_camera_intrinsic_matrix') \
+                as mock_blender:
+            mock_blender.return_value = camera_matrix
+            with patch(target='builtins.open', new=mock_open()) as mock:
+                data_output.write_list_files(configs, trajectory)
+                # Verify the correct files are written to
+                mock.assert_any_call(
+                    file=F'output/test1_{date_string}.test', mode='w', encoding='utf-8')
+                mock.assert_any_call(
+                    file=F'output/test1_{date_string}.txt', mode='w', encoding='utf-8')
+                mock.assert_any_call(
+                    file=F'output/test1_{date_string}_meters.txt', mode='w', encoding='utf-8')
 
 
 if __name__ == '__main__':

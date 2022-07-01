@@ -1,11 +1,62 @@
 """!
 This module tests the configuration_loader module.
 """
-import unittest
-from unittest.mock import mock_open, patch
 import json
+import unittest
 from typing import Dict
-from data_generation.configuration_loader import _load_config, _load_trajectory, _parse_args
+from unittest.mock import mock_open, patch
+import numpy
+from data_generation.configuration_loader import create_camera_pose, _load_config, \
+    _load_trajectory, _parse_args
+
+
+class TestCreateCameraPose(unittest.TestCase):
+    """!
+    This class tests the create_camera_pose function.
+    """
+
+    def test_identity(self) -> None:
+        """!
+        Test that zeros produce the identity transform.
+
+        @return None
+        """
+        input_dict = {
+            'x': 0.0,
+            'y': 0.0,
+            'z': 0.0,
+            'roll': 0.0,
+            'pitch': 0.0,
+            'yaw': 0.0
+        }
+        expected_result = numpy.identity(4)
+        result = create_camera_pose(input_dict)
+        self.assertTrue(numpy.allclose(result, expected_result, 1e-6),
+                        msg='Identity pose not created.')
+
+    def test_full_rotation(self) -> None:
+        """!
+        Test that rotations are applied in the right order.
+
+        @return None
+        """
+        input_dict = {
+            'x': 1.0,
+            'y': 2.0,
+            'z': 3.0,
+            'roll': numpy.pi,
+            'pitch': numpy.pi / 2.0,
+            'yaw': -numpy.pi / 2.0
+        }
+        expected_result = numpy.array([
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 0.0, 2.0],
+            [0.0, 1.0, 0.0, 3.0],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        result = create_camera_pose(input_dict)
+        self.assertTrue(numpy.allclose(result, expected_result, 1e-6),
+                        msg='Arbitrary pose not created.')
 
 
 class TestLoadConfig(unittest.TestCase):
