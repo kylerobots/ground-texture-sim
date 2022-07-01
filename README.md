@@ -30,11 +30,14 @@ Copyright 2022 Kyle M. Hart
 
 See [LICENSE](LICENSE.md) for more info.
 
-Since v3.0.0 and on relies on Blender's API, it is licensed under GPLv3 and later. There is not code reuse between
+Since v3.0.0 and on relies on Blender's API, it is licensed under GPLv3 and later. There is no code reuse between
 v3.0.0 and previous versions, so no conflict with previous licenses.
 
 The example texture provided in this repository comes from [Poly Haven](https://polyhaven.com/a/t_brick_floor_002) and
 is licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+The format for the data comes from this repository: https://github.com/JanFabianSchmid/HD_Ground and is licensed under
+CC BY-SA: 4.0
 
 ## Install ##
 There are three ways to use this, depending on your preferred setup. Regardless of the setup, make sure your PYTHONPATH
@@ -76,9 +79,9 @@ generates data for the example provided in example_setup.
 blender example_setup/environment.blend -b --python generate_data.py --python-use-system-env -- config.json
 ```
 
-You can substitute `example_setup/environment.blend` for another environment you may have. Likewise, `config.json`
-should be replaced with the name of the configuration JSON file that specifies everything for your project. An example
-JSON file can be found at the root directory of this project.
+You can substitute `example_setup/environment.blend` for another Blender environment you may have. Likewise,
+`config.json` should be replaced with the name of the configuration JSON file that specifies everything for your
+project. An example JSON file can be found at the root directory of this project.
 
 The `-b` flag will run Blender in the background, so you don't need to open it up. However, you may use Blender as
 usual to adjust lighting, the scene, or anything else not currently supported by this script.
@@ -86,10 +89,20 @@ usual to adjust lighting, the scene, or anything else not currently supported by
 The `--python-use-system-env` flag allows Blender to search for modules on your PYTHONPATH instead of just within
 Blender's instance of Python. This is essential for all the necessary code to run.
 
-The images are output to the location specified by `output` in the JSON. Each image is numbered sequentially in the form
-`000000.png`. Additionally, there are two other text files written to the same folder. `calibration.txt` contains the
-camera's intrinsic matrix, with each line in the file containing one row of the matrix. `trajectory.txt` contains the
-list of poses associated with each image, one per line in `x, y, theta` format.
+The data is output to the location specified by `output` in the JSON. There are multiple files and folders. At the top
+level are three list files. The one ending in `.test` lists a relative path to each image in the sequence. The ones that
+end in `.txt` both contain lists alternating between the relative path to each image and a global pose, stored as a 3x3
+homogenous matrix. The difference between the two is that the one with a `_meters.txt` suffix stores the global pose of
+a simulated robot carrying the camera. The one with just `.txt` notes the pose of the top left pixel of the image, in
+pixel space. In other words, the origin of this space is the origin of the top left corner of the image taken when the
+simulated robot is at (0, 0, 0).
+
+Additionally there are two folders. The first, called `camera_properties` contains text files with the camera intrinsic
+matrix, called `<camera_name>_intrinsic_matrix.txt`, and the camera's pose as measured from the simulated robot, called
+`<camera_name>_pose.txt`. The next folder is a series of nested folders containing the images. The names of the folders
+and image files are based on the values set in the JSON and have the format:
+`<sequence_type>/<date>/<sequence_number>/HDG2_t<texture_number>_<sequence_type>_<date>_<sequence_number>_<camera_name>_i#######.png`
+This comes from the format specified here: https://github.com/JanFabianSchmid/HD_Ground
 
 Note that, depending on your settings and computing power, this script may take some time to execute. The script will
 continually provide progress updates as it goes.
@@ -97,32 +110,47 @@ continually provide progress updates as it goes.
 ## Customization ##
 
 ### Customizing the Output ###
-The below table shows the values that can currently be specified in the configuration JSON. It also lists if they are
-required or not. The JSON should be modified before running the script.
+The below example JSON and table show what values can currently be specified in the configuration JSON. The table also
+lists if a parameter is required and its default if not required.
 
-| Parameter Key     | Required? | Default Value | Description |
-| ----------------- | :-------: | :-----------: | ----------- |
-| output            | Yes       | *N/A*         | The folder the images and calibration file should be written to. Can be absolute or relative |
-| trajectory        | Yes       | *N/A*         | The name of the file to read the list of poses. Each line in the file should be of the form: `x, y, yaw` |
-| camera_properties | Partial   | *See notes*   | Several aspects controlling the camera's position. |
-
-The camera_properties are specified as a nested JSON, like shown below. The property `name` is required and should match
-the camera name in Blender. The other values are optional and the below example shows their default values if not
-specified.
 ```json
 {
-    "camera_properties": {
-        "name": "c01",
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "roll": 0.0,
-        "pitch": 1.5708,
-        "yaw": 0.0
-    }
+  "trajectory": "example_setup/trajectories/corners_1x1.txt",
+  "output": "output",
+  "sequence": {
+    "texture_number": 1,
+    "sequence_type": "regular",
+    "sequence_number": 1
+  },
+  "camera": {
+    "name": "Camera",
+    "x": 0.0,
+    "y": 0.0,
+    "z": 0.25,
+    "roll": 0.0,
+    "pitch": 1.5708,
+    "yaw": 0.0
+  }
 }
 ```
-The six pose elements represent the pose of the camera relative to each trajectory pose. In other words, if the
+
+| Parameter Key | Required? | Default Value | Description |
+| ------------- | :-------: | :-----------: | ----------- |
+| trajectory    | Yes       | *N/A*         | The name of the file to read the list of poses the robot should take. Each line in the file should be of the form `x, y, yaw (radians)` |
+| output        | Yes       | *N/A*         | The folder the images and calibration file should be written to. Can be absolute or relative |
+| sequence/texture_number | Yes | *N/A* | An integer designation of the texture used in this sequence |
+| sequence/sequence_type | Yes | *N/A* | A string describing what type of sequence, such as "regular" or "lawnmower" |
+| sequence/sequence_number | Yes | *N/A* | A unique integer relative to this particular texture and date of data collection |
+| camera/name | Yes | *N/A* | The name in Blender for the camera. |
+| camera/x | No | 0.0 | The X component of the translation of the camera from the simulated robot's frame. |
+| camera/y | No | 0.0 | The Y component of the translation of the camera from the simulated robot's frame. |
+| camera/z | No | 0.0 | The Z component of the translation of the camera from the simulated robot's frame. |
+| camera/roll | No | 0.0 | The roll of the orientation, in RPY Euler angles and radians, of the camera from the simulated robot's frame |
+| camera/pitch | No | 1.5708 | The pitch of the orientation, in RPY Euler angles and radians, of the camera from the simulated robot's frame |
+| camera/yaw | No | 0.0 | The yaw of the orientation, in RPY Euler angles and radians, of the camera from the simulated robot's frame |
+
+Note that while any 6 DOF pose of the camera is technically possible, deviations too far from a downward facing camera
+are unspecified. It also represents the pose of the camera relative to each trajectory pose. In other words, if the
 trajectories specified in the trajectory file are a robot's origin on the ground plane, these values are the pose of the
 camera with respect to the robot's origin. This is provided to allow easy data generation of cases where the camera may
 be misaligned or off-center. Importantly, the roll, pitch, and yaw are Euler angles applied in that order and are
