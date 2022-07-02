@@ -7,8 +7,8 @@ from math import pi
 from typing import Dict, List, Tuple
 from unittest.mock import mock_open, patch
 import numpy
-from data_generation import data_output
-from data_generation.data_output import _project_image_corner
+from ground_texture_sim import data_output
+from ground_texture_sim.data_output import _project_image_corner
 
 
 class TestProjectImageCorner(unittest.TestCase):
@@ -122,7 +122,7 @@ class TestWriteCameraIntrinsicMatrix(unittest.TestCase):
 
         @return None
         """
-        with patch(target='data_generation.blender_interface.get_camera_intrinsic_matrix') as mock:
+        with patch(target='ground_texture_sim.blender_interface.get_camera_intrinsic_matrix') as mock:
             mock.side_effect = Exception('Cannot find camera')
             with self.assertRaises(NameError, msg='Does not raise error on incorrect name'):
                 data_output.write_camera_intrinsic_matrix(
@@ -137,7 +137,7 @@ class TestWriteCameraIntrinsicMatrix(unittest.TestCase):
         expected_output = '0.000000 1.000000 2.000000\n' \
             '3.000000 4.000000 5.000000\n' \
             '6.000000 7.000000 8.000000\n'
-        with patch('data_generation.blender_interface.get_camera_intrinsic_matrix') as mock_blender:
+        with patch('ground_texture_sim.blender_interface.get_camera_intrinsic_matrix') as mock_blender:
             mock_blender.return_value = [
                 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
             with patch(target='builtins.open', new=mock_open()) as mock_output:
@@ -266,7 +266,7 @@ class TestWriteListFiles(unittest.TestCase):
             '0.997298 0.073462 201.887181 -0.073462 0.997298 34.887751 0.000000 0.000000 1.000000\n'
         ]
         # Mock the calls to get the camera matrix from Blender
-        with patch(target='data_generation.blender_interface.get_camera_intrinsic_matrix') \
+        with patch(target='ground_texture_sim.blender_interface.get_camera_intrinsic_matrix') \
                 as mock_blender:
             mock_blender.return_value = camera_matrix
             with patch(target='builtins.open', new=mock_open()) as mock:
@@ -301,7 +301,7 @@ class TestWriteListFiles(unittest.TestCase):
         current_date = datetime.date.today()
         date_string = current_date.strftime('%y%m%d')
         # Mock the calls to get the camera matrix from Blender
-        with patch(target='data_generation.blender_interface.get_camera_intrinsic_matrix') \
+        with patch(target='ground_texture_sim.blender_interface.get_camera_intrinsic_matrix') \
                 as mock_blender:
             mock_blender.return_value = camera_matrix
             with patch(target='builtins.open', new=mock_open()) as mock:

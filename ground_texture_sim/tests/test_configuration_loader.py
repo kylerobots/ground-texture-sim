@@ -6,7 +6,7 @@ import unittest
 from typing import Dict
 from unittest.mock import mock_open, patch
 import numpy
-from data_generation.configuration_loader import create_camera_pose, _load_config, \
+from ground_texture_sim.configuration_loader import create_camera_pose, _load_config, \
     _load_trajectory, _parse_args
 
 

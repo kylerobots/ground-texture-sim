@@ -5,7 +5,7 @@ from typing import Dict, List
 from math import pi
 import bpy
 import mathutils
-from data_generation import name_configuration
+from ground_texture_sim import name_configuration
 
 
 def generate_images(configs: Dict, trajectory: List[List[float]]) -> None:

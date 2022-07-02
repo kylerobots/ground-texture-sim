@@ -5,7 +5,7 @@ import os
 from math import cos, sin
 from typing import Dict, List
 import numpy
-from data_generation import blender_interface, configuration_loader, name_configuration
+from ground_texture_sim import blender_interface, configuration_loader, name_configuration
 
 
 def _project_image_corner(camera_matrix: numpy.ndarray, camera_pose: numpy.ndarray,

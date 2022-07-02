@@ -4,7 +4,7 @@ This module tests the name_configuration module
 import unittest
 import datetime
 from os import path
-from data_generation import name_configuration
+from ground_texture_sim import name_configuration
 
 
 class TestCreateImagePath(unittest.TestCase):

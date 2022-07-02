@@ -2,9 +2,9 @@
   branch = True
   include = 
     generate_data.py
-    data_generation/*
+    ground_texture_sim/*
   omit = 
-    data_generation/tests/*
+    ground_texture_sim/tests/*
   parallel = True
   relative_files = True
 [report]
