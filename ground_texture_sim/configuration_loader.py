@@ -5,42 +5,6 @@ provided trajectory data.
 import argparse
 import json
 from typing import Dict, List, Tuple
-import numpy
-
-
-def create_camera_pose(camera_configs: Dict) -> numpy.ndarray:
-    """!
-    @brief Determine the 4x4 homogenous matrix for the camera's pose relative to the "robot".
-
-    This takes the camera position values from the config dictionary and creates a 4x4 homogenous
-    transform matrix. This assumes RPY applied as intrinsic rotations.
-    @param camera_configs The ['camera'] portion of the configuration JSON.
-    @return A 4x4 Numpy array representing the pose of the camera in the robot's frame of reference.
-    """
-    pose = numpy.identity(4)
-    pose[0, 3] = camera_configs['x']
-    pose[1, 3] = camera_configs['y']
-    pose[2, 3] = camera_configs['z']
-    roll = camera_configs['roll']
-    pitch = camera_configs['pitch']
-    yaw = camera_configs['yaw']
-    rotation_roll = numpy.array([
-        [1.0, 0.0, 0.0],
-        [0.0, numpy.cos(roll), -numpy.sin(roll)],
-        [0.0, numpy.sin(roll), numpy.cos(roll)]
-    ])
-    rotation_pitch = numpy.array([
-        [numpy.cos(pitch), 0.0, numpy.sin(pitch)],
-        [0.0, 1.0, 0.0],
-        [-numpy.sin(pitch), 0.0, numpy.cos(pitch)]
-    ])
-    rotation_yaw = numpy.array([
-        [numpy.cos(yaw), -numpy.sin(yaw), 0.0],
-        [numpy.sin(yaw), numpy.cos(yaw), 0.0],
-        [0.0, 0.0, 1.0]
-    ])
-    pose[0:3, 0:3] = rotation_roll @ rotation_pitch @ rotation_yaw
-    return pose
 
 
 def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]:  # pragma: no cover
