@@ -1,101 +1,74 @@
 """!
-This module tests the name_configuration module
+@brief This module tests the name_configuration module
 """
-import unittest
 import datetime
-from os import path
-from ground_texture_sim import name_configuration
+import unittest
+from ground_texture_sim.name_configuration import NameConfigurator
 
 
-class TestCreateImagePath(unittest.TestCase):
+class TestNameConfigurator(unittest.TestCase):
     """!
-    This class tests the create_image_path function.
+    @brief Tests the NameConfigurator class.
     """
 
-    def test_success_absolute(self) -> None:
+    def setUp(self) -> None:
         """!
-        Test that the function creates the expected path when the output is an absolute directory.
-
+        @brief Create the class and some expected formats for the dates.
         @return None
         """
-        input_dict = {
-            'camera': {
-                'name': 'c01'
-            },
-            'output': '/opt',
-            'sequence': {
-                'texture_number': 2,
-                'sequence_number': 3,
-                'sequence_type': 'regular'
-            }
-        }
-        image_number = 5
+        ## The class under test
+        self._namer = NameConfigurator('/blah/output', 'regular', 3, 2, 'c01')
         current_date = datetime.date.today()
-        base_directory = path.join(
-            input_dict['output'], 'regular', current_date.strftime('%y%m%d'), 'seq0003')
-        base_directory = path.abspath(base_directory)
-        file_name = F'HDG2_t002_regular_{current_date.strftime("%Y-%m-%d")}_s0003_c01_i0000005.png'
-        expected_result = path.join(base_directory, file_name)
-        actual_result = name_configuration.create_image_path(
-            image_number, input_dict)
-        self.assertEqual(expected_result, actual_result,
-                         msg='Image string is not correct')
+        ## The current date formatted as expected for folder names.
+        self._date_folder = current_date.strftime('%y%m%d')
+        ## The current date formatted as expected for image names.
+        self._date_file = current_date.strftime("%Y-%m-%d")
 
-    def test_success_relative(self) -> None:
+    def test_create_image_path_absolute(self) -> None:
         """!
-        Test the function creates the expected path when the output is a relative directory.
-
+        @brief Ensure that create_image_path returns an absolute file path when specified.
         @return None
         """
-        input_dict = {
-            'output': 'output',
-            'camera': {
-                'name': 'c01'
-            },
-            'sequence': {
-                'texture_number': 2,
-                'sequence_number': 3,
-                'sequence_type': 'regular'
-            }
-        }
-        image_number = 5
-        current_date = datetime.date.today()
-        base_directory = path.join(
-            input_dict['output'], 'regular', current_date.strftime('%y%m%d'), 'seq0003')
-        base_directory = path.abspath(base_directory)
-        file_name = F'HDG2_t002_regular_{current_date.strftime("%Y-%m-%d")}_s0003_c01_i0000005.png'
-        expected_result = path.join(base_directory, file_name)
-        actual_result = name_configuration.create_image_path(
-            image_number, input_dict)
-        self.assertEqual(expected_result, actual_result,
-                         msg='Image string is not correct')
+        image_path = self._namer.create_image_path(5, absolute=True)
+        expected_path = F'/blah/output/regular/{self._date_folder}/seq0003/' \
+            F'HDG2_t002_regular_{self._date_file}_s0003_c01_i0000005.png'
+        self.assertEqual(image_path, expected_path,
+                         msg='image_path is not absolute.')
 
-
-class TestCreateFileListBase(unittest.TestCase):
-    """!
-    This class tests the create_file_list_base function.
-    """
-
-    def test_success(self) -> None:
+    def test_create_image_path_relative(self) -> None:
         """!
-        Assuming a well-formed configuration dictionary, test that the base name follows the
-        expected format.
-
-        The name should be *sequence_type*_*date in YYMMDD*
-
+        @brief Ensure that create_image_path returns a relative file path when specified.
         @return None
         """
-        # Create a dictionary with the minimum required values needed for the function.
-        configs = {
-            "output": "output",
-            "sequence": {
-                "texture_number": 1,
-                "sequence_type": "regular_test",
-                "sequence_number": 1
-            }
-        }
-        current_date = datetime.date.today()
-        expected_result = F'regular_test_{current_date.strftime("%y%m%d")}'
-        result = name_configuration.create_file_list_base(configs)
-        self.assertEqual(result, expected_result,
-                         msg='Main file list names are not correct')
+        image_path = self._namer.create_image_path(5, absolute=False)
+        expected_path = F'regular/{self._date_folder}/seq0003/' \
+            F'HDG2_t002_regular_{self._date_file}_s0003_c01_i0000005.png'
+        self.assertEqual(image_path, expected_path,
+                         msg='image_path is not relative.')
+
+    def test_meters_txt_file_correct(self) -> None:
+        """!
+        @brief Test that the _meters.txt file is named correctly.
+        @return None
+        """
+        expected_path = F'regular_{self._date_folder}_meters.txt'
+        self.assertEqual(self._namer.meters_txt_file, expected_path,
+                         msg='_meters.txt file not named correctly.')
+
+    def test_test_file_correct(self) -> None:
+        """!
+        @brief Test that the .test file is named correctly.
+        @return None
+        """
+        expected_path = F'regular_{self._date_folder}.test'
+        self.assertEqual(self._namer.test_file, expected_path,
+                         msg='.test file not named correctly.')
+
+    def test_txt_file_correct(self) -> None:
+        """!
+        @brief Test that the .txt file is named correctly.
+        @return None
+        """
+        expected_path = F'regular_{self._date_folder}.txt'
+        self.assertEqual(self._namer.txt_file, expected_path,
+                         msg='.txt file not named correctly.')
