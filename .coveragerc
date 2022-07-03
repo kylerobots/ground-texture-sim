@@ -1,7 +1,6 @@
 [run]
   branch = True
   include = 
-    generate_data.py
     ground_texture_sim/*
   omit = 
     ground_texture_sim/tests/*
