@@ -19,7 +19,7 @@ class BlenderInterface():
         @param camera_name The name of the camera in the target Blender environment. Defaults to
         "Camera".
         """
-        ## The name of the selected camera in the Blender interface.
+        # The name of the selected camera in the Blender interface.
         self.camera_name = camera_name
 
     @property
@@ -82,35 +82,24 @@ class BlenderInterface():
                 F'{camera_name} is not a Blender camera. Available cameras '
                 F'are: {bpy.data.cameras.keys()}'
             )
-        ## The name of the selected camera in the Blender interface.
+        # The name of the selected camera in the Blender interface.
         self._camera_name = camera_name
 
-    def generate_image(self, image_path: str, x: float, y: float, z: float, roll: float,
-                       pitch: float, yaw: float) -> None:
+    def generate_image(self, image_path: str, camera_pose: numpy.ndarray) -> None:
         """!
         @brief Position the camera at a designated pose and render an image.
 
         This method takes the 6 DOF pose of the camera, places the camera at that pose in the
         environment, renders the image, then saves the image to the designated file.
 
-        The 6 arguments specifying the pose are the pose of the camera in the world frame. The roll,
-        pitch, and yaw are Euler angles in radians and are specified as *extrinsic* rotations in
-        roll, pitch, yaw order.
-
         Blender's coordinate system is different than the usual coordinate system assumed in
-        robotics. This method adds the correct adjustment, so there is no need to account for it.
+        robotics. This method adds the correct adjustment, so there is no need to account for it. In
+        other words, specify the camera pose using conventional robotics coordinate systems.
 
         @param image_path An absolute path to where the image should go. Blender does not seem to
         handle relative paths great.
-        @param x The X component of the translation, in meters, of the camera in the world's frame.
-        @param y The Y component of the translation, in meters, of the camera in the world's frame.
-        @param z The Z component of the translation, in meters, of the camera in the world's frame.
-        @param roll The X axis component of the rotation, in radians, of the camera in the world's
-        frame. The rotation is performed as *extrinsic* RPY Euler angles.
-        @param pitch The Y axis component of the rotation, in radians, of the camera in the world's
-        frame. The rotation is performed as *extrinsic* RPY Euler angles.
-        @param yaw The Z axis component of the rotation, in radians, of the camera in the world's
-        frame. The rotation is performed as *extrinsic* RPY Euler angles.
+        @param camera_pose The 4x4 homogenous matrix representing the pose of the camera in the
+        world frame.
         @return None
         @exception ValueError raised if the provided path is not absolute.
         """
@@ -118,18 +107,19 @@ class BlenderInterface():
         if not path.isabs(image_path):
             raise ValueError(
                 F'Image path must be absolute. Received: {image_path}')
-        # Convert the provided pose into a transform matrix.
-        pose_translation = mathutils.Matrix.Translation(vector=(x, y, z))
-        pose_rotation = mathutils.Euler(
-            angles=(roll, pitch, yaw), order='XYZ').to_matrix().to_4x4()
-        pose = pose_translation @ pose_rotation
+        # Convert the provided pose into a Mathutils matrix. This has better support for extracting
+        # the XYZ, RPY values needed to position in Blender.
+        pose = mathutils.Matrix()
+        for i in range(4):
+            for j in range(4):
+                pose[i][j] = camera_pose[i][j]
         # Calculate the offset to get Blender to position the camera correctly.
         # Pre-compute the offset used to get blender camera poses correct.
         blender_adjustment = mathutils.Euler(
-            angles=(pi/2.0, 0.0, -pi/2.0), order='XYZ').to_matrix().to_4x4()
+            (pi/2.0, 0.0, -pi/2.0), 'XYZ').to_matrix().to_4x4()
         blender_placement = pose @ blender_adjustment
         # Now place the camera
-        camera = bpy.data.cameras[self.camera_name]
+        camera = bpy.data.objects[self.camera_name]
         camera.location.x = blender_placement.to_translation()[0]
         camera.location.y = blender_placement.to_translation()[1]
         camera.location.z = blender_placement.to_translation()[2]

@@ -3,6 +3,7 @@ This module tests the blender_interface module.
 """
 import unittest
 from unittest.mock import MagicMock, patch
+import numpy
 from ground_texture_sim.blender_interface import BlenderInterface
 
 
@@ -73,7 +74,7 @@ class TestBlenderInterface(unittest.TestCase):
             with self.assertRaises(ValueError, msg='Relative path does not raise error.'):
                 interface = BlenderInterface()
                 interface.generate_image(
-                    'relative_path/image.png', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+                    'relative_path/image.png', numpy.identity(4))
 
 
 if __name__ == '__main__':  # pragma: no cover
