@@ -109,7 +109,7 @@ def _load_trajectory(filename: str) -> List[List[float]]:
             # can be skipped
             if len(line) == 0:
                 continue
-            pose_strings = line.split(sep=',')
+            pose_strings = line.split(sep=' ')
             if len(pose_strings) != 3:
                 raise RuntimeError(
                     F'Each pose must be 3 floats, separated by commas. Got: {line}')
