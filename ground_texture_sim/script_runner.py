@@ -1,7 +1,6 @@
 """!
-The module containing the primary script execution class.
+@brief The module containing the primary script execution class.
 """
-from operator import mod
 from typing import List
 import ground_texture_sim
 
@@ -22,24 +21,30 @@ class GroundTextureSim():
         # Parse the command line arguments
         configs, trajectory = ground_texture_sim.configuration_loader.load_configuration(
             args_list=args)
-        # The properly formatted configuration dictionary.
+        ## The properly formatted configuration dictionary.
         self._configs = configs
-        # The list of trajectories.
+        ## The list of trajectories.
         self._trajectory = trajectory
-        # The camera pose as specified by the configuration details.
+        ## The camera pose as specified by the configuration details.
         self._camera_pose = ground_texture_sim.transforms.create_transform_matrix(
             configs['camera']['x'], configs['camera']['y'], configs['camera']['z'],
             configs['camera']['roll'], configs['camera']['pitch'], configs['camera']['yaw']
         )
         # Create any needed classes
-        # The interface with blender for the given camera.
+        ## The interface with blender for the given camera.
         self._blender_interface = ground_texture_sim.blender_interface.BlenderInterface(
             configs['camera']['name'])
-        # A class to help with transform math.
+        ## A class to help with transform math.
         self._transformer = ground_texture_sim.transforms.Transformer(
             self._camera_pose, self._blender_interface.camera_intrinsic_matrix)
-        # A class to help with naming things
+        ## A class to help with naming things
         self._namer = ground_texture_sim.name_configuration.NameConfigurator(
+            configs['output'], configs['sequence']['sequence_type'],
+            configs['sequence']['sequence_number'], configs['sequence']['texture_number'],
+            configs['camera']['name']
+        )
+        ## A class to write things to file
+        self._writer = ground_texture_sim.data_writer.DataWriter(
             configs['output'], configs['sequence']['sequence_type'],
             configs['sequence']['sequence_number'], configs['sequence']['texture_number'],
             configs['camera']['name']
@@ -60,5 +65,9 @@ class GroundTextureSim():
             # Write camera image
             image_path = self._namer.create_image_path(i, absolute=True)
             self._blender_interface.generate_image(image_path, camera_pose)
-                F'{robot_pose[0, 0]:0.6f} {robot_pose[0, 1]:0.6f} {robot_pose[0, 3]:0.6f} {robot_pose[1, 0]:0.6f} {robot_pose[1, 1]:0.6f} {robot_pose[1, 3]:0.6f} 0.0 0.0 1.0\n')
         # Write main list files.
+        pixel_poses = [[0.0, 0.0, 0.0]] * len(self._trajectory)
+        self._writer.write_camera_intrinsic_matrix(
+            self._blender_interface.camera_intrinsic_matrix)
+        self._writer.write_camera_pose(self._camera_pose)
+        self._writer.write_lists(self._trajectory, pixel_poses)

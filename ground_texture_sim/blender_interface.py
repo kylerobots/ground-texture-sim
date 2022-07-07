@@ -19,7 +19,7 @@ class BlenderInterface():
         @param camera_name The name of the camera in the target Blender environment. Defaults to
         "Camera".
         """
-        # The name of the selected camera in the Blender interface.
+        ## The name of the selected camera in the Blender interface.
         self.camera_name = camera_name
 
     @property
@@ -82,7 +82,7 @@ class BlenderInterface():
                 F'{camera_name} is not a Blender camera. Available cameras '
                 F'are: {bpy.data.cameras.keys()}'
             )
-        # The name of the selected camera in the Blender interface.
+        ## The name of the selected camera in the Blender interface.
         self._camera_name = camera_name
 
     def generate_image(self, image_path: str, camera_pose: numpy.ndarray) -> None:

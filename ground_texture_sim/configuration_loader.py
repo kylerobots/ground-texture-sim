@@ -1,6 +1,6 @@
 """!
-This module provides the functions necessary to read in all the user's configurations and import the
-provided trajectory data.
+@brief This module provides the functions necessary to read in all the user's configurations and
+import the provided trajectory data.
 """
 import argparse
 import json
@@ -31,7 +31,7 @@ def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]: 
 
 def _load_config(filename: str) -> Dict:
     """!
-    Read in the user provided configuration JSON.
+    @brief Read in the user provided configuration JSON.
 
     This also checks that all required elements are present. An Exception is raised if not. If an
     optional element is not present, a default value is assumed.
@@ -89,7 +89,7 @@ def _load_config(filename: str) -> Dict:
 
 def _load_trajectory(filename: str) -> List[List[float]]:
     """!
-    Read in the poses from the trajectory file.
+    @brief Read in the poses from the trajectory file.
 
     The file should be structured with one pose per line. The poses are stored as X, Y, Theta
     (whitespace is optional). The theta value should be in radians. These coordinates are where the
@@ -109,10 +109,10 @@ def _load_trajectory(filename: str) -> List[List[float]]:
             # can be skipped
             if len(line) == 0:
                 continue
-            pose_strings = line.split(sep=' ')
+            pose_strings = line.split()
             if len(pose_strings) != 3:
                 raise RuntimeError(
-                    F'Each pose must be 3 floats, separated by commas. Got: {line}')
+                    F'Each pose must be 3 floats, separated by a space. Got: {line}')
             try:
                 single_pose = []
                 for element in pose_strings:
@@ -120,7 +120,7 @@ def _load_trajectory(filename: str) -> List[List[float]]:
                 result.append(single_pose)
             except Exception as error:
                 raise RuntimeError(
-                    F'Each pose must be 3 floats, separated by commas. Got: {line}') from error
+                    F'Each pose must be 3 floats, separated by a space. Got: {line}') from error
     return result
 
 
