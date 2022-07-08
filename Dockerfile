@@ -3,7 +3,7 @@ ARG UBUNTU_VERSION=focal
 FROM ubuntu:${UBUNTU_VERSION} AS base
 
 LABEL author="Kyle M. Hart" \
-	version="3.1.0" \
+	version="4.0.0" \
 	license="SPDX-License-Identifier: GPL-3.0-or-later"
 
 # Install Python and Blender
@@ -32,9 +32,16 @@ RUN apt update \
 CMD [ "blender" ]
 
 FROM base AS run
+# For some reason, the final run image needs Numpy installed explicitly, so do that here.
+RUN apt update \
+	&& DEBIAN_FRONTEND=noninteractive \
+	apt install -y \
+	python3-numpy \
+	&& rm -rf /var/lib/apt/lists/*
 # Make a local user
 RUN useradd -ms /bin/bash user
 USER user
 WORKDIR /home/user/ground_texture_sim
 COPY . /home/user/ground_texture_sim
-CMD [ "blender", "environment.blend", "-b", "--python", "data_generation.py", "--", "config.json" ]
+ENV PYTHONPATH=/home/user/ground_texture_sim
+CMD [ "blender", "example_setup/environment.blend", "-b", "--python", "generate_data.py", "--python-use-system-env", "--", "config.json" ]

@@ -1,7 +1,13 @@
 {
   "trajectory": "example_setup/trajectories/corners_1x1.txt",
   "output": "output",
-  "camera_properties": {
+  "sequence": {
+    "texture_number": 1,
+    "sequence_type": "regular",
+    "sequence_number": 1
+  },
+  "camera": {
+    "name": "Camera",
     "x": 0.0,
     "y": 0.0,
     "z": 0.25,

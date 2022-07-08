@@ -1,0 +1,22 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Documentation",
+      "type": "shell",
+      "command": "doxygen Doxyfile"
+    },
+    {
+      "label": "Run Example",
+      "type": "shell",
+      "command": "blender example_setup/environment.blend -b --python generate_data.py --python-use-system-env -- config.json"
+    },
+    {
+      "label": "Calculate Coverage",
+      "type": "shell",
+      "command": "coverage run -m unittest discover && coverage combine && coverage html -d coverage_report"
+    }
+  ]
+}
