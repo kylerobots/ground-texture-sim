@@ -104,6 +104,95 @@ class TestTransformer(unittest.TestCase):
                 numpy.identity(4), numpy.identity(3))
             transformer.camera_pose = numpy.identity(2)
 
+    def test_project_image_corner_full(self) -> None:
+        """!
+        @brief Test that the method correctly transforms the corner when at an arbitrary pose.
+        @return None
+        """
+        robot_pose = numpy.array([
+            [0.0, -1.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0, 2.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        camera_pose = numpy.array([
+            [0.0, -1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [-1.0, 0.0, 0.0, 0.25],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        camera_matrix = numpy.array([
+            [2666.666667, 0.000000, 960.000000],
+            [0.000000, 2250.000000, 540.000000],
+            [0.000000, 0.000000, 1.000000]
+        ])
+        expected_result = [10986.66666792, -16650.0000001, numpy.pi / 2.0]
+        transformer = transforms.Transformer(camera_pose, camera_matrix)
+        result = transformer.project_image_corner(robot_pose)
+        self.assertEqual(len(expected_result), len(result),
+                         msg='Projected point is wrong length.')
+        for result_element, expected_element in zip(result, expected_result):
+            self.assertAlmostEqual(
+                result_element, expected_element, msg='Element of projected point is not correct.')
+
+    def test_project_image_corner_identity(self) -> None:
+        """!
+        @brief Test that the method correctly transforms the corner when at the origin.
+        @return None
+        """
+        robot_pose = numpy.identity(4)
+        camera_pose = numpy.array([
+            [0.0, -1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [-1.0, 0.0, 0.0, 0.25],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        camera_matrix = numpy.array([
+            [2666.666667, 0.000000, 960.000000],
+            [0.000000, 2250.000000, 540.000000],
+            [0.000000, 0.000000, 1.000000]
+        ])
+        expected_result = [0.0, 0.0, 0.0]
+        transformer = transforms.Transformer(camera_pose, camera_matrix)
+        result = transformer.project_image_corner(robot_pose)
+        self.assertEqual(len(expected_result), len(result),
+                         msg='Projected point is wrong length.')
+        for result_element, expected_element in zip(result, expected_result):
+            self.assertAlmostEqual(
+                result_element, expected_element, msg='Element of projected point is not correct.')
+
+    def test_project_image_corner_negative(self) -> None:
+        """!
+        @brief Test that the method correctly transforms the corner when the pose has a negative
+        yaw.
+        @return None
+        """
+        robot_pose = numpy.array([
+            [0.0, 1.0, 0.0, 1.0],
+            [-1.0, 0.0, 0.0, 2.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        camera_pose = numpy.array([
+            [0.0, -1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [-1.0, 0.0, 0.0, 0.25],
+            [0.0, 0.0, 0.0, 1.0]
+        ])
+        camera_matrix = numpy.array([
+            [2666.666667, 0.000000, 960.000000],
+            [0.000000, 2250.000000, 540.000000],
+            [0.000000, 0.000000, 1.000000]
+        ])
+        expected_result = [12266.66666808, -18269.9999999, -numpy.pi / 2.0]
+        transformer = transforms.Transformer(camera_pose, camera_matrix)
+        result = transformer.project_image_corner(robot_pose)
+        self.assertEqual(len(expected_result), len(result),
+                         msg='Projected point is wrong length.')
+        for result_element, expected_element in zip(result, expected_result):
+            self.assertAlmostEqual(
+                result_element, expected_element, msg='Element of projected point is not correct.')
+
     def test_transform_camera_to_world_full(self) -> None:
         """!
         @brief Verify that the transform to world function works for some arbitrary values.

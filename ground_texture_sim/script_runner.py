@@ -55,7 +55,9 @@ class GroundTextureSim():
         @brief Generate and write the data to file.
         @return None
         """
-        # For each trajectory, convert it into a camera pose and write the image.
+        # For each trajectory, convert it into a camera pose and write the image. Capture the pixel
+        # values of the image corners too
+        pixel_poses = []
         for i, trajectory in enumerate(self._trajectory):
             robot_pose = ground_texture_sim.transforms.create_transform_matrix(
                 trajectory[0], trajectory[1], 0.0, 0.0, 0.0, trajectory[2])
@@ -65,8 +67,10 @@ class GroundTextureSim():
             # Write camera image
             image_path = self._namer.create_image_path(i, absolute=True)
             self._blender_interface.generate_image(image_path, camera_pose)
+            # Project the image corner
+            pixel_poses.append(
+                self._transformer.project_image_corner(robot_pose))
         # Write main list files.
-        pixel_poses = [[0.0, 0.0, 0.0]] * len(self._trajectory)
         self._writer.write_camera_intrinsic_matrix(
             self._blender_interface.camera_intrinsic_matrix)
         self._writer.write_camera_pose(self._camera_pose)
