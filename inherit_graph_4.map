@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" title=" " alt="" coords="5,242,129,269"/>
+<area shape="rect" id="node2" href="$classground__texture__sim_1_1tests_1_1test__blender__interface_1_1TestBlenderInterface.html" title="Tests the BlenderInterface class." alt="" coords="189,5,441,47"/>
+<area shape="rect" id="node3" href="$classground__texture__sim_1_1tests_1_1test__configuration__loader_1_1TestLoadConfig.html" title="This class tests the load_config function." alt="" coords="195,71,434,112"/>
+<area shape="rect" id="node4" href="$classground__texture__sim_1_1tests_1_1test__configuration__loader_1_1TestLoadTrajectory.html" title="This class tests the read_poses function." alt="" coords="185,136,444,177"/>
+<area shape="rect" id="node5" href="$classground__texture__sim_1_1tests_1_1test__configuration__loader_1_1TestParseArgs.html" title="This class tests the parse_args function." alt="" coords="197,201,432,243"/>
+<area shape="rect" id="node6" href="$classground__texture__sim_1_1tests_1_1test__data__writer_1_1TestDataWriter.html" title="Tests the DataWriter class." alt="" coords="219,267,411,308"/>
+<area shape="rect" id="node7" href="$classground__texture__sim_1_1tests_1_1test__name__configuration_1_1TestNameConfigurator.html" title="Tests the NameConfigurator class." alt="" coords="177,332,452,373"/>
+<area shape="rect" id="node8" href="$classground__texture__sim_1_1tests_1_1test__transforms_1_1TestCreateTransformMatrix.html" title="Test that the create_transform_matrix function works." alt="" coords="189,397,441,439"/>
+<area shape="rect" id="node9" href="$classground__texture__sim_1_1tests_1_1test__transforms_1_1TestTransformer.html" title="Test the Transformer class works as expected." alt="" coords="219,463,411,504"/>
+</map>
