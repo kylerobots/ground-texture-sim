@@ -1,46 +1,10 @@
 """!
-This module provides the functions necessary to read in all the user's configurations and import the
-provided trajectory data.
+@brief This module provides the functions necessary to read in all the user's configurations and
+import the provided trajectory data.
 """
 import argparse
 import json
 from typing import Dict, List, Tuple
-import numpy
-
-
-def create_camera_pose(camera_configs: Dict) -> numpy.ndarray:
-    """!
-    @brief Determine the 4x4 homogenous matrix for the camera's pose relative to the "robot".
-
-    This takes the camera position values from the config dictionary and creates a 4x4 homogenous
-    transform matrix. This assumes RPY applied as intrinsic rotations.
-    @param camera_configs The ['camera'] portion of the configuration JSON.
-    @return A 4x4 Numpy array representing the pose of the camera in the robot's frame of reference.
-    """
-    pose = numpy.identity(4)
-    pose[0, 3] = camera_configs['x']
-    pose[1, 3] = camera_configs['y']
-    pose[2, 3] = camera_configs['z']
-    roll = camera_configs['roll']
-    pitch = camera_configs['pitch']
-    yaw = camera_configs['yaw']
-    rotation_roll = numpy.array([
-        [1.0, 0.0, 0.0],
-        [0.0, numpy.cos(roll), -numpy.sin(roll)],
-        [0.0, numpy.sin(roll), numpy.cos(roll)]
-    ])
-    rotation_pitch = numpy.array([
-        [numpy.cos(pitch), 0.0, numpy.sin(pitch)],
-        [0.0, 1.0, 0.0],
-        [-numpy.sin(pitch), 0.0, numpy.cos(pitch)]
-    ])
-    rotation_yaw = numpy.array([
-        [numpy.cos(yaw), -numpy.sin(yaw), 0.0],
-        [numpy.sin(yaw), numpy.cos(yaw), 0.0],
-        [0.0, 0.0, 1.0]
-    ])
-    pose[0:3, 0:3] = rotation_roll @ rotation_pitch @ rotation_yaw
-    return pose
 
 
 def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]:  # pragma: no cover
@@ -67,7 +31,7 @@ def load_configuration(args_list: List[str]) -> Tuple[Dict, List[List[float]]]: 
 
 def _load_config(filename: str) -> Dict:
     """!
-    Read in the user provided configuration JSON.
+    @brief Read in the user provided configuration JSON.
 
     This also checks that all required elements are present. An Exception is raised if not. If an
     optional element is not present, a default value is assumed.
@@ -125,7 +89,7 @@ def _load_config(filename: str) -> Dict:
 
 def _load_trajectory(filename: str) -> List[List[float]]:
     """!
-    Read in the poses from the trajectory file.
+    @brief Read in the poses from the trajectory file.
 
     The file should be structured with one pose per line. The poses are stored as X, Y, Theta
     (whitespace is optional). The theta value should be in radians. These coordinates are where the
@@ -145,10 +109,10 @@ def _load_trajectory(filename: str) -> List[List[float]]:
             # can be skipped
             if len(line) == 0:
                 continue
-            pose_strings = line.split(sep=',')
+            pose_strings = line.split()
             if len(pose_strings) != 3:
                 raise RuntimeError(
-                    F'Each pose must be 3 floats, separated by commas. Got: {line}')
+                    F'Each pose must be 3 floats, separated by a space. Got: {line}')
             try:
                 single_pose = []
                 for element in pose_strings:
@@ -156,7 +120,7 @@ def _load_trajectory(filename: str) -> List[List[float]]:
                 result.append(single_pose)
             except Exception as error:
                 raise RuntimeError(
-                    F'Each pose must be 3 floats, separated by commas. Got: {line}') from error
+                    F'Each pose must be 3 floats, separated by a space. Got: {line}') from error
     return result
 
 
