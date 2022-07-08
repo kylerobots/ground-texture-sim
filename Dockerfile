@@ -32,9 +32,16 @@ RUN apt update \
 CMD [ "blender" ]
 
 FROM base AS run
+# For some reason, the final run image needs Numpy installed explicitly, so do that here.
+RUN apt update \
+	&& DEBIAN_FRONTEND=noninteractive \
+	apt install -y \
+	python3-numpy \
+	&& rm -rf /var/lib/apt/lists/*
 # Make a local user
 RUN useradd -ms /bin/bash user
 USER user
 WORKDIR /home/user/ground_texture_sim
 COPY . /home/user/ground_texture_sim
-CMD [ "blender", "environment.blend", "-b", "--python", "generate_data.py", "--", "config.json" ]
+ENV PYTHONPATH=/home/user/ground_texture_sim
+CMD [ "blender", "example_setup/environment.blend", "-b", "--python", "generate_data.py", "--python-use-system-env", "--", "config.json" ]
