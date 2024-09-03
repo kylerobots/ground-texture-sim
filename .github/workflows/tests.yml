@@ -43,7 +43,7 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v2
     - name: Download Reports
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       id: download
       with:
         name: 'coverage'
